@@ -1,0 +1,47 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.3.3'
+	id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc' 			// Spring Data JDBC를 사용하여 데이터베이스 접근
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf' 			// Thymeleaf 템플릿 엔진으로 HTML 렌더링
+	implementation 'org.springframework.boot:spring-boot-starter-web' 					// Spring MVC를 사용하여 웹 애플리케이션을 구축
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3' 			// MyBatis를 사용하여 데이터베이스와의 매핑 처리(추후 JPA로 변경 예정)
+	implementation 'org.springframework.boot:spring-boot-starter-security' 				// Spring Security를 사용하여 패스워드 인코딩 및 보안 관련 기능 제공
+	implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16' 				// JDBC 쿼리 로그 확인용
+ 	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'					// 레이아웃 템플릿 기능 제공
+	compileOnly 'org.projectlombok:lombok'												// 컴파일 시점에만 적용해서 롬복 사용 가능하게 함
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'						// 개발 중 Hot Reload 기능 제공
+	runtimeOnly 'com.mysql:mysql-connector-j' 											// MySQL JDBC 드라이버
+	annotationProcessor 'org.projectlombok:lombok'										// Lombok의 어노테이션 처리기를 컴파일 시점에 적용
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'				// 테스트(JUnit 및 기타 테스트 라이브러리 포함)
+	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3' // MyBatis 관련 테스트를 위한 MyBatis Test Starter
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'						// JUnit Platform에서 테스트를 실행할 때 필요한 런처
+}
+
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

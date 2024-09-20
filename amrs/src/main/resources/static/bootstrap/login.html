@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/chapter01_thymeleaf/layout/bootstrap/layout.html}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Login Page</title>
+</head>
+<body>
+
+	<div layout:fragment="content">
+		<div class="login-container">
+			<h2>로그인</h2>
+			<form action="#" method="post">
+				<div class="mb-3">
+					<label for="username" class="form-label">아이디</label> <input
+						type="text" class="form-control" id="username"
+						placeholder="아이디를 입력하세요" th:field="*{username}">
+				</div>
+				<div class="mb-3">
+					<label for="password" class="form-label">비밀번호</label> <input
+						type="password" class="form-control" id="password"
+						placeholder="비밀번호를 입력하세요" th:field="*{password}">
+				</div>
+				<button type="submit" class="btn btn-primary">로그인</button>
+			</form>
+			<a href="#" class="forgot-password">비밀번호를 잊으셨나요?</a>
+		</div>
+	</div>
+	<!-- Bootstrap JS -->
+	
+
+</body>
+</html>

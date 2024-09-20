@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="Untree.co">
+<link rel="shortcut icon" href="favicon.png">
+
+<meta name="description" content="" />
+<meta name="keywords" content="bootstrap, bootstrap4" />
+
+<!-- Bootstrap CSS -->
+<!-- <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet"> -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+ <!-- Login CSS
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://unicons.iconscout.com/release/v2.1.9/css/unicons.css" rel="stylesheet"> -->
+
+<link th:href="@{/bootstrap/css/login.css}" rel="stylesheet">
+<link th:href="@{/bootstrap/scss/style.scss}" rel="stylesheet">
+
+<title>Login Page</title>
+<script th:src="@{/jquery/jquery-3.7.1.min.js}"></script>
+<script th:src="@{http://dmaps.daum.net/map_js_init/postcode.v2.js}"></script>
+<script>
+
+	function execDaumPostcode() {
+	    new daum.Postcode({
+	        oncomplete: function(data) {
+	            // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+	
+	            // 도로명 주소의 노출 규칙에 따라 주소를 조합한다.
+	            // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+	            var fullRoadAddr = data.roadAddress; // 도로명 주소 변수
+	            var extraRoadAddr = ''; // 도로명 조합형 주소 변수
+	
+	            // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+	            // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+	            if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+	                extraRoadAddr += data.bname;
+	            }
+	            // 건물명이 있고, 공동주택일 경우 추가한다.
+	            if (data.buildingName !== '' && data.apartment === 'Y'){
+	               extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+	            }
+	            // 도로명, 지번 조합형 주소가 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+	            if (extraRoadAddr !== ''){
+	                extraRoadAddr = ' (' + extraRoadAddr + ')';
+	            }
+	            // 도로명, 지번 주소의 유무에 따라 해당 조합형 주소를 추가한다.
+	            if (fullRoadAddr !== ''){
+	                fullRoadAddr += extraRoadAddr;
+	            }
+	
+	            // 우편번호와 주소 정보를 해당 필드에 넣는다.
+	            document.getElementById('zipcode').value = data.zonecode; //5자리 새우편번호 사용
+	            document.getElementById('roadAddress').value = fullRoadAddr;
+	            document.getElementById('jibunAddress').value = data.jibunAddress;
+	
+	        }
+	    }).open();
+	}
+	
+</script>
+</head>
+<body>
+	<!-- <a href="https://front.codes/" class="logo" target="_blank">
+    <img src="https://assets.codepen.io/1462889/fcy.png" alt="">
+ </a> -->
+	<div layout:fragment="content">
+
+		<!-- Start Section -->
+		<div class="login-background">
+			<div class="section">
+				<div class="container">
+					<div class="row full-height justify-content-center">
+						<div class="col-12 text-center align-self-center py-5">
+							<div class="section pb-5 pt-5 pt-sm-2 text-center">
+								<h6 class="mb-0 pb-3">
+									<span class="libre-baskerville-bold">Log In </span><span
+										class="libre-baskerville-bold">Sign Up</span>
+								</h6>
+								<input class="checkbox" type="checkbox" id="reg-log"
+									name="reg-log" /> <label for="reg-log" class="fa-solid fa-check"></label>
+								<div class="card-3d-wrap mx-auto">
+									<div class="card-3d-wrapper">
+										<div class="card-front">
+											<div class="center-wrap">
+												<div class="section text-center">
+													<h4 class="mb-4 pb-3 libre-baskerville-bold">Log In</h4>
+													<div class="form-group">
+														<input type="email" name="logemail" class="form-style"
+															placeholder="Your Email" id="logemail" autocomplete="off">
+														<!-- <i class="fa-regular fa-envelope"></i> -->
+													</div>
+													<div class="form-group mt-2">
+													<!-- <i class="fa-solid fa-lock"></i> -->
+														<input type="password" name="logpass" class="form-style"
+															placeholder="Your Password" id="logpass"
+															autocomplete="off"> 
+													</div>
+													<a href="#" class="btn mt-4 libre-baskerville-bold">submit</a>
+													<p class="mb-0 mt-4 text-center libre-baskerville-bold">
+														<a href="#0" class="link">Forgot your password?</a>
+													</p>
+												</div>
+											</div>
+										</div>
+										<!-- 회원가입 -->
+										<div class="card-back">
+										<form th:action="@{/member/createMember}" method="post">
+											<div class="center-wrap">
+												<div class="section text-center">
+													<h4 class="mb-4 pb-3 libre-baskerville-bold">Sign Up</h4>
+													<div class="form-group">
+														<input type="text" name="email" class="form-style"
+															placeholder="Your Email" id="email"
+															autocomplete="off"> <i
+															class="input-icon uil uil-user"></i>
+															<input type="checkbox" name="emailstsYn" value="이메일 수신 동의">
+													</div>
+													<div class="form-group mt-2">
+														<input type="password" name="passwd" class="form-style"
+															placeholder="Your Password" id="passwd"
+															autocomplete="off"> <i
+															class="input-icon uil uil-lock-alt"></i>
+													</div>
+													<div class="form-group mt-2">
+														<input type="text" name="memberNm" class="form-style"
+															placeholder="Your name" id="memberNm"
+															autocomplete="off"> <i
+															class="input-icon uil uil-lock-alt"></i>
+													</div>
+													<div class="form-group mt-2">
+														<input type="date" name="birthAt" class="form-style"
+															id="birthAt" autocomplete="off">
+														<i class="input-icon uil uil-at"></i>
+													</div>
+													<div class="form-group mt-2">
+														<input type="text" name="memberPhoneNumber" class="form-style"
+															placeholder="Your Phone" id="memberPhoneNumber"
+															autocomplete="off"> <i
+															class="input-icon uil uil-lock-alt"></i>
+														<input type="checkbox" name="smsstsYn" value="메시지 수신 동의">
+													</div>
+													<div class="form-group mt-2">
+														<input type="text" name="zipcode" class="form-style"
+															placeholder="우편번호" id="zipcode" autocomplete="off" style="width:278px;">
+															 <i class="input-icon uil uil-lock-alt"></i>
+															 <input type="button" class="btn" th:onclick="javascript:execDaumPostcode()" value="검색">
+															 <br>
+														<input type="text" class="form-style" name="roadAddress" 	id="roadAddress" size="60"><br>														
+														<input type="text" class="form-style"  name="jibunAddress" id="jibunAddress" size="60"> <br>
+														<input type="text" class="form-style" name="namujiAddress" id="namujiAddress" size="60"/>
+													</div>
+													<input type="hidden" name="role" value="user">
+													<button type="submit" class="btn mt-4">submit</button>
+												</div>
+											</div>
+										</form>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

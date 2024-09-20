@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>전시 리스트 조회</title>
+<style>
+/* body {
+	font-family: Arial, sans-serif;
+	margin: 20px;
+	background-color: #f0f0f0;
+} */
+
+.all-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+	gap: 20px;
+	margin-top: 4rem;
+	margin-bottom: 4rem;
+}
+
+.card {
+	background-color: white;
+	border-radius: 10px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	padding: 20px;
+	text-align: center;
+	transition: transform 0.3s;
+	display: flex;
+	align-items: center;
+	height: 23rem;
+}
+
+.card:hover {
+	transform: translateY(-10px);
+}
+
+.icon {
+	width: 150px;
+	height: 200px;
+	margin-bottom: 15px;
+	margin-top: 15px;
+}
+
+h2 {
+	font-size: 18px;
+	margin-bottom: 10px;
+}
+
+.period, .location {
+	font-size: 14px;
+	color: #555;
+}
+</style>
+</head>
+<body>
+
+	<div layout:fragment="content">
+		
+		<!-- Start Hero Section -->
+		<div class="cart-background">
+			<div class="container" style="transform: translate(10px, 122px);">
+				<div class="row justify-content-between">
+					<div class="col-lg-5">
+						<div class="intro-excerpt">
+							<h1 class="noto-serif-kr">모든 전시</h1>
+						</div>
+					</div>
+					<div class="col-lg-7"></div>
+				</div>
+			</div>
+		</div>
+		<!-- End Hero Section -->
+
+		<div class="container all-list noto-serif-kr">
+			<div class="card">
+				<img class="icon" src="https://via.placeholder.com/150X200" alt="전시 아이콘">
+				<h2>현대 미술 전시</h2>
+				<p class="period">2024-09-01 ~ 2024-10-15</p>
+				<p class="location">서울 미술관</p>
+			</div>
+			<div class="card">
+				<img class="icon" src="https://via.placeholder.com/150X200" alt="전시 아이콘">
+				<h2>고전 미술 특별전</h2>
+				<p class="period">2024-08-01 ~ 2024-12-01</p>
+				<p class="location">국립중앙박물관</p>
+			</div>
+			<div class="card">
+				<img class="icon" src="https://via.placeholder.com/150X200" alt="전시 아이콘">
+				<h2>온라인 디지털 전시</h2>
+				<p class="period">2024-09-10 ~ 2025-01-01</p>
+				<p class="location">온라인</p>
+			</div>
+			<div class="card">
+				<img class="icon" src="https://via.placeholder.com/150X200" alt="전시 아이콘">
+				<h2>사진 예술 전시회</h2>
+				<p class="period">2024-07-15 ~ 2024-10-31</p>
+				<p class="location">대구 아트센터</p>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

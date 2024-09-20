@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="zxx" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="Untree.co">
+<link rel="shortcut icon" href="favicon.png">
+<!-- 타임리프 사용 필요 없음 -->
+
+<meta name="description" content="" />
+<meta name="keywords" content="bootstrap, bootstrap4" />
+
+<!-- Bootstrap CSS -->
+<link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+<!-- 타임리프 사용 불필요 -->
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+	rel="stylesheet">
+
+<link th:href="@{/bootstrap/css/tiny-slider.css}" rel="stylesheet">
+<!-- 타임리프 사용 불필요 -->
+<link th:href="@{/bootstrap/css/style.css}" rel="stylesheet">
+<!-- 타임리프 사용 불필요 -->
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+	href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap"
+	rel="stylesheet">
+<link
+	href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200..900&display=swap"
+	rel="stylesheet">
+<title>Art Museum Reservation System</title>
+<style>
+.dropdown-menu {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+	position: relative;
+}
+
+.dropdown-item {
+	display: block;
+	padding: 10px;
+	text-decoration: none;
+	color: #000;
+}
+
+.dropdown-submenu {
+	display: none;
+	position: absolute;
+	left: 100%;
+	top: 0;
+	list-style: none;
+	padding: 0;
+}
+
+.dropdown-item:hover+.dropdown-submenu, .dropdown-submenu:hover {
+	display: block;
+}
+
+.dropdown-submenu li {
+	position: relative;
+}
+
+.dropdown-submenu a {
+	padding: 10px;
+	text-decoration: none;
+	display: block;
+	white-space: nowrap;
+	color: #000;
+	background-color: #f8f9fa;
+}
+
+.dropdown-submenu a:hover {
+	background-color: #e9ecef;
+}
+</style>
+</head>
+
+<body>
+
+	<!-- Start Header/Navigation -->
+	<nav
+		class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark"
+		arial-label="Furni navigation bar">
+
+		<div class="container">
+			<!-- localhost 주소(Controller) -->
+			<a class="navbar-brand libre-baskerville-bold" th:href="@{/}">AMRS<span>.</span></a>
+
+			<button class="navbar-toggler" type="button"
+				data-bs-toggle="collapse" data-bs-target="#navbarsFurni"
+				aria-controls="navbarsFurni" aria-expanded="false"
+				aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<div class="collapse navbar-collapse noto-serif-kr" id="navbarsFurni">
+				<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+					<li class="nav-item active"><a class="nav-link" th:href="@{/}">Home</a></li>
+					<li><a class="nav-link" th:href="@{/main/about}">AMRS 소개</a></li>
+					<li class="nav-item dropdown"><a
+						class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+						href="shop.html" role="button" aria-haspopup="true"
+						aria-expanded="false">전시</a>
+						<div class="dropdown-menu">
+							<a class="dropdown-item" href="shop.html">미술관별 전시</a> 
+							<a class="dropdown-item dropdown-toggle" href="shop.html">종류별 전시</a>
+							<a class="dropdown-item dropdown-toggle" href="shop.html">전시 일정</a>
+							<ul class="dropdown-submenu">
+								<li><a class="dropdown-item" href="current.html">현재 전시</a></li>
+								<li><a class="dropdown-item" href="past.html">과거 전시</a></li>
+								<li><a class="dropdown-item" href="upcoming.html">예정 전시</a></li>
+								<li><a class="dropdown-item" href="online.html">온라인 전시</a></li>
+							</ul>
+						</div></li>
+					<li class="nav-item dropdown"><a
+						class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+						href="shop.html" role="button" aria-haspopup="true"
+						aria-expanded="false">컬렉션</a>
+						<div class="dropdown-menu">
+							<a class="dropdown-item" href="shop.html">대표 전시</a> <a
+								class="dropdown-item" th:href="@{/exhibition/all_exhibitions}">모든
+								전시</a>
+						</div></li>
+					<li class="nav-item dropdown"><a
+						class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+						href="shop.html" role="button" aria-haspopup="true"
+						aria-expanded="false">예매</a>
+						<div class="dropdown-menu">
+							<a class="dropdown-item" href="shop.html">티켓 구매</a> <a
+								class="dropdown-item" href="shop.html">가격 안내</a>
+						</div></li>
+					<li><a class="nav-link" href="blog.html">News & Events</a></li>
+					<li><a class="nav-link" th:href="@{/blog/blogMain}">Blog</a></li>
+				</ul>
+
+				<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+					<li><a class="nav-link" th:href="@{/member/login}"><img
+							th:src="@{/bootstrap/images/user.svg}"></a></li>
+					<li><a class="nav-link" th:href="@{/member/cart}"><img
+							th:src="@{/bootstrap/images/cart.svg}"></a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!-- End Header/Navigation -->
+		<div layout:fragment="content"></div>
+	<!-- Account Settings -->
+				<div class="account-settings mt-5">
+					<table class="noto-serif-kr">
+						<tr align="center">
+							<td><a th:href="@{/member/mypageMain}">결제내역</a></td>
+						</tr>
+						<tr align="center">
+							<td>취소/환불내역</td>
+						</tr>
+						<tr align="center">
+							<td>문의하기</td>
+						</tr>
+						<tr align="center">
+							<td>문의내역 확인</td>
+						</tr>
+						<tr align="center">
+							<td>리뷰관리</td>
+						</tr>
+						<tr align="center">
+							<td><a th:href="@{/member/myInfo}">개인정보확인/수정</a></td>
+						</tr>
+						<tr align="center">
+							<td>결제수단관리</td>
+						</tr>
+					</table>
+				</div>
+
+	<!-- Start Footer Section -->
+	<footer class="footer-section">
+		<div class="container relative">
+
+			<!-- <div class="sofa-img">
+					<img th:src="@{/bootstrap/images/sofa.png}" alt="Image" class="img-fluid">
+				</div> -->
+
+			<div class="row">
+				<div class="col-lg-8">
+					<div class="subscription-form">
+						<h3 class="d-flex align-items-center">
+							<span class="me-1"><img
+								th:src="@{/bootstrap/images/envelope-outline.svg}" alt="Image"
+								class="img-fluid"></span><span>Subscribe to Newsletter</span>
+						</h3>
+
+						<form th:action="@{/index}" class="row g-3">
+							<div class="col-auto">
+								<input type="text" class="form-control"
+									placeholder="Enter your name">
+							</div>
+							<div class="col-auto">
+								<input type="email" class="form-control"
+									placeholder="Enter your email">
+							</div>
+							<div class="col-auto">
+								<button class="btn btn-primary">
+									<span class="fa fa-paper-plane"></span>
+								</button>
+							</div>
+						</form>
+
+					</div>
+				</div>
+			</div>
+
+			<div class="row g-5 mb-5">
+				<div class="col-lg-4">
+					<div class="mb-4 footer-logo-wrap noto-serif-kr">
+						<a href="/index" class="footer-logo">AMRS<span>.</span></a>
+					</div>
+					<p class="mb-4">Donec facilisis quam ut purus rutrum lobortis.
+						Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet
+						velit. Aliquam vulputate velit imperdiet dolor tempor tristique.
+						Pellentesque habitant</p>
+
+					<ul class="list-unstyled custom-social">
+						<li><a href="/index"><span
+								class="fa fa-brands fa-facebook-f"></span></a></li>
+						<li><a href="/index"><span
+								class="fa fa-brands fa-twitter"></span></a></li>
+						<li><a href="/index"><span
+								class="fa fa-brands fa-instagram"></span></a></li>
+						<li><a href="/index"><span
+								class="fa fa-brands fa-linkedin"></span></a></li>
+					</ul>
+				</div>
+
+				<div class="col-lg-8">
+					<div class="row links-wrap">
+						<div class="col-6 col-sm-6 col-md-3">
+							<ul class="list-unstyled">
+								<li><a href="/index">About us</a></li>
+								<li><a href="/index">Services</a></li>
+								<li><a href="/index">Blog</a></li>
+								<li><a href="/index">Contact us</a></li>
+							</ul>
+						</div>
+
+						<div class="col-6 col-sm-6 col-md-3">
+							<ul class="list-unstyled">
+								<li><a href="/index">Support</a></li>
+								<li><a href="/index">Knowledge base</a></li>
+								<li><a href="/index">Live chat</a></li>
+							</ul>
+						</div>
+
+						<div class="col-6 col-sm-6 col-md-3">
+							<ul class="list-unstyled">
+								<li><a href="/index">Jobs</a></li>
+								<li><a href="/index">Our team</a></li>
+								<li><a href="/index">Leadership</a></li>
+								<li><a href="/index">Privacy Policy</a></li>
+							</ul>
+						</div>
+
+						<div class="col-6 col-sm-6 col-md-3">
+							<ul class="list-unstyled">
+								<li><a href="/index">Nordic Chair</a></li>
+								<li><a href="/index">Kruzo Aero</a></li>
+								<li><a href="/index">Ergonomic Chair</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="border-top copyright">
+				<div class="row pt-4">
+					<div class="col-lg-6">
+						<p class="mb-2 text-center text-lg-start">
+							Copyright &copy;
+							<script>
+								document.write(new Date().getFullYear());
+							</script>
+							. All Rights Reserved. &mdash; Designed with love by <a
+								href="https://untree.co">Untree.co</a> Distributed By <a
+								href="https://themewagon.com">ThemeWagon</a>
+							<!-- License information: https://untree.co/license/ -->
+						</p>
+					</div>
+
+					<div class="col-lg-6 text-center text-lg-end">
+						<ul class="list-unstyled d-inline-flex ms-auto">
+							<li class="me-4"><a href="/index">Terms &amp; Conditions</a></li>
+							<li><a href="/index">Privacy Policy</a></li>
+						</ul>
+					</div>
+
+				</div>
+			</div>
+
+		</div>
+	</footer>
+	<!-- End Footer Section -->
+
+	<script>
+		document
+				.addEventListener(
+						"DOMContentLoaded",
+						function() {
+							var currentPath = window.location.pathname; // 현재 페이지의 경로를 가져옴
+							var menuItems = document
+									.querySelectorAll(".custom-navbar .custom-navbar-nav li a");
+
+							menuItems
+									.forEach(function(menuItem) {
+										if (menuItem.getAttribute("href") === currentPath) {
+											menuItem.parentElement.classList
+													.add("active"); // 부모 요소에 active 클래스 추가
+										} else {
+											menuItem.parentElement.classList
+													.remove("active"); // 다른 항목은 active 제거
+										}
+									});
+						});
+	</script>
+
+
+	<script th:src="@{/bootstrap/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/bootstrap/js/tiny-slider.js}"></script>
+	<script th:src="@{/bootstrap/js/custom.js}"></script>
+
+</body>
+
+</html>

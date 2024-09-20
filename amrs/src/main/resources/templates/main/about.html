@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layout/layout.html}">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="Untree.co">
+<link rel="shortcut icon" href="favicon.png">
+
+<meta name="description" content="" />
+<meta name="keywords" content="bootstrap, bootstrap4" />
+<title>About AMRS.</title>
+
+<!-- CSS for styling -->
+<style>
+        h4 {
+        	color: #f4f4f4;
+        }
+        section {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+        h2 {
+            font-size: 2.5em;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        p {
+            font-size: 1.2em;
+            color: #555;
+            text-align: left;
+            margin-bottom: 33px;
+            line-height: 1.8;
+        }
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 30px;
+        }
+        .feature {
+            flex: 1 1 45%;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        .feature h3 {
+            margin-top: 0;
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .feature p {
+            font-size: 1.1em;
+            color: #666;
+        }
+        footer {
+            text-align: center;
+            background-color: #222;
+            padding: 30px 20px;
+            color: #ccc;
+            border-top: 1px solid #444;
+        }
+        footer p {
+            margin: 0;
+            font-size: 0.9em;
+        }
+        @media (max-width: 768px) {
+            .feature {
+                flex: 1 1 100%;
+            }
+            h2, p {
+                text-align: left;
+            }
+        }
+        .introduce-card {
+        	margin-bottom: 20px;
+        	border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+	<div layout:fragment="content">
+		<div class="introduce-background">
+			<div class="container" style="transform: translate(10px, 122px);">
+				<div class="row justify-content-between">
+					<div class="col-lg-5">
+						<div class="intro-excerpt">
+							<h1 class="libre-baskerville-bold">About AMRS.</h1>
+							<h4 class="noto-serif-kr">당신의 예술 여정, 더 쉽게</h4>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<section class="noto-serif-kr">
+			<h2>소개</h2>
+			<p>
+				<strong class="libre-baskerville-bold">AMRS.</strong>은 미술관 전시 정보를 한눈에 확인하고, 간편하게 예매할 수 있는
+				플랫폼입니다. 예술을 사랑하는 사람들을 위해 큐레이션된 다양한 전시와 작품들을 손쉽게 탐험하세요.
+			</p>
+
+			<div class="features">
+				<div class="feature">
+					<img src="https://via.placeholder.com/400x200" class="introduce-card" alt="간편한 예매">
+					<h3>간편한 예매</h3>
+					<p>원하는 전시를 빠르고 쉽게 예약하세요.</p>
+				</div>
+				<div class="feature">
+					<img src="https://via.placeholder.com/400x200" class="introduce-card" alt="최신 전시 정보">
+					<h3>최신 전시 정보</h3>
+					<p>국내외 미술관의 전시 소식을 실시간으로 업데이트합니다.</p>
+				</div>
+				<div class="feature">
+					 <img src="https://via.placeholder.com/400x200" class="introduce-card" alt="맞춤 큐레이션">
+					<h3>맞춤 큐레이션</h3>
+					<p>당신의 취향에 맞는 전시를 추천해 드립니다.</p>
+				</div>
+				<div class="feature">
+					<img src="https://via.placeholder.com/400x200" class="introduce-card" alt="멤버 전용 혜택">
+					<h3>멤버 전용 혜택</h3>
+					<p>회원에게만 제공되는 특별한 할인과 이벤트 혜택을 누리세요.</p>
+				</div>
+			</div>
+		</section>
+
+		<footer>
+			<p>&copy; 2024 AMRS.. All rights reserved.</p>
+		</footer>
+		</div>
+</body>
+</html>

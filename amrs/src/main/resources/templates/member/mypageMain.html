@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{/layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<title>Mypage Main</title>
+<style>
+a {
+	text-decoration: none;
+}
+
+table {
+	width: 80%;
+	margin: 20px auto;
+	border-collapse: collapse;
+	font-family: 'Arial', sans-serif;
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+	overflow: hidden;
+}
+
+thead th {
+	background-color: #4CAF50;
+	color: white;
+	text-align: left;
+	padding: 12px 15px;
+	font-size: 1rem;
+}
+
+tbody td {
+	padding: 12px 15px;
+	border-bottom: 1px solid #ddd;
+}
+
+tbody tr:nth-child(odd) {
+	background-color: #f9f9f9;
+}
+
+tbody tr:nth-child(even) {
+	background-color: #ffffff;
+}
+
+tbody tr:hover {
+	background-color: #f1f1f1;
+	cursor: pointer;
+}
+
+table {
+	border-radius: 10px;
+	overflow: hidden;
+}
+
+tbody tr:last-child td {
+	border-bottom: none;
+}
+
+.container {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+}
+
+.account-settings {
+	width: 40%;
+	max-width: 300px;
+	padding-top: 2rem;
+	padding-bottom: 7rem;
+	margin-right: 2rem;
+}
+
+.features {
+	width: 76%;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
+	gap: 30px;
+	margin-top: 6rem;
+}
+
+.feature {
+	flex: 1 1 45%;
+	display: inline-block;
+	background-color: #fff;
+	padding: 30px;
+	padding-top: 10px;
+	border-radius: 12px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+	border-radius: 12px;
+}
+
+.feature:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.feature h3 {
+	margin-top: 0;
+	font-size: 1.8em;
+	color: #333;
+	margin-bottom: 15px;
+}
+
+.payment-search {
+	background-color: #fff;
+	flex: auto;
+	border-radius: 10px;
+	height: 46px;
+	display: flex;
+	justify-content: flex-start;
+}
+
+.payment-date {
+	display: flex;
+	justify-content: flex-start;
+}
+
+.feature-same-date-ordered {
+	display: flex;
+	background-color: #fff;
+	border-radius: 12px;
+	border-style: solid;
+	border-color: lightgray;
+	border-width: 1px;
+	align-items: flex-start;
+	padding: 15px;
+	margin: 10px;
+	padding: 15px;
+}
+
+.same-date-ordered-info {
+	margin: 20px 20px;
+}
+
+.order-detail-link {
+	margin-left: 748px;
+}
+
+.fa-magnifying-glass {
+	margin-left: 680px;
+	padding: 15px;
+}
+
+.fa-bars-staggered:hover {
+	cursor: pointer;
+	color: #333; /* 원하는 색상으로 변경 가능 */
+}
+
+.payment-search-placeholder {
+	padding: 9px 5px;
+	margin-left: 17px;
+	font-size: larger;
+	width: auto;
+	flex: none;
+}
+
+.delete-button-zone {
+	margin-left: auto;
+	display: flex;
+	flex-direction: column; /* 아이콘과 버튼을 세로로 배치 */
+	align-items: flex-end; /* 오른쪽 정렬 */
+	height: 24vh;
+	gap: 136px; /* 아이콘과 버튼 사이 간격 */
+}
+</style>
+</head>
+<body>
+	<div layout:fragment="content">
+		<!-- Profile Section -->
+		<div class="login-background">
+			<div class="container">
+				<!-- Account Settings -->
+				<div class="account-settings mt-5">
+					<table class="noto-serif-kr">
+						<tr align="center">
+							<td><a th:href="@{/member/mypageMain}">결제내역</a></td>
+						</tr>
+						<tr align="center">
+							<td>취소/환불내역</td>
+						</tr>
+						<tr align="center">
+							<td>문의하기</td>
+						</tr>
+						<tr align="center">
+							<td>문의내역 확인</td>
+						</tr>
+						<tr align="center">
+							<td>리뷰관리</td>
+						</tr>
+						<tr align="center">
+							<td><a th:href="@{/member/myInfo}">개인정보확인/수정</a></td>
+						</tr>
+						<tr align="center">
+							<td>결제수단관리</td>
+						</tr>
+					</table>
+				</div>
+
+				<!-- Features Section -->
+				<div class="features noto-serif-kr">
+					<div class="payment-search">
+						<p class="payment-search-placeholder">결제한 전시를 검색해 보세요!</p>
+						<i class="fa-solid fa-magnifying-glass"></i>
+					</div>
+					<div class="feature">
+						<div class="payment-date">
+							2024.09.09
+							<p align="right">
+								<a href="" class="order-detail-link">주문 상세보기</a>
+							<p>
+						</div>
+						<div class="feature-same-date-ordered">
+							<img src="https://via.placeholder.com/150x200"
+								class="introduce-card" alt="전시 포스터"
+								style="width: 150px; height: 200px;">
+							<div class="same-date-ordered-info">
+								<h3>결제 전시 제목</h3>
+								<hr />
+								<p>원</p>
+							</div>
+							<div class="delete-button-zone">
+								<i class="fa-solid fa-bars-staggered"></i>
+								<button class="btn btn-create-review">리뷰 작성</button>
+							</div>
+							<!-- 팝업 창 -->
+							<div class="modal-overlay" id="modalOverlay"></div>
+							<div class="modal" id="modal">
+								<span class="close-btn" id="closeBtn">&times;</span>
+								<p>팝업 창 내용입니다.</p>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>
