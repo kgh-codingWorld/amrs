@@ -86,6 +86,12 @@ public class CommonController {
 		// 로그인 페이지로 이동
 		return "member/login";
 	}
+	
+	@GetMapping("/member/registerMember")
+	public String registerMember() {
+		// 로그인 페이지로 이동
+		return "member/registerMember";
+	}
 
 	@GetMapping("/member/mypageMain")
 	public String mypageMain() {
