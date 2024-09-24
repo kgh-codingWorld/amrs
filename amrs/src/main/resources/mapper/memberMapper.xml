@@ -1,15 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.application.amrs.member.dao.MemberDAO">
+<mapper namespace="com.application.amrs.member.MemberDAO">
 
 <insert id="insertMember" parameterType="MemberDTO">
-	INSERT INTO MEMBER
+	INSERT INTO MEMBER (
+		MEMBER_ID,
+		PASSWD,
+		MEMBER_NM,
+		BIRTH_AT,
+		MEMBER_HP,
+		MEMBER_PROFILE_ORIGINAL_NAME,
+		MEMBER_PROFILE_UUID,
+		SMSSTS_YN,
+		EMAILSTS_YN,
+		ZIPCODE,
+		ROAD_ADDRESS,
+		JIBUN_ADDRESS,
+		NAMUJI_ADDRESS,
+		MEMBER_ROLE,
+		MEMBER_POINT
+	)
 	VALUES (
 		#{memberId},
-		#{email},
 		#{passwd},
+		#{memberNm},
 		#{birthAt},
-		#{memberPhoneNumber},
+		#{memberHp},
 		#{memberProfileOriginalName},
 		#{memberProfileUUID},
 		#{smsstsYn},
@@ -18,10 +34,27 @@
 		#{roadAddress},
 		#{jibunAddress},
 		#{namujiAddress},
-		#{memberPoint},
-		#{memberRole},
-		#{createDt},
-		#{upadateDt}
+		#{memberRole, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+		#{memberPoint}
 	)
 </insert>
+
+<select id="selectDuplicatedId" resultType="String" parameterType="String">
+	SELECT	MEMBER_ID
+	FROM	MEMBER
+	WHERE	MEMBER_ID = #{memberId}
+</select>
+
+<select id="login" parameterType="String" resultType="MemberDTO">
+	SELECT	PASSWD,
+			MEMBER_NM
+	FROM 	MEMBER
+	WHERE 	MEMBER_ID = #{memberId}
+</select>
+
+<select id="selectOneMember" parameterType="String" resultType="MemberDTO">
+	SELECT	*
+	FROM	MEMBER
+	WHERE	MEMBER_ID = #{memberId}
+</select>
 </mapper>

@@ -135,23 +135,48 @@ tbody tr:last-child td {
 					<table class="noto-serif-kr">
 						<tr align="center">
 							<td>이름</td>
-							<td style="font-weight: bold;">홍길동</td>
+							<td style="font-weight: bold;" th:text="${memberDTO.memberNm}"></td>
 						</tr>
 						<tr align="center">
 							<td>비밀번호</td>
-							<td style="font-weight: bold;"></td>
+							<td style="font-weight: bold;"><a href="#">비밀번호 수정</a></td>
+						</tr>
+						<tr align="center">
+							<td>생년월일</td>
+							<td style="font-weight: bold;" th:text="${#dates.format(memberDTO.birthAt, 'yyyy년 MM월 dd일')}"></td>
+						</tr>
+						<tr align="center">
+							<td>휴대폰</td>
+							<td style="font-weight: bold;" th:text="${memberDTO.memberHp}"></td>
 						</tr>
 						<tr align="center">
 							<td>이메일</td>
-							<td style="font-weight: bold;"></td>
+							<td style="font-weight: bold;" th:text="${memberDTO.memberId}"></td>
 						</tr>
 						<tr align="center">
 							<td>주소</td>
-							<td style="font-weight: bold;"></td>
+							<td style="font-weight: bold;">
+							    <span th:text="${memberDTO.zipcode}"></span><br>
+							    <span th:text="${memberDTO.roadAddress}"></span><br>
+							    <span th:text="${memberDTO.jibunAddress}"></span>
+							</td>
+						</tr>
+						<tr align="center">
+							<td>보유 포인트</td>
+							<td style="font-weight: bold;" th:text="|${memberDTO.memberPoint}points|"></td>
+						</tr>
+						<tr align="center">
+							<td>수신 동의 여부</td>
+							<td style="font-weight: bold;">
+							</td>
+						</tr>
+						<tr align="center">
+							<td>가입날짜</td>
+							<td style="font-weight: bold;" th:text="${#dates.format(memberDTO.createDt, 'yyyy년 MM월 dd일')}"></td>
 						</tr>
 						<tr align="center">
 							<td colspan="2">
-								<a href="#" style="text-decoration: none;">결제내역 보러가기</a>
+								<a href="#" style="text-decoration: none;">Back</a>
 							</td>
 						</tr>
 					</table>

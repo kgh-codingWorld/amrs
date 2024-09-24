@@ -24,6 +24,87 @@
 
 <title>Login Page</title>
 <script th:src="@{/jquery/jquery-3.7.1.min.js}"></script>
+<script>
+
+	$(function(){
+		
+		$("#loginBtn").click(function(){
+			
+			let loginData = {
+				"memberId" : $("[name='memberId']").val(),
+				"passwd" : $("[name='passwd']").val()
+			}
+			
+			$.ajax({
+				url : "/member/login",
+				type : "post",
+				contentType : "application/json",
+				data : JSON.stringify(loginData),
+				success : function (isValidMember) {
+					
+					if (isValidMember == "y") {
+						location.href = "/";
+					}
+					else {
+						$("#failMsg").html("<span style='color:red;'>아이디와 패스워드를 확인하세요.</span>");
+					}
+					
+				}
+				
+				
+			});
+			
+		});
+		
+	});
+	
+	// 쿠키 설정 함수
+	function setCookie(cname, cvalue, exdays) {
+	    const d = new Date();
+	    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+	    let expires = "expires="+ d.toUTCString();
+	    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+	}
+
+	// 쿠키 읽기 함수
+	function getCookie(cname) {
+	    let name = cname + "=";
+	    let decodedCookie = decodeURIComponent(document.cookie);
+	    let ca = decodedCookie.split(';');
+	    for(let i = 0; i <ca.length; i++) {
+	        let c = ca[i];
+	        while (c.charAt(0) == ' ') {
+	            c = c.substring(1);
+	        }
+	        if (c.indexOf(name) == 0) {
+	            return c.substring(name.length, c.length);
+	        }
+	    }
+	    return "";
+	}
+
+	// 로그인 버튼 클릭 시 쿠키에 아이디 저장
+	$("#loginBtn").click(function() {
+	    let loginData = {
+	        "memberId": $("[name='memberId']").val()
+	        /* "passwd": $("[name='passwd']").val() */
+	    };
+
+	    if ($("#memorizeId").is(":checked")) {
+	        setCookie("savedId", loginData.memberId, 7); // 7일 동안 쿠키 저장
+	    } else {
+	        setCookie("savedId", "", -1); // 쿠키 삭제
+	    }
+	});
+
+
+</script>
+<style>
+.memorizeId{
+	display: flex;
+	margin-top: 1rem;
+}
+</style>
 </head>
 <body>
 	<!-- <a href="https://front.codes/" class="logo" target="_blank">
@@ -38,34 +119,28 @@
 					<div class="row full-height justify-content-center">
 						<div class="col-12 text-center align-self-center py-5">
 							<div class="section pb-5 pt-5 pt-sm-2 text-center">
-								<h6 class="mb-0 pb-3">
-									<span class="libre-baskerville-bold">Log In </span><span
-										class="libre-baskerville-bold">Sign Up</span>
-								</h6>
-								<input class="checkbox" type="checkbox" id="reg-log"
-									name="reg-log" /> <label for="reg-log" class="fa-solid fa-check"></label>
+								<h4 class="noto-serif-kr">Sign Up</h4>
 								<div class="card-3d-wrap mx-auto">
 									<div class="card-3d-wrapper">
 										<div class="card-front">
 											<div class="center-wrap">
 												<div class="section text-center">
-													<h4 class="mb-4 pb-3 libre-baskerville-bold">Log In</h4>
 													<div class="form-group">
-														<input type="email" name="logemail" class="form-style"
-															placeholder="Your Email" id="logemail" autocomplete="off">
-														<!-- <i class="fa-regular fa-envelope"></i> -->
+														<input type="email" name="memberId" class="form-style"
+															placeholder="Your Email" id="memberId" autocomplete="off">
 													</div>
 													<div class="form-group mt-2">
-													<!-- <i class="fa-solid fa-lock"></i> -->
-														<input type="password" name="logpass" class="form-style"
-															placeholder="Your Password" id="logpass"
-															autocomplete="off"> 
+														<input type="password" name="passwd" class="form-style"
+															placeholder="Your Password" id="passwd"
+															autocomplete="off">
 													</div>
-													<a href="#" class="btn mt-4 libre-baskerville-bold">submit</a>
-													<p class="mb-0 mt-4 text-center libre-baskerville-bold">
-														<a href="#0" class="link">Forgot your password?</a>
-														<a th:href="@{/member/registerMember}" class="link">Forgot your password?</a>
-													</p>
+													<div class="form-group mt-2 memorizeId" style="display: flex; align-items: center;">
+													    <input type="checkbox" id="memorizeId" name="memorizeId" value="아이디 저장" />
+													    <label class="noto-serif-kr" for="memorizeId" style="margin-left: 5px; font-size: 11px;">아이디 저장</label> <!-- 텍스트와 체크박스 간 여백 -->
+													</div>
+													<a href="#" id="loginBtn" class="btn mt-4 libre-baskerville-bold">submit</a>
+														<p class="noto-serif-kr" style="margin: 0; margin-top: 30px;"><a href="#0" class="link" style="font-size:12px;">아이디/비밀번호찾기</a></p>
+														<span class="noto-serif-kr"><a th:href="@{/member/registerMember}" class="link" style="font-size:12px;">회원가입</a></span>
 												</div>
 											</div>
 										</div>

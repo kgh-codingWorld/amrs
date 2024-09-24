@@ -123,14 +123,17 @@
 						        </ul>
 							<a class="dropdown-item" href="shop.html">전시 일정</a>
 						</div></li>
-					<li class="nav-item dropdown"><a
-						class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
 						href="shop.html" role="button" aria-haspopup="true"
-						aria-expanded="false">컬렉션</a>
+						aria-expanded="false">
+						컬렉션
+						</a>
 						<div class="dropdown-menu">
-							<a class="dropdown-item" href="shop.html">대표 전시</a> <a
-								class="dropdown-item" th:href="@{/exhibition/allExhibition}">모든 전시</a>
-						</div></li>
+							<a class="dropdown-item" href="shop.html">대표 전시</a> 
+							<a class="dropdown-item" th:href="@{/exhibition/allExhibition}">모든 전시</a>
+						</div>
+					</li>
 					<li class="nav-item dropdown"><a
 						class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
 						href="shop.html" role="button" aria-haspopup="true"
@@ -142,13 +145,41 @@
 					<li><a class="nav-link" href="blog.html">News & Events</a></li>
 					<li><a class="nav-link" th:href="@{/blog/blogMain}">Blog</a></li>
 				</ul>
-
-				<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
-					<li><a class="nav-link" th:href="@{/member/login}"><img
-							th:src="@{/bootstrap/images/user.svg}"></a></li>
-					<li><a class="nav-link" th:href="@{/member/cart}"><img
-							th:src="@{/bootstrap/images/cart.svg}"></a></li>
-				</ul>
+				<div th:if="${session.memberId == null}">
+					<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+						<li>
+							<a class="nav-link" th:href="@{/member/login}">
+								<span class="noto-serif-kr">Sign In</span>
+							</a>
+						</li>
+						<li>
+							<a class="nav-link" th:href="@{/member/registerMember}">
+								<span class="noto-serif-kr">Sign Up</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div th:unless="${session.memberId == null}">
+					<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+						<li class="nav-item dropdown">
+							<a class="nav-link" data-bs-toggle="dropdown"
+							 role="button" aria-haspopup="true"
+							aria-expanded="false">
+								<img th:src="@{/bootstrap/images/user.svg}">
+							</a>
+							<div class="dropdown-menu">
+								<span class="dropdown-item-text">
+								<img th:src="@{/bootstrap/images/profile_basic2.webp}" style="border-radius: 15px; width:30px; height:30px;"/>
+								&nbsp;<strong th:text="${session.memberNm}"></strong> 님</span>
+								<a class="dropdown-item" th:href="@{/member/mypageMain}">마이페이지</a> 
+								<a class="dropdown-item" th:href="@{/member/logout}">로그아웃</a>
+							</div>
+						</li>
+								
+						<li><a class="nav-link" th:href="@{/member/cart}"><img
+								th:src="@{/bootstrap/images/cart.svg}"></a></li>
+					</ul>
+				</div>
 			</div>
 		</div>
 	</nav>
@@ -174,7 +205,7 @@
 								class="img-fluid"></span><span>Subscribe to Newsletter</span>
 						</h3>
 
-						<form th:action="@{/index}" class="row g-3">
+						<form th:action="@{/}" class="row g-3">
 							<div class="col-auto">
 								<input type="text" class="form-control"
 									placeholder="Enter your name">
@@ -286,25 +317,20 @@
 	<!-- End Footer Section -->
 
 	<script>
-		document
-				.addEventListener(
-						"DOMContentLoaded",
-						function() {
-							var currentPath = window.location.pathname; // 현재 페이지의 경로를 가져옴
-							var menuItems = document
-									.querySelectorAll(".custom-navbar .custom-navbar-nav li a");
+		document.addEventListener("DOMContentLoaded", function() {
+			var currentPath = window.location.pathname; // 현재 페이지의 경로를 가져옴
+			var menuItems = document.querySelectorAll(".custom-navbar .custom-navbar-nav li a");
 
-							menuItems
-									.forEach(function(menuItem) {
-										if (menuItem.getAttribute("href") === currentPath) {
-											menuItem.parentElement.classList
-													.add("active"); // 부모 요소에 active 클래스 추가
-										} else {
-											menuItem.parentElement.classList
-													.remove("active"); // 다른 항목은 active 제거
-										}
-									});
-						});
+			menuItems.forEach(function(menuItem) {
+				if (menuItem.getAttribute("href") === currentPath) {
+					menuItem.parentElement.classList
+							.add("active"); // 부모 요소에 active 클래스 추가
+				} else {
+					menuItem.parentElement.classList
+							.remove("active"); // 다른 항목은 active 제거
+				}
+			});
+		});
 	</script>
 
 

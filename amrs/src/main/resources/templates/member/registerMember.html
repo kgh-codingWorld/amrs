@@ -65,6 +65,197 @@
 	}
 	
 </script>
+
+<script>
+
+	let isPassId = false;
+	let isPassPasswd = false;
+	let isDuplicatedChecked = false; // 중복 확인 여부 추적 변수
+	
+	$().ready(function() {
+		
+		/* 아이디 */
+		$("#isDuplicatedId").click(function(){
+			
+			isDuplicatedChecked = true;
+			
+			let memberId = $("#memberId").val();
+		    if (memberId == "") {
+		    	$("#isDuplicatedIdMsg").html("<span style='color:red;'>아이디를 입력하세요.</span>");
+		   		return;
+		    }
+		   
+		    $.ajax({
+		    	
+		       type : "post",
+		       url : "/member/checkDuplicatedId",
+		       data : { "memberId" : memberId },
+		       success : function (isDuplicatedId) {
+		    	   
+		          if (isDuplicatedId == "y") {
+		          	$("#isDuplicatedIdMsg").html("<span style='color:green;'>사용가능한 아이디입니다.</span>");
+		          	isDuplicatedChecked = true;  // 중복 확인 완료
+		          	isPassId = true;
+		          }
+		          else {
+	        		$("#isDuplicatedIdMsg").html("<span style='color:red;'>중복된 아이디입니다.</span>");
+	        		isDuplicatedChecked = false;  // 중복 확인 실패
+	        		isPassId = false;
+		          }
+		          
+		       }
+		       
+		    });
+		    
+		});	
+		
+		
+		// 이메일 형식 검증 함수
+	    function isValidEmail(email) {
+	        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	        return emailRegex.test(email);
+	    }
+
+	    // 이메일 입력 필드에서 포커스가 벗어났을 때(blur 이벤트) 실행
+	    $("#memberId").change(function() {
+	        var email = $(this).val(); // 입력한 값 가져오기
+
+	        if (!isValidEmail(email)) {
+	            alert("올바른 이메일 형식으로 입력하세요.");
+	            $(this).focus(); // 잘못 입력했을 경우 다시 포커스를 이메일 입력 칸으로 이동
+	            return;
+	        }
+	        
+	        /* if (!isDuplicatedChecked) {
+	            alert("아이디 중복확인을 해주세요.");
+	            $(this).focus(); // 다시 아이디 입력 칸으로 포커스 이동
+	        } */
+	    });
+	    
+	 	// 이메일 필드에서 실시간으로 키 입력을 감지해 메시지 처리
+	    $("#memberId").keyup(function() {
+	        var email = $(this).val(); // 입력한 값 가져오기
+
+	        // 입력된 값이 없으면 중복 확인 메시지 삭제
+	        if (email === "") {
+	            $("#isDuplicatedIdMsg").html(""); // 메시지 초기화
+	            isDuplicatedChecked = false; // 다시 중복 확인 필요
+	        }
+	    });
+	 	
+	 	$("input[type='submit']").click(function(){
+	 		
+	 		if(!isDuplicatedChecked){
+	 			alert("아이디 중복확인을 해주세요.");
+	            $(this).focus(); // 다시 아이디 입력 칸으로 포커스 이동
+	 		}
+	 	});
+		
+		
+		/* 패스워드 */
+		$("#confirmPasswd").keyup(function(){
+			
+			let passwd = $("#passwd").val();
+			let confirmPasswd = $("#confirmPasswd").val();
+			
+			if (passwd == confirmPasswd && passwd !== "" && confirmPasswd !== "") {
+				$("#isValidPasswdMsg").html("<span style='color:green;'>패스워드가 일치합니다.</span>");
+				isPassPasswd = true;
+			}
+			else if (passwd != confirmPasswd && passwd !== "" && confirmPasswd !== ""){
+				$("#isValidPasswdMsg").html("<span style='color:red;'>패스워드가 일치하지 않습니다.</span>");
+				isPassPasswd = false;
+			}
+			
+		});	
+	    
+	 	
+	    $("#confirmPasswd").keyup(function() {
+	        var confirmPasswd = $(this).val(); // 입력한 값 가져오기
+
+	        // 입력된 값이 없으면 중복 확인 메시지 삭제
+	        if (confirmPasswd === "") {
+	            $("#isValidPasswdMsg").html("<span style='color:red;'>비밀번호 확인을 위하여 재입력 해주세요.</span>");
+	        }
+	    });
+		
+	});
+	
+	
+	function checkFormValidation() {
+
+		if (!isPassId) {
+			alert("아이디를 확인해주세요.");
+			$("#memberId").focus();
+			return false;
+		}
+		
+		if (!isPassPasswd) {
+			alert("패스워드를 확인해주세요.");
+			$("#confirmPasswd").focus();
+			return false;
+		}
+	}
+	
+	
+</script>
+<style>
+.register-table{
+	width: 50rem;
+	background-color: #88b3a2;
+	display: grid;
+	padding: 25px;
+	border-radius: 10px;
+	border: none;
+	margin: 10px;
+}
+
+.btn-register-page{
+	width: 73px;
+	height: 30px;
+	text-align: center;
+	font-size: 11px;
+	padding: 0;
+	vertical-align: middle;
+}
+
+.td-input-block{
+	padding-left: 20px;
+	padding: 18px;
+	width: 41rem;
+}
+
+.stsYn-text{
+	font-size: 9px;
+}
+
+.address-input{
+	width: 24rem;
+	margin-bottom: 10px;
+}
+
+#zipcode{
+	width: 15rem;
+}
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+input {
+    border-radius: 5px;
+    outline: none;
+    border: none;
+}
+
+/* 포커스될 때 테두리 색 변경 */
+input:focus {
+    border-color: #3b5d50 !important; /* 포커스 시 테두리 색상 변경 */
+}
+</style>
 </head>
 <body>
 	<!-- <a href="https://front.codes/" class="logo" target="_blank">
@@ -72,102 +263,82 @@
  </a> -->
 	<div layout:fragment="content">
 
-		<!-- Start Section -->
 		<div class="login-background">
 			<div class="section">
-				<div class="container">
-					<div class="row full-height justify-content-center">
-						<div class="col-12 text-center align-self-center py-5">
-							<div class="section pb-5 pt-5 pt-sm-2 text-center">
-								<h6 class="mb-0 pb-3">
-									<span class="libre-baskerville-bold">Log In </span><span
-										class="libre-baskerville-bold">Sign Up</span>
-								</h6>
-								<input class="checkbox" type="checkbox" id="reg-log"
-									name="reg-log" /> <label for="reg-log" class="fa-solid fa-check"></label>
-								<div class="card-3d-wrap mx-auto">
-									<div class="card-3d-wrapper">
-										<div class="card-front">
-											<div class="center-wrap">
-												<div class="section text-center">
-													<h4 class="mb-4 pb-3 libre-baskerville-bold">Log In</h4>
-													<div class="form-group">
-														<input type="email" name="logemail" class="form-style"
-															placeholder="Your Email" id="logemail" autocomplete="off">
-														<!-- <i class="fa-regular fa-envelope"></i> -->
-													</div>
-													<div class="form-group mt-2">
-													<!-- <i class="fa-solid fa-lock"></i> -->
-														<input type="password" name="logpass" class="form-style"
-															placeholder="Your Password" id="logpass"
-															autocomplete="off"> 
-													</div>
-													<a href="#" class="btn mt-4 libre-baskerville-bold">submit</a>
-													<p class="mb-0 mt-4 text-center libre-baskerville-bold">
-														<a href="#0" class="link">Forgot your password?</a>
-													</p>
-												</div>
-											</div>
-										</div>
-										<!-- 회원가입 -->
-										<div class="card-back">
-										<form th:action="@{/member/createMember}" method="post">
-											<div class="center-wrap">
-												<div class="section text-center">
-													<h4 class="mb-4 pb-3 libre-baskerville-bold">Sign Up</h4>
-													<div class="form-group">
-														<input type="text" name="email" class="form-style"
-															placeholder="Your Email" id="email"
-															autocomplete="off"> <i
-															class="input-icon uil uil-user"></i>
-															<input type="checkbox" name="emailstsYn" value="이메일 수신 동의">
-													</div>
-													<div class="form-group mt-2">
-														<input type="password" name="passwd" class="form-style"
-															placeholder="Your Password" id="passwd"
-															autocomplete="off"> <i
-															class="input-icon uil uil-lock-alt"></i>
-													</div>
-													<div class="form-group mt-2">
-														<input type="text" name="memberNm" class="form-style"
-															placeholder="Your name" id="memberNm"
-															autocomplete="off"> <i
-															class="input-icon uil uil-lock-alt"></i>
-													</div>
-													<div class="form-group mt-2">
-														<input type="date" name="birthAt" class="form-style"
-															id="birthAt" autocomplete="off">
-														<i class="input-icon uil uil-at"></i>
-													</div>
-													<div class="form-group mt-2">
-														<input type="text" name="memberPhoneNumber" class="form-style"
-															placeholder="Your Phone" id="memberPhoneNumber"
-															autocomplete="off"> <i
-															class="input-icon uil uil-lock-alt"></i>
-														<input type="checkbox" name="smsstsYn" value="메시지 수신 동의">
-													</div>
-													<div class="form-group mt-2">
-														<input type="text" name="zipcode" class="form-style"
-															placeholder="우편번호" id="zipcode" autocomplete="off" style="width:278px;">
-															 <i class="input-icon uil uil-lock-alt"></i>
-															 <input type="button" class="btn" th:onclick="javascript:execDaumPostcode()" value="검색">
-															 <br>
-														<input type="text" class="form-style" name="roadAddress" 	id="roadAddress" size="60"><br>														
-														<input type="text" class="form-style"  name="jibunAddress" id="jibunAddress" size="60"> <br>
-														<input type="text" class="form-style" name="namujiAddress" id="namujiAddress" size="60"/>
-													</div>
-													<input type="hidden" name="role" value="user">
-													<button type="submit" class="btn mt-4">submit</button>
-												</div>
-											</div>
-										</form>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+				<div class="container noto-serif-kr" align="center">
+					<form th:action="@{/member/registerMember}" th:onsubmit="return checkFormValidation();" method="post" enctype="multipart/form-data">
+						<h3 style="padding: 40px;">Sign Up</h3>
+						<table border="1" class="register-table">
+							<tr>
+								<td>아이디(이메일)</td>
+								<td class="td-input-block">
+						            <input type="email" name="memberId" id="memberId" placeholder="아이디(이메일)" required class="input-block"/>&emsp;
+						            <input type="button" id="isDuplicatedId" class="btn btn-register-page" value="중복확인" />&emsp;
+						            <span id="isDuplicatedIdMsg"></span>
+						        </td>
+						    </tr>
+					        <tr>
+						        <td>비밀번호</td>
+						        <td class="td-input-block"><input type="password" id="passwd" name="passwd" placeholder="비밀번호" required class="input-block"/></td>
+					        </tr>
+					        <tr>
+						        <td>비밀번호 확인</td>
+						        <td class="td-input-block">
+						        	<input type="password" id="confirmPasswd" placeholder="비밀번호 확인" required class="input-block"/>&emsp;
+						        	<span id="isValidPasswdMsg"></span>
+						        </td>
+					        </tr>
+					        <tr>
+						        <td>이름</td>
+						        <td class="td-input-block"><input type="text" name="memberNm" placeholder="실명으로 입력하세요." required class="input-block"/></td>
+					        </tr>                
+					        <tr>
+						        <td>생년월일</td>
+						        <td class="td-input-block">
+									<input type="date" name="birthAt" required class="input-block">
+						        </td>
+					        </tr>                        
+					        <tr>
+						        <td>핸드폰 번호</td>
+						        <td class="td-input-block">
+									<input type="text" name="memberHp" placeholder="010-0000-0000" required class="input-block">
+						        </td>
+					        </tr>                         
+					        <tr>
+						        <td>프로필</td>
+						        <td class="td-input-block">
+						        	<input type="file" name="uploadProfile" class="input-block"/>
+						        	<!-- MEMBER_PROFILE_ORIGINAL_NAME과 MEMBER_PROFILE_UUID는 백엔드에서 처리 -->
+						        </td>
+					        </tr>                              
+					        <tr>
+						        <td>주소</td>
+						        <td class="td-input-block">
+						        	<input type="text" placeholder="우편번호 입력" id="zipcode" name="zipcode" required class="input-block address-input">
+					                <input type="button" th:onclick="javascript:execDaumPostcode()" value="검색" class="btn btn-register-page">
+					                <input type="text" name="roadAddress" id="roadAddress" size="60" required placeholder="도로명 주소" class="input-block address-input"> <br>
+									<input type="text"  name="jibunAddress" id="jibunAddress" size="60" required placeholder="지번 주소"class="input-block address-input"> <br>
+									<input type="text" name="namujiAddress" id="namujiAddress" size="60" placeholder="나머지 주소" class="input-block address-input"/>
+						        </td>
+					        </tr>
+					        <tr style="border-bottom: 2px solid black;">
+					        	<td>수신 동의 여부</td>
+					        	<td class="td-input-block">
+					        		&emsp;메시지 수신&emsp;<input type="checkbox" value="y" name="smsstsYn" class="chkbox"/>
+					        		&emsp;이메일 수신&emsp;<input type="checkbox" value="y" name="emailstsYn" class="chkbox"/>
+					        		<span class="stsYn-text">AMRS에서 발송하는 소식을 수신합니다.</span>
+					        	</td>
+					        </tr>
+						    <tr>
+						        <td colspan="2" align="center">
+						        	이미 회원가입이 되어있다면 ? <a th:href="@{/member/login}"><strong>로그인하기</strong></a>
+						        </td>
+					        </tr>                            
+					     </table>
+					        <input type="hidden" value="USER" name="memberRole"/> 
+						    <input type="submit" value="회원가입" style="margin: 50px;">
+	     			</form>
+				</div>	
 			</div>
 		</div>
 	</div>

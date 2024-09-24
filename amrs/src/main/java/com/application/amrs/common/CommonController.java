@@ -1,11 +1,21 @@
-package com.application.amrs.controller;
+package com.application.amrs.common;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.application.amrs.member.MemberService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 @Controller
 public class CommonController {
+	
+	@Autowired
+	private MemberService memberService;
 
 	/* 페이지 이동용 컨트롤러 */
 	
@@ -13,6 +23,43 @@ public class CommonController {
 	public String main() {
 		// 메인 화면으로 이동
 		return "main/index";
+	}
+	
+/*회원 관련 메서드*/
+	
+	@GetMapping("/member/login")
+	public String login() {
+		// 로그인 페이지로 이동
+		return "member/login";
+	}
+	
+	@GetMapping("/member/logout")
+	public String logout(HttpServletRequest request) {
+		
+		HttpSession session = request.getSession();
+		session.invalidate();
+		
+		return "redirect:/";
+	}
+	
+	@GetMapping("/member/registerMember")
+	public String registerMember() {
+		// 회원가입 페이지로 이동
+		return "member/registerMember";
+	}
+
+	@GetMapping("/member/mypageMain")
+	public String mypageMain() {
+		// 마이페이지 메인으로 이동
+		return "member/mypageMain";
+	}
+
+	@GetMapping("/member/myInfo")
+	public String myInfo(HttpServletRequest request, Model model) {
+		// 개인정보확인/수정 페이지로 이동
+		HttpSession session = request.getSession();
+		model.addAttribute("memberDTO", memberService.getMemberDetail((String)session.getAttribute("memberId")));
+		return "member/myInfo";
 	}
 	
 	@GetMapping("/main/about")
@@ -71,39 +118,16 @@ public class CommonController {
 
 	@GetMapping("/blog/blogMain")
 	public String blogMain() {
-		// 블로그 메인으로 이동
+		// 게시글 메인으로 이동
 		return "blog/blogMain";
 	}
 	
 	@GetMapping("/blog/myBlog")
 	public String myBlog() {
-		// 내 블로그로 이동
+		// 내 게시글로 이동
 		return "blog/myBlog";
 	}
 	
-	@GetMapping("/member/login")
-	public String login() {
-		// 로그인 페이지로 이동
-		return "member/login";
-	}
-	
-	@GetMapping("/member/registerMember")
-	public String registerMember() {
-		// 로그인 페이지로 이동
-		return "member/registerMember";
-	}
-
-	@GetMapping("/member/mypageMain")
-	public String mypageMain() {
-		// 마이페이지 메인으로 이동
-		return "member/mypageMain";
-	}
-
-	@GetMapping("/member/myInfo")
-	public String myInfo() {
-		// 개인정보확인/수정 페이지로 이동
-		return "member/myInfo";
-	}
 	
 	@GetMapping("/member/cart")
 	public String cart() {
