@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.application.amrs.member.MemberDAO">
 
-<insert id="insertMember" parameterType="MemberDTO">
-	INSERT INTO MEMBER (
+	<insert id="insertMember" parameterType="MemberDTO">
+		INSERT INTO MEMBER (
 		MEMBER_ID,
 		PASSWD,
 		MEMBER_NM,
@@ -19,8 +19,8 @@
 		NAMUJI_ADDRESS,
 		MEMBER_ROLE,
 		MEMBER_POINT
-	)
-	VALUES (
+		)
+		VALUES (
 		#{memberId},
 		#{passwd},
 		#{memberNm},
@@ -34,27 +34,100 @@
 		#{roadAddress},
 		#{jibunAddress},
 		#{namujiAddress},
-		#{memberRole, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+		#{memberRole,
+		typeHandler=org.apache.ibatis.type.EnumTypeHandler},
 		#{memberPoint}
-	)
-</insert>
+		)
+	</insert>
 
-<select id="selectDuplicatedId" resultType="String" parameterType="String">
-	SELECT	MEMBER_ID
-	FROM	MEMBER
-	WHERE	MEMBER_ID = #{memberId}
-</select>
+	<select id="findMemberId" resultType="String"
+		parameterType="String">
+		SELECT MEMBER_ID
+		FROM MEMBER
+		WHERE MEMBER_ID = #{memberId}
+	</select>
 
-<select id="login" parameterType="String" resultType="MemberDTO">
-	SELECT	PASSWD,
-			MEMBER_NM
-	FROM 	MEMBER
-	WHERE 	MEMBER_ID = #{memberId}
-</select>
+	<select id="login" parameterType="String" resultType="MemberDTO">
+		SELECT 	PASSWD,
+				MEMBER_NM
+		FROM	MEMBER
+		WHERE 	MEMBER_ID = #{memberId}
+	</select>
 
-<select id="selectOneMember" parameterType="String" resultType="MemberDTO">
-	SELECT	*
-	FROM	MEMBER
-	WHERE	MEMBER_ID = #{memberId}
-</select>
+	<select id="selectOneMember" parameterType="String"
+		resultType="MemberDTO">
+		SELECT *
+		FROM MEMBER
+		WHERE MEMBER_ID = #{memberId}
+	</select>
+
+	<select id="isValidPasswd" parameterType="String" resultType="MemberDTO">
+		SELECT	PASSWD
+		FROM	MEMBER
+		WHERE	MEMBER_ID = #{memberId}
+	</select>
+	
+	<update id="updateMyPasswd" parameterType="MemberDTO">
+		UPDATE MEMBER
+		
+		<set>
+			<if
+				test="passwd != null and passwd != ''">
+				PASSWD = #{passwd}	
+			</if>
+		</set>
+	</update>
+	
+	<update id="updateMyInfo" parameterType="MemberDTO">
+		UPDATE MEMBER
+
+		<set>
+			<if
+				test="memberProfileOriginalName != null and memberProfileOriginalName != ''">
+				MEMBER_PROFILE_ORIGINAL_NAME = #{memberProfileOriginalName},
+			</if>
+			<if test="memberProfileUUID != null and !memberProfileUUID != ''">
+				MEMBER_PROFILE_UUID = #{memberProfileUUID},
+			</if>
+			<if test="memberNm != null and memberNm != ''">
+				MEMBER_NM = #{memberNm},
+			</if>
+			<if test="birthAt != null">
+				BIRTH_AT = #{birthAt},
+			</if>
+			<if test="memberHp != null and memberHp != ''">
+				MEMBER_HP = #{memberHp},
+			</if>
+			<if test="zipcode != null and zipcode != ''">
+				ZIPCODE = #{zipcode},
+			</if>
+			<if test="roadAddress != null and roadAddress != ''">
+				ROAD_ADDRESS = #{roadAddress},
+			</if>
+			<if test="jibunAddress != null and jibunAddress != ''">
+				JIBUN_ADDRESS = #{jibunAddress},
+			</if>
+			<if test="namujiAddress != null and namujiAddress != ''">
+				NAMUJI_ADDRESS = #{namujiAddress},
+			</if>
+			<if test="smsstsYn != null and smsstsYn != ''">
+				SMSSTS_YN = #{smsstsYn},  
+			</if>
+			<if test="emailstsYn != null and emailstsYn != ''">
+				EMAILSTS_YN = #{emailstsYn},  
+			</if>
+		</set>
+		WHERE	MEMBER_ID = #{memberId}
+	</update>
+	<delete id="deleteAccount" parameterType="String">
+		DELETE	FROM MEMBER
+		WHERE	MEMBER_ID = #{memberId}
+	</delete>
+	
+	<select id="selectMemberNameById" resultType="String" 
+	parameterType="String">
+		SELECT	MEMBER_NM
+		FROM	MEMBER
+		WHERE	MEMBER_ID = #{memberId}
+	</select>
 </mapper>

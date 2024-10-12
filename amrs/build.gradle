@@ -32,6 +32,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security' 				// Spring Security를 사용하여 패스워드 인코딩 및 보안 관련 기능 제공
 	implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16' 				// JDBC 쿼리 로그 확인용
  	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'					// 레이아웃 템플릿 기능 제공
+    implementation 'org.json:json:20210307'												// REST API access token용
+    implementation group: 'org.springframework.boot', 									// 이메일 인증용
+    name: 'spring-boot-starter-mail', 
+    version: '3.0.5'
+	implementation 'jakarta.validation:jakarta.validation-api:3.0.2'					// 이메일 인증용(유효성 검사)
 	compileOnly 'org.projectlombok:lombok'												// 컴파일 시점에만 적용해서 롬복 사용 가능하게 함
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'						// 개발 중 Hot Reload 기능 제공
 	runtimeOnly 'com.mysql:mysql-connector-j' 											// MySQL JDBC 드라이버

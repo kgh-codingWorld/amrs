@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="Untree.co">
+<link rel="shortcut icon" href="favicon.png">
+
+<meta name="description" content="" />
+<meta name="keywords" content="bootstrap, bootstrap4" />
+
+<!-- Bootstrap CSS -->
+<!-- <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet"> -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+ <!-- Login CSS
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://unicons.iconscout.com/release/v2.1.9/css/unicons.css" rel="stylesheet"> -->
+
+<link th:href="@{/bootstrap/css/login.css}" rel="stylesheet">
+<link th:href="@{/bootstrap/scss/style.scss}" rel="stylesheet">
+<title>Id Result Page</title>
+<style>
+	.login-background {
+            background-color: #f7f7f7;
+            padding: 40px;
+        }
+        .section {
+            margin: 50px auto;
+            width: 50%;
+        }
+        .form-control {
+            margin-bottom: 20px;
+        }
+        .btn-primary {
+            width: 100%;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            padding-top: 100px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;
+        }
+        .modal-header {
+            font-weight: bold;
+        }
+        .modal-footer {
+            text-align: right;
+        }
+</style>
+</head>
+<body>
+	<!-- <a href="https://front.codes/" class="logo" target="_blank">
+    <img src="https://assets.codepen.io/1462889/fcy.png" alt="">
+ </a> -->
+	<div layout:fragment="content">
+
+		<div class="login-background">
+			<div class="section">
+				<div class="container noto-serif-kr" align="center">
+						<div class="container">
+                    <!-- 아이디 찾기 폼 (전화번호 인증) -->
+                    <form th:action="@{/member/findId}" method="post">
+                        <div class="form-group">
+                        	<i class="fa-solid fa-mobile-screen-button" style="font-size: xxx-large"></i>
+                        </div>
+                        <button type="submit" class="btn btn-primary">휴대폰 인증</button>
+                    </form>
+
+                    <!-- 성공 메시지 영역 -->
+                    <div id="success-message" th:if="${success}" class="alert alert-success">
+                        <p th:text="${success}"></p>
+                    </div>
+                </div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.application.amrs.blog.BlogDAO">
+
+<resultMap id="blogMap" type="hashmap" >
+		<result column="BLOG_ID"  	   property="blogId"/>
+		<result column="BLOG_TITLE" 	   property="blogTitle"/>
+		<result column="BLOG_CONTENT" 	   property="blogContent"/>
+		<result column="READ_CNT" 	   property="readCnt"/>
+		<result column="CREATE_DT" 	   property="createDt"/>
+		<result column="UPDATE_DT"       property="updateDt"/>
+		<result column="LIKE_COUNT"     property="likeCount"/>
+		<result column="BLOG_THUMBNAIL_UUID"  property="blogThumbnailUUID"/>
+		<result column="MEMBER_ID"  property="memberId"/>
+	</resultMap>
+
+<select id="selectBlogList" resultMap="blogMap">
+        SELECT  B.BLOG_ID    AS BLOG_ID,
+                B.BLOG_TITLE AS BLOG_TITLE,
+                B.BLOG_THUMBNAIL_UUID AS BLOG_THUMBNAIL_UUID,
+                B.READ_CNT AS READ_CNT, 
+                B.CREATE_DT  AS CREATE_DT,
+                M.MEMBER_ID  AS MEMBER_ID
+        FROM    BLOG B
+        JOIN    MEMBER M
+        ON      B.MEMBER_ID = M.MEMBER_ID
+        ORDER   BY B.CREATE_DT DESC
+    </select>
+
+<insert id="insertBlog" parameterType="BlogDTO">
+	INSERT INTO BLOG (
+	MEMBER_ID, 
+	BLOG_ORIGINAL_THUMBNAIL_NAME, 
+	BLOG_THUMBNAIL_UUID, 
+	BLOG_TITLE,
+	BLOG_CONTENT
+	)
+    VALUES (
+    #{memberId}, 
+    #{blogOriginalThumbnailName}, 
+    #{blogThumbnailUUID}, 
+    #{blogTitle}, 
+    #{blogContent}
+    )
+	
+</insert>
+
+<select id="selectBlogById" resultMap="blogMap" parameterType="int">
+	SELECT	B.BLOG_ID	 	AS BLOG_ID,
+			B.BLOG_TITLE 	AS BLOG_TITLE,
+			B.BLOG_CONTENT	AS BLOG_CONTENT,
+			B.READ_CNT		AS READ_CNT,
+			B.CREATE_DT		AS CREATE_DT,
+			B.UPDATE_DT		AS UPDATE_DT,
+			B.LIKE_COUNT	AS LIKE_COUNT,
+			B.BLOG_THUMBNAIL_UUID AS BLOG_THUMBNAIL_UUID,
+			M.MEMBER_ID		AS MEMBER_ID
+	FROM	BLOG B
+	JOIN	MEMBER M
+	ON		B.MEMBER_ID = M.MEMBER_ID
+	WHERE	BLOG_ID = #{blogId}
+</select>
+
+<update id="updateLikeCount" parameterType="int">
+    UPDATE BLOG
+    SET LIKE_COUNT = LIKE_COUNT + #{value}
+    WHERE BLOG_ID = #{blogId}
+</update>
+
+<select id="getLikeCount" resultType="int" parameterType="int">
+	SELECT 	LIKE_COUNT
+	FROM	BLOG
+	WHERE	BLOG_ID = #{blogId}
+</select>
+
+<update id="updateBlog" parameterType="BlogDTO">
+	UPDATE BLOG
+	<set>
+		<if test="blogTitle != null and blogTitle != ''">
+			BLOG_TITLE = #{blogTitle},
+		</if>
+		<if test="blogContent != null and blogContent != ''">
+			BLOG_CONTENT = #{blogContent}
+		</if> 
+	</set>
+	WHERE BLOG_ID = #{blogId}
+</update>
+
+<update id="updateReadCnt" parameterType="int">
+	UPDATE	BLOG
+	SET		READ_CNT = READ_CNT + 1
+	WHERE	BLOG_ID = #{blogId}
+</update>
+
+<delete id="deleteBlog" parameterType="int">
+	DELETE 	FROM BLOG
+	WHERE	BLOG_ID = #{blogId}
+</delete>
+</mapper>

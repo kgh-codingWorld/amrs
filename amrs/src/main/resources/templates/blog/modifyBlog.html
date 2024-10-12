@@ -1,0 +1,158 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout.html}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="Untree.co">
+    <link rel="shortcut icon" href="favicon.png">
+    <link rel="stylesheet" href="/bootstrap/css/blog.css">
+    <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.1.1/ckeditor5.css">
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="bootstrap, bootstrap4" />
+
+    <title>Register Blog Page</title>
+    <style>
+        /* 배경 이미지 설정 */
+        .blog-background {
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 0;
+        }
+
+        /* 폼 컨테이너 */
+        .form-container {
+            background-color: rgba(255, 255, 255, 0.9); /* 배경과 어우러지도록 투명한 흰색 */
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* 제목 스타일 */
+        h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #343a40;
+        }
+
+        /* 테이블과 입력 폼 */
+        table {
+            width: 100%;
+        }
+
+        td {
+            padding: 10px;
+            vertical-align: top;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        input[type="submit"], input[type="button"] {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #343a40;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover, input[type="button"]:hover {
+            background-color: #495057;
+        }
+
+        /* 미리보기 스타일 */
+        .post-preview {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            display: none;
+        }
+    </style>
+    <script th:src="@{/ckeditor/ckeditor.js}"></script>
+</head>
+
+<body>
+	<div layout:fragment="content">
+		<!-- Start Hero Section -->
+		<div class="blog-background">
+			<div class="container form-container">
+				<form th:action="@{/blog/updateBLog}" method="post" enctype="multipart/form-data">
+					<div class="main-container">
+						<table border="0" class="noto-serif-kr">
+							<tr>
+								<td>작성자</td>
+								<td style="width:42rem;"><input type="text" size="100" th:value="${maskedMemberNm}" class="noto-serif-kr" readonly /></td>
+							</tr>
+							<tr>
+								<td>제목</td>
+								<td style="width:42rem;"><input type="text" th:value="${blog.blogTitle}" name="blogTitle" size="100" required /></td>
+							</tr>
+							<tr>
+								<td>메인<br>이미지</td>
+								<td style="width:42rem; vertical-align: middle;"><input type="file" th:value="${blogThumbnailUUID}" name="thumbnail" size="100" /></td>
+							</tr>
+							<tr>
+								<td>글내용</td>
+								<td style="width:42rem;">
+									<textarea rows="10" cols="50" th:text="${blog.blogContent}" name="blogContent" required></textarea>
+									<script>CKEDITOR.replace("blogContent");</script>
+								</td>
+							</tr>
+							<tr align="center">
+								<td colspan="2">
+									<input type="hidden" name="memberId" th:value="${session.memberId}" />
+									<input type="submit" value="작성하기" />
+									<input type="button" value="목록보기" th:onclick="|location.href='@{/blog/postList}'|" />
+								</td>
+							</tr>
+						</table>
+					</div>
+				</form>
+
+				<!-- 미리보기 영역 -->
+				<div id="postPreview" class="post-preview">
+					<h3 id="previewTitle"></h3>
+					<p id="previewContent"></p>
+				</div>
+			</div>
+		</div>
+		<!-- End Hero Section -->
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+		$(document).ready(function() {
+			$('#blogPostForm').submit(function(e) {
+				e.preventDefault(); // 폼 제출 기본 동작 방지
+
+				// 입력된 제목과 내용을 가져오기
+				var postTitle = $('#postTitle').val();
+				var postContent = $('#postContent').val();
+
+				// 미리보기 영역에 값 표시
+				$('#previewTitle').text(postTitle);
+				$('#previewContent').text(postContent);
+				$('#postPreview').show();
+			});
+		});
+	</script>
+</body>
+</html>

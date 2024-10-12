@@ -23,6 +23,63 @@
 <link th:href="@{/bootstrap/scss/style.scss}" rel="stylesheet">
 
 <title>Login Page</title>
+<style>
+.register-table{
+	width: 50rem;
+	background-color: #88b3a2;
+	display: grid;
+	padding: 25px;
+	border-radius: 10px;
+	border: none;
+	margin: 10px;
+}
+
+.btn-register-page{
+	width: 73px;
+	height: 30px;
+	text-align: center;
+	font-size: 11px;
+	padding: 0;
+	vertical-align: middle;
+}
+
+.td-input-block{
+	padding-left: 20px;
+	padding: 18px;
+	width: 41rem;
+}
+
+.stsYn-text{
+	font-size: 9px;
+}
+
+.address-input{
+	width: 24rem;
+	margin-bottom: 10px;
+}
+
+#zipcode{
+	width: 15rem;
+}
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+input {
+    border-radius: 5px;
+    outline: none;
+    border: none;
+}
+
+/* 포커스될 때 테두리 색 변경 */
+input:focus {
+    border-color: #3b5d50 !important; /* 포커스 시 테두리 색상 변경 */
+}
+</style>
 <script th:src="@{/jquery/jquery-3.7.1.min.js}"></script>
 <script th:src="@{http://dmaps.daum.net/map_js_init/postcode.v2.js}"></script>
 <script>
@@ -199,63 +256,6 @@
 	
 	
 </script>
-<style>
-.register-table{
-	width: 50rem;
-	background-color: #88b3a2;
-	display: grid;
-	padding: 25px;
-	border-radius: 10px;
-	border: none;
-	margin: 10px;
-}
-
-.btn-register-page{
-	width: 73px;
-	height: 30px;
-	text-align: center;
-	font-size: 11px;
-	padding: 0;
-	vertical-align: middle;
-}
-
-.td-input-block{
-	padding-left: 20px;
-	padding: 18px;
-	width: 41rem;
-}
-
-.stsYn-text{
-	font-size: 9px;
-}
-
-.address-input{
-	width: 24rem;
-	margin-bottom: 10px;
-}
-
-#zipcode{
-	width: 15rem;
-}
-
-input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
-    vertical-align: middle;
-}
-
-input {
-    border-radius: 5px;
-    outline: none;
-    border: none;
-}
-
-/* 포커스될 때 테두리 색 변경 */
-input:focus {
-    border-color: #3b5d50 !important; /* 포커스 시 테두리 색상 변경 */
-}
-</style>
 </head>
 <body>
 	<!-- <a href="https://front.codes/" class="logo" target="_blank">

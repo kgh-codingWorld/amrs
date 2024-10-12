@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.application.amrs.follow.FollowDAO">
+
+    <!-- 팔로우 중복 확인 -->
+    <select id="findFollow" resultType="com.application.amrs.follow.FollowDTO">
+        SELECT *
+        FROM FOLLOW
+        WHERE FROM_MEMBER_ID = #{fromMemberId} AND TO_MEMBER_ID = #{toMemberId}
+    </select>
+
+    <!-- 팔로우 추가 -->
+    <insert id="insertFollow">
+        INSERT INTO FOLLOW (FROM_MEMBER_ID, TO_MEMBER_ID)
+        VALUES (#{fromMemberId}, #{toMemberId})
+    </insert>
+
+    <!-- 팔로우 취소 -->
+    <delete id="deleteFollow">
+        DELETE FROM FOLLOW
+        WHERE FROM_MEMBER_ID = #{fromMemberId} AND TO_MEMBER_ID = #{toMemberId}
+    </delete>
+
+    <!-- 팔로잉 목록 조회 -->
+    <select id="getFollowingList" resultType="com.application.amrs.follow.FollowDTO">
+        SELECT TO_MEMBER_ID AS toMemberId
+        FROM FOLLOW
+        WHERE FROM_MEMBER_ID = #{fromMemberId}
+    </select>
+
+    <!-- 팔로워 목록 조회 -->
+    <select id="getFollowersList" resultType="com.application.amrs.follow.FollowDTO">
+        SELECT FROM_MEMBER_ID AS fromMemberId
+        FROM FOLLOW
+        WHERE TO_MEMBER_ID = #{toMemberId}
+    </select>
+
+</mapper>

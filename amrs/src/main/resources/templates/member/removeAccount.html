@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="Untree.co">
+<link rel="shortcut icon" href="favicon.png">
+
+<meta name="description" content="" />
+<meta name="keywords" content="bootstrap, bootstrap4" />
+
+<!-- Bootstrap CSS -->
+<!-- <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet"> -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+ <!-- Login CSS
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://unicons.iconscout.com/release/v2.1.9/css/unicons.css" rel="stylesheet"> -->
+
+<link th:href="@{/bootstrap/css/login.css}" rel="stylesheet">
+<link th:href="@{/bootstrap/scss/style.scss}" rel="stylesheet">
+
+<title>Remove Account Page</title>
+<style>
+.register-table{
+	width: 50rem;
+	background-color: #88b3a2;
+	display: grid;
+	padding: 25px;
+	border-radius: 10px;
+	border: none;
+	margin: 10px;
+}
+
+.btn-register-page{
+	width: 73px;
+	height: 30px;
+	text-align: center;
+	font-size: 11px;
+	padding: 0;
+	vertical-align: middle;
+}
+
+.td-input-block{
+	padding-left: 20px;
+	padding: 18px;
+	width: 41rem;
+}
+
+.stsYn-text{
+	font-size: 9px;
+}
+
+.address-input{
+	width: 24rem;
+	margin-bottom: 10px;
+}
+
+#zipcode{
+	width: 15rem;
+}
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+input {
+    border-radius: 5px;
+    outline: none;
+    border: none;
+}
+
+/* 포커스될 때 테두리 색 변경 */
+input:focus {
+    border-color: #3b5d50 !important; /* 포커스 시 테두리 색상 변경 */
+}
+</style>
+<script>
+	
+</script>
+</head>
+<body>
+	<!-- <a href="https://front.codes/" class="logo" target="_blank">
+    <img src="https://assets.codepen.io/1462889/fcy.png" alt="">
+ </a> -->
+	<div layout:fragment="content">
+
+		<div class="login-background">
+			<div class="section">
+				<div class="container noto-serif-kr" align="center">
+					<div class="container">
+				        <h2>개인정보 확인을 위해 비밀번호를 입력해 주세요</h2>
+				
+				        <!-- 비밀번호 확인 폼 -->
+				        <form th:action="@{/member/removeAccount}" method="post">
+				            <div class="form-group">
+				                <label for="password">비밀번호:</label>
+				                <input type="password" id="passwd" name="passwd" class="form-control" required>
+				            </div>
+				            <div id="error-message" th:if="${error}" class="alert alert-danger">
+				                <p th:text="${error}">비밀번호가 올바르지 않습니다.</p>
+				            </div>
+				            <input type="hidden" th:value="${memberDTO.memberId}" name="memberId"/>
+				            <button type="submit" class="btn btn-primary">회원탈퇴</button>
+			            </form>
+				    </div>
+				</div>	
+			</div>
+		</div>
+	</div>
+</body>
+</html>

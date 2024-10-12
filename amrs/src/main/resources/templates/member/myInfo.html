@@ -108,7 +108,210 @@ tbody tr:last-child td {
 	border: inherit;
 	transform: translate(67rem, 10px);
 }
+
+.hidden{
+    display: none;
+    margin: 10px;
+    width: 16rem;
+}
+
+.btn-sm{
+	font-size: 12px;
+	padding-left: 13px;
+	padding-right: 13px;
+	border-radius: 10px;
+}
+
 </style>
+<script th:src="@{/jquery/jquery-3.7.1.min.js}"></script>
+<script th:src="@{http://dmaps.daum.net/map_js_init/postcode.v2.js}"></script>
+<script>
+	function execDaumPostcode() {
+    	new daum.Postcode({
+        	oncomplete: function(data) {
+	            // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+	
+	            // 도로명 주소의 노출 규칙에 따라 주소를 조합한다.
+	            // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+	            var fullRoadAddr = data.roadAddress; // 도로명 주소 변수
+	            var extraRoadAddr = ''; // 도로명 조합형 주소 변수
+	
+	            // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+	            // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+	            if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+	                extraRoadAddr += data.bname;
+	            }
+	            // 건물명이 있고, 공동주택일 경우 추가한다.
+	            if (data.buildingName !== '' && data.apartment === 'Y'){
+	               extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+	            }
+	            // 도로명, 지번 조합형 주소가 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+	            if (extraRoadAddr !== ''){
+	                extraRoadAddr = ' (' + extraRoadAddr + ')';
+	            }
+	            // 도로명, 지번 주소의 유무에 따라 해당 조합형 주소를 추가한다.
+	            if (fullRoadAddr !== ''){
+	                fullRoadAddr += extraRoadAddr;
+	            }
+	
+	            // 우편번호와 주소 정보를 해당 필드에 넣는다.
+	            document.getElementById('zipcode').value = data.zonecode; //5자리 새우편번호 사용
+	            document.getElementById('roadAddress').value = fullRoadAddr;
+	            document.getElementById('jibunAddress').value = data.jibunAddress;
+	
+	        }
+    }).open();
+}
+</script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
+	<script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.1.8.js"></script>
+<script>
+	
+	$().ready(function(){
+	
+		if(typeof IMP !== 'undefined') {
+			IMP.init("imp20450427");
+			console.log("IMP 객체 초기화 완료"); // IMP 객체가 초기화되었는지 확인
+		} else {
+			console.error('IMP 객체를 찾을 수 없습니다. 스크립트가 올바르게 로드되었는지 확인하세요.');
+		}
+		
+		$('#editNameBtn').click(function(e) {
+			e.preventDefault();
+			console.log("본인인증 시작");
+			
+			if(!IMP){
+				console.error("IMP 객체가 정의되지 않았습니다. 포트원 라이브러리 로드 오류 확인 필요.");
+				return;
+			}
+			// IMP.certification 실행
+			IMP.certification({
+				pg: "inicis", // 본인인증 설정이 2개 이상일 때 필수
+				merchant_uid: "AUTH" + new Date().toISOString().slice(0, 10).replace(/-/g, '') + "-USER123-" + Math.random().toString(36).substring(2, 8), // 주문 번호 고유값 생성
+				//m_redirect_url: "/member/phoneAuthenticationRedirect" // 리디렉션 URL
+				
+			}, function(rsp) {
+				// 인증 성공 시 로직
+				console.log("rsp 표시");
+				if (rsp.success) {
+					axios.post("/certifications/confirm", { imp_uid: rsp.imp_uid })
+					.then(function(response) {
+						alert("인증이 성공적으로 처리되었습니다.");
+						// 인증이 성공한 후 다른 동작 처리
+					})
+					.catch(function(error) {
+						alert("서버 통신 중 오류가 발생했습니다.");
+					});
+				} else {
+					// 인증 실패 시 로직
+					alert("인증에 실패하였습니다. 에러 내용: " + rsp.error_msg);
+				}
+			});
+        });
+		
+		
+        $('#editHpBtn').click(function() {
+            var emailInput = document.getElementById('editHp');
+            
+            // 입력 필드가 보이지 않는 상태면 나타내고, 보이는 상태면 숨김
+            if (emailInput.classList.contains('hidden')) {
+                emailInput.classList.remove('hidden'); // 입력 필드 보이기
+            } else {
+                emailInput.classList.add('hidden'); // 입력 필드 숨기기
+            }
+        });
+        
+        
+        
+        // 프로필 변경 버튼 클릭 시 file input 트리거
+        $('#changeProfileBtn').click(function() {
+            $('#profileInput').click(); // file input을 클릭하여 파일 탐색기 열기
+        });
+        
+	     // 파일 선택 후 이미지 미리보기
+	        $('#profileInput').change(function() {
+	            var file = this.files[0];
+	            if (file) {
+	                var reader = new FileReader();
+	                reader.onload = function(e) {
+	                    $('#profileImage').attr('src', e.target.result); // 선택한 이미지로 미리보기 설정
+	                    $('#profileImageDeleted').val(false); // 이미지가 삭제된 상태가 아님
+	                };
+	                reader.readAsDataURL(file);
+	            }
+	        });
+	
+	        // 프로필 삭제 버튼 클릭 시 기본 이미지로 변경
+	        $('#removeProfileBtn').click(function() {
+	            $('#profileImage').attr('src', '/bootstrap/images/profile_basic2.webp'); // 기본 이미지로 변경
+	            $('#profileInput').val(''); // 파일 입력 초기화
+	            $('#profileImageDeleted').val(true); // 프로필 이미지가 삭제되었음을 알림
+	        });
+
+        // 파일 선택 후 이벤트 (선택한 파일명 출력 등)
+        $('#profileInput').change(function() {
+            var fileName = $(this).val().split('\\').pop();
+            alert('선택한 파일: ' + fileName);
+            // 여기서 파일 업로드 처리 로직을 추가할 수 있습니다.
+        });
+        
+        
+        $('.btn-danger').click(function(){
+        	
+        	alert("정말로 회원탈퇴를 진행할까요?");
+        	
+        });
+        
+        $('#emailText').click(function() {
+            $('#emailModal').modal('show');
+        });
+	
+        $('#editPasswd').click(function() {
+	        let passwd = $("#passwd").val();
+	        let newPasswd = $("#newPasswd").val();
+	        let chkNewPasswd = $("#chkNewPasswd").val();
+	        let memberId = $("#memberId").val();
+
+	        // 현재 비밀번호를 검증하는 AJAX 요청
+	        $.ajax({
+	            type: "post",
+	            url: "/member/isValidPasswd",
+	            data: { "passwd": passwd, "memberId": memberId },  // memberId도 전송
+	            success: function(isValidPasswd) {
+	                if (isValidPasswd === "y") {
+	                	$("#isValidPasswdMsg").html("<span style='color:green;'>패스워드가 일치합니다.</span>");
+	                	
+	                    // 새로운 비밀번호와 확인 비밀번호가 일치하는지 검증
+	                    if (newPasswd === chkNewPasswd && newPasswd !== "" && chkNewPasswd !== "") {
+	                        $("#isValidPasswdMsg").html("<span style='color:green;'>패스워드가 일치합니다.</span>");
+
+	                        // 비밀번호 변경 요청
+	                        $.ajax({
+	                            type: "post",
+	                            url: "/member/modifyMyPasswd",
+	                            data: { "newPasswd": newPasswd, "memberId": memberId },  // memberId도 함께 전송
+	                            success: function(response) {
+	                                alert("비밀번호가 성공적으로 변경되었습니다.");
+	                            },
+	                            error: function(xhr, status, error) {
+	                                console.log("Error: " + error);
+	                            }
+	                        });
+	                    } else {
+	                        $("#isValidPasswdMsg").html("<span style='color:red;'>새 비밀번호가 일치하지 않습니다.</span>");
+	                    }
+	                } else {
+	                    $("#isValidPasswdMsg").html("<span style='color:red;'>현재 비밀번호와 일치하지 않습니다.</span>");
+	                }
+	            },
+	            error: function(xhr, status, error) {
+	                console.log("Error: " + error);
+	            }
+	        });
+	    });
+	});
+	
+</script>
 </head>
 <body>
 	<div layout:fragment="content">
@@ -116,79 +319,138 @@ tbody tr:last-child td {
 		<!-- Profile Section -->
 		<div class="login-background">
 			<div class="container">
-				<div class="profile-header">
-					<img th:src="@{/bootstrap/images/profile_basic2.webp}"
-						alt="User Profile Picture" class="img-thumbnail">
-					<div class="profile-info">
-						<!-- <h4 th:text="${user.name}">User Name</h4>
-                <p th:text="${user.email}">user@example.com</p> -->
-					</div>
-				</div>
+			<form th:action="@{/member/modifyMyInfo}" method="post" enctype="multipart/form-data">
+					<div class="profile-header">
+					<!-- 프로필 이미지 미리보기 -->
+			        <img id="profileImage" th:src="${memberDTO.memberProfileUUID != null ? '/uploads/' + memberDTO.memberProfileUUID : '/bootstrap/images/profile_basic2.webp'}"
+			            alt="User Profile Picture" class="img-thumbnail" width="150" height="150">
+			
+			        <!-- 프로필 이미지 업로드 -->
+			        <input type="file" name="uploadProfile" id="profileInput" style="display:none;" accept="image/*">
+			        <input type="hidden" id="profileImageDeleted" name="profileImageDeleted" value="false">
+			        
+			        <!-- 프로필 변경 및 삭제 버튼 -->
+			        <div class="noto-serif-kr" style="margin-top:1rem;">
+				        <button type="button" id="changeProfileBtn" class="btn btn-primary btn-sm">프로필 변경</button>
+				        <button type="button" id="removeProfileBtn" class="btn btn-sm">프로필 삭제</button>
+			        </div>
+			    </div>
 
-				<!-- Customer Center -->
-				<div class="noto-serif-kr">
-					<input type="button" class="btn-customer-center" value="고객센터" onclick="location.href='#'"/>
-				</div>
-				
-				<!-- Account Settings -->
-				<div class="account-settings mt-5">
-					<table class="noto-serif-kr">
-						<tr align="center">
-							<td>이름</td>
-							<td style="font-weight: bold;" th:text="${memberDTO.memberNm}"></td>
-						</tr>
-						<tr align="center">
-							<td>비밀번호</td>
-							<td style="font-weight: bold;"><a href="#">비밀번호 수정</a></td>
-						</tr>
-						<tr align="center">
-							<td>생년월일</td>
-							<td style="font-weight: bold;" th:text="${#dates.format(memberDTO.birthAt, 'yyyy년 MM월 dd일')}"></td>
-						</tr>
-						<tr align="center">
-							<td>휴대폰</td>
-							<td style="font-weight: bold;" th:text="${memberDTO.memberHp}"></td>
-						</tr>
-						<tr align="center">
-							<td>이메일</td>
-							<td style="font-weight: bold;" th:text="${memberDTO.memberId}"></td>
-						</tr>
-						<tr align="center">
-							<td>주소</td>
-							<td style="font-weight: bold;">
-							    <span th:text="${memberDTO.zipcode}"></span><br>
-							    <span th:text="${memberDTO.roadAddress}"></span><br>
-							    <span th:text="${memberDTO.jibunAddress}"></span>
-							</td>
-						</tr>
-						<tr align="center">
-							<td>보유 포인트</td>
-							<td style="font-weight: bold;" th:text="|${memberDTO.memberPoint}points|"></td>
-						</tr>
-						<tr align="center">
-							<td>수신 동의 여부</td>
-							<td style="font-weight: bold;">
-							</td>
-						</tr>
-						<tr align="center">
-							<td>가입날짜</td>
-							<td style="font-weight: bold;" th:text="${#dates.format(memberDTO.createDt, 'yyyy년 MM월 dd일')}"></td>
-						</tr>
-						<tr align="center">
-							<td colspan="2">
-								<a href="#" style="text-decoration: none;">Back</a>
-							</td>
-						</tr>
-					</table>
-				</div>
-				<div class="profile-button-zone">
-					<a th:href="@{/}"
-						class="btn btn-danger btn-logout noto-serif-kr">Settings</a> 
-					<a th:href="@{/main/index}"
-						class="btn btn-danger btn-logout noto-serif-kr">Logout</a>
-				</div>
+	
+					<!-- Customer Center -->
+					<div class="noto-serif-kr">
+						<input type="button" class="btn-customer-center" value="고객센터" onclick="location.href='#'"/>
+					</div>
+					
+					<!-- Account Settings -->
+					<div class="account-settings mt-5">
+						<table class="noto-serif-kr">
+							<tr align="center">
+					            <td>이름</td>
+					            <td style="font-weight: bold;">
+					                <span id="nameText" th:text="${memberDTO.memberNm}"></span>
+					                <input type="button" id="editNameBtn" class="btn btn-primary btn-sm" style="margin-left: 10px;" value="변경(개명 시 사용)">
+					            </td>
+					        </tr>
+							<tr align="center">
+								<td>비밀번호</td>
+								<td style="font-weight: bold;">
+									<input type="password" placeholder="현재 비밀번호" name="passwd" class="form-control" id="passwd" style="width: 16rem;">
+									<span id="isValidPasswdMsg"></span>
+									<input type="password" placeholder="새로운 비밀번호" class="form-control" id="newPasswd" style="width: 16rem; margin: 10px;" >
+									<input type="password" placeholder="비밀번호 확인" class="form-control" id="chkNewPasswd" style="width: 16rem;">
+									<span><input type="button" class="btn btn-sm" id="editPasswd" value="비밀번호 변경"></span>
+								</td>
+							</tr>
+							<tr align="center">
+								<td>생년월일</td>
+								<td style="font-weight: bold;" th:text="${#dates.format(memberDTO.birthAt, 'yyyy년 MM월 dd일')}"></td>
+							</tr>
+							<tr align="center">
+							    <td>휴대폰</td>
+							    <td style="font-weight: bold;">
+							        <span id="hpText" th:text="${memberDTO.memberHp}"></span>
+							        <input type="button" id="editHpBtn" class="btn btn-primary btn-sm" style="margin-left: 10px;" value="휴대폰 번호 변경">
+							        
+							        <!-- 휴대폰 번호 수정 입력 필드 (처음에는 숨김 처리) -->
+							        <input type="text" id="editHp" class="hidden form-control" style="width: 16rem; margin: 10px;" th:placeholder="${memberDTO.memberHp}" name="memberHp">
+							        
+							    </td>
+							</tr>
+							<tr align="center">
+					            <td>이메일</td>
+					            <td style="font-weight: bold;">
+					                <span id="emailText" th:text="${memberDTO.memberId}"></span>
+					                <input type="hidden" th:value="${memberDTO.memberId}" name="memberId" id="memberId">
+					                <span id="emailMsg"></span>
+					            </td>
+					        </tr>
+							<tr align="center">
+								<td>주소</td>
+								<td style="font-weight: bold;">
+								    <input type="text" name="zipcode" th:field="${memberDTO.zipcode}" class="form-control" placeholder="우편번호"><br>
+								    <input type="text" name="roadAddress" th:field="${memberDTO.roadAddress}" class="form-control" placeholder="도로명주소"><br>
+								    <input type="text" name="jibunAddress" th:field="${memberDTO.jibunAddress}" class="form-control" placeholder="지번"><br>
+								    <input type="text" name="namujiAddress" th:field="${memberDTO.namujiAddress}" class="form-control" placeholder="상세주소">
+								    <input type="button" th:onclick="javascript:execDaumPostcode()" value="주소 변경" class="btn btn-register-page btn-sm">
+								</td>
+							</tr>
+							<tr align="center">
+								<td>보유 포인트</td>
+								<td style="font-weight: bold;" th:text="|${memberDTO.memberPoint}points|"></td>
+							</tr>
+							<tr align="center">
+								<td>수신 동의 여부</td>
+								<td style="font-weight: bold;">
+									<input type="checkbox" th:field="${memberDTO.smsstsYn}" value="y" name="smsstsYn">
+									<label style="vertical-align: text-bottom;">sms 수신 동의</label>&emsp;
+									<input type="checkbox" th:field="${memberDTO.emailstsYn}" value="y" name="emailstsYn">
+									<label style="vertical-align: text-bottom;">email 수신 동의</label>
+								</td>
+							</tr>
+							<tr align="center">
+								<td>가입날짜</td>
+								<td style="font-weight: bold;" th:text="${#dates.format(memberDTO.createDt, 'yyyy년 MM월 dd일')}"></td>
+							</tr>
+							<tr align="center">
+								<td>마지막 업데이트 날짜</td>
+								<td style="font-weight: bold;" th:text="${#dates.format(memberDTO.updateDt, 'yyyy년 MM월 dd일')}"></td>
+							</tr>
+							<tr align="center">
+								<td colspan="2">
+									<a th:href="@{/member/mypageMain}" style="text-decoration: none;"><strong>Back</strong></a>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div class="profile-button-zone">
+						<input type="submit" class="btn btn-logout noto-serif-kr" value="Save">
+						<a th:href="@{/member/logout}"
+							class="btn btn-logout noto-serif-kr">Logout</a> 
+						<a th:href="@{/member/removeAccount}" style="background-color: red; border: none;"
+							class="btn btn-danger btn-logout noto-serif-kr">회원탈퇴</a>
+					</div>
+				</form>
 			</div>
 		</div>
 	</div>
+	<!-- 모달 시작 -->
+	<div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="emailModalLabel">알림</h5>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	      </div>
+	      <div class="modal-body">
+	        이메일 주소는 변경이 불가능합니다.
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<!-- 모달 끝 -->
 </body>
 </html>

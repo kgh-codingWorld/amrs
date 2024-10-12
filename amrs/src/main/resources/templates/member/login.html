@@ -13,12 +13,7 @@
 <meta name="keywords" content="bootstrap, bootstrap4" />
 
 <!-- Bootstrap CSS -->
-<!-- <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet"> -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
- <!-- Login CSS
-<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://unicons.iconscout.com/release/v2.1.9/css/unicons.css" rel="stylesheet"> -->
-
 <link th:href="@{/bootstrap/css/login.css}" rel="stylesheet">
 <link th:href="@{/bootstrap/scss/style.scss}" rel="stylesheet">
 
@@ -26,38 +21,6 @@
 <script th:src="@{/jquery/jquery-3.7.1.min.js}"></script>
 <script>
 
-	$(function(){
-		
-		$("#loginBtn").click(function(){
-			
-			let loginData = {
-				"memberId" : $("[name='memberId']").val(),
-				"passwd" : $("[name='passwd']").val()
-			}
-			
-			$.ajax({
-				url : "/member/login",
-				type : "post",
-				contentType : "application/json",
-				data : JSON.stringify(loginData),
-				success : function (isValidMember) {
-					
-					if (isValidMember == "y") {
-						location.href = "/";
-					}
-					else {
-						$("#failMsg").html("<span style='color:red;'>아이디와 패스워드를 확인하세요.</span>");
-					}
-					
-				}
-				
-				
-			});
-			
-		});
-		
-	});
-	
 	// 쿠키 설정 함수
 	function setCookie(cname, cvalue, exdays) {
 	    const d = new Date();
@@ -87,7 +50,6 @@
 	$("#loginBtn").click(function() {
 	    let loginData = {
 	        "memberId": $("[name='memberId']").val()
-	        /* "passwd": $("[name='passwd']").val() */
 	    };
 
 	    if ($("#memorizeId").is(":checked")) {
@@ -96,20 +58,41 @@
 	        setCookie("savedId", "", -1); // 쿠키 삭제
 	    }
 	});
-
-
 </script>
+
 <style>
-.memorizeId{
+.memorizeId {
 	display: flex;
 	margin-top: 1rem;
+}
+
+/* 링크들을 배치하는 부모 컨테이너 */
+.link-container {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	margin-top: 30px;
+}
+
+.left-links, .right-links {
+	display: flex;
+	align-items: center; /* 링크들 높이를 맞춤 */
+}
+
+.left-links a, .right-links a {
+	margin: 0 10px; /* 좌우 여백 */
+	text-decoration: none;
+	color: #000;
+	font-size: 12px;
+}
+
+.card-3d-wrap {
+	padding: 20px;
 }
 </style>
 </head>
 <body>
-	<!-- <a href="https://front.codes/" class="logo" target="_blank">
-    <img src="https://assets.codepen.io/1462889/fcy.png" alt="">
- </a> -->
 	<div layout:fragment="content">
 
 		<!-- Start Section -->
@@ -124,28 +107,46 @@
 									<div class="card-3d-wrapper">
 										<div class="card-front">
 											<div class="center-wrap">
-												<div class="section text-center">
-													<div class="form-group">
-														<input type="email" name="memberId" class="form-style"
-															placeholder="Your Email" id="memberId" autocomplete="off">
+													<div class="section text-center">
+														<span id="failMsg" class="noto-serif-kr"></span>
+														<form th:action="@{/member/login}" method="post">
+															<div class="form-group">
+																<input type="email" name="memberId" class="form-style"
+																	placeholder="Your Email" id="memberId" autocomplete="off">
+															</div>
+															<div class="form-group mt-2">
+																<input type="password" name="passwd" class="form-style"
+																	placeholder="Your Password" id="passwd"
+																	autocomplete="off">
+															</div>
+															<div class="form-group mt-2 memorizeId" style="display: flex; align-items: center;">
+															    <input type="checkbox" id="memorizeId" name="memorizeId" value="아이디 저장" />
+															    <label class="noto-serif-kr" for="memorizeId" style="margin-left: 5px; font-size: 11px;">아이디 저장</label> <!-- 텍스트와 체크박스 간 여백 -->
+															</div>
+															<button id="loginBtn" class="btn mt-4 libre-baskerville-bold">submit</button>
+														</form>
+														<!-- 링크를 배치하는 영역 -->
+														<div class="link-container">
+															<div class="left-links">
+																<p class="noto-serif-kr" style="margin: auto;">
+																	<a th:href="@{/member/findId}" class="link" style="font-size:12px;">이메일 찾기</a>
+																</p>
+																<span class="noto-serif-kr">
+																	<a th:href="@{/member/resetPassword}" class="link" style="font-size:12px;">비밀번호 재설정</a>
+																</span>
+															</div>
+															<div class="right-links">
+																<span class="noto-serif-kr">
+																	<a th:href="@{/member/registerMember}" class="link" style="font-size:12px;">회원가입</a>
+																</span>
+															</div>
+														</div>
 													</div>
-													<div class="form-group mt-2">
-														<input type="password" name="passwd" class="form-style"
-															placeholder="Your Password" id="passwd"
-															autocomplete="off">
-													</div>
-													<div class="form-group mt-2 memorizeId" style="display: flex; align-items: center;">
-													    <input type="checkbox" id="memorizeId" name="memorizeId" value="아이디 저장" />
-													    <label class="noto-serif-kr" for="memorizeId" style="margin-left: 5px; font-size: 11px;">아이디 저장</label> <!-- 텍스트와 체크박스 간 여백 -->
-													</div>
-													<a href="#" id="loginBtn" class="btn mt-4 libre-baskerville-bold">submit</a>
-														<p class="noto-serif-kr" style="margin: 0; margin-top: 30px;"><a href="#0" class="link" style="font-size:12px;">아이디/비밀번호찾기</a></p>
-														<span class="noto-serif-kr"><a th:href="@{/member/registerMember}" class="link" style="font-size:12px;">회원가입</a></span>
-												</div>
+												
 											</div>
 										</div>
 									</div>
-								</div>
+								</div> <!-- card-3d-wrap -->
 							</div>
 						</div>
 					</div>

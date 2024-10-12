@@ -1,11 +1,19 @@
 package com.application.amrs.common;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.application.amrs.blog.BlogDTO;
+import com.application.amrs.blog.BlogService;
+import com.application.amrs.member.MemberDTO;
 import com.application.amrs.member.MemberService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,8 +24,14 @@ public class CommonController {
 	
 	@Autowired
 	private MemberService memberService;
+	
+	@Autowired
+	private BlogService blogService;
 
 	/* 페이지 이동용 컨트롤러 */
+	// .
+	// .
+	// .
 	
 	@GetMapping("/")
 	public String main() {
@@ -25,12 +39,22 @@ public class CommonController {
 		return "main/index";
 	}
 	
-/*회원 관련 메서드*/
+	/*회원 관련 메서드*/
 	
 	@GetMapping("/member/login")
 	public String login() {
 		// 로그인 페이지로 이동
 		return "member/login";
+	}
+	
+	@GetMapping("/member/findId")
+	public String findAccount() {
+		return "member/findId";
+	}
+	
+	@GetMapping("/member/resetPassword")
+	public String resetPassword() {
+		return "member/resetPassword";
 	}
 	
 	@GetMapping("/member/logout")
@@ -53,7 +77,15 @@ public class CommonController {
 		// 마이페이지 메인으로 이동
 		return "member/mypageMain";
 	}
-
+	
+	@GetMapping("/member/checkPassword")
+	public String checkPassword(HttpServletRequest request, Model model) {
+		// 개인정보확인/수정 페이지 전 비밀번호 확인
+		HttpSession session = request.getSession();
+		model.addAttribute("memberDTO", memberService.getMemberDetail((String)session.getAttribute("memberId")));
+		return "member/checkPassword";
+	}
+	
 	@GetMapping("/member/myInfo")
 	public String myInfo(HttpServletRequest request, Model model) {
 		// 개인정보확인/수정 페이지로 이동
@@ -62,11 +94,24 @@ public class CommonController {
 		return "member/myInfo";
 	}
 	
+	@GetMapping("/member/removeAccount")
+	public String removeAccount(Model model, HttpSession session) {
+		
+		String memberId = (String) session.getAttribute("memberId");
+		model.addAttribute("memberDTO", memberService.getMemberDetail(memberId));
+		//MemberDTO memberDTO = memberService.getMemberDetail(memberId);
+		//model.addAttribute("memberDTO", memberDTO);
+		
+		return "member/removeAccount";
+	}
+	
 	@GetMapping("/main/about")
 	public String about() {
 		// 소개 페이지로 이동
 		return "main/about";
 	}
+	
+	/* 전시 관련 메서드 */
 	
 	@GetMapping("/exhibition/exhibitionByMuseum")
 	public String exhibitionByMuseum() {
@@ -98,6 +143,8 @@ public class CommonController {
 		return "exhibition/presidentExhibition";
 	}
 
+	/* 티켓 관련 메서드 */
+	
 	@GetMapping("/ticket/ticket")
 	public String ticket() {
 		// 티켓 구매 페이지로 이동
@@ -110,24 +157,81 @@ public class CommonController {
 		return "ticket/price";
 	}
 	
+	/* 뉴스 관련 메서드 */
+	
 	@GetMapping("main/news")
 	public String news() {
 		// 뉴스 페이지로 이동
 		return "news/news";
 	}
 
+	/* 블로그 관련 메서드 */
+	
 	@GetMapping("/blog/blogMain")
-	public String blogMain() {
-		// 게시글 메인으로 이동
-		return "blog/blogMain";
+    public String getBlogList(HttpServletRequest request, Model model) {
+        List<Map<String, Object>> blogList = blogService.getBlogList();
+        model.addAttribute("blogList", blogList); // Thymeleaf에 전달할 데이터
+        return "blog/blogMain"; 
+    }
+	
+	@GetMapping("/blog/blogDetail/{blogId}")
+	public String blogDetail(@PathVariable("blogId") int blogId, Model model) {
+		
+		Map<String, Object> blog = blogService.getBlogById(blogId, true);
+		String memberId = (String)blog.get("memberId");
+		String memberNm = memberService.getMemberNameById(memberId);
+		String maskedMemberNm = memberService.maskLastCharacter(memberNm);
+		
+		model.addAttribute("blog", blog);
+		model.addAttribute("memberNm", maskedMemberNm);
+		
+		return "blog/blogDetail";
+	}
+	
+	
+	@GetMapping("/blog/registerBlog")
+	public String registerBlog(HttpServletRequest request, Model model) {
+		HttpSession session = request.getSession();
+		String memberNm = (String) session.getAttribute("memberNm");
+		String maskedMemberNm = memberService.maskLastCharacter(memberNm);
+		model.addAttribute("maskedMemberNm", maskedMemberNm);
+		return "blog/registerBlog";
+	}
+	
+	@GetMapping("/blog/modifyBlog/{blogId}")
+	public String modifyBlog(@PathVariable("blogId") int blogId, HttpServletRequest request, Model model) {
+		HttpSession session = request.getSession();
+		String memberNm = (String) session.getAttribute("memberNm");
+		String maskedMemberNm = memberService.maskLastCharacter(memberNm);
+		model.addAttribute("maskedMemberNm", maskedMemberNm);
+		System.out.println("maskedMemberNm : " + maskedMemberNm);
+		model.addAttribute("blog", blogService.getBlogById(blogId, true));
+		
+		return "blog/modifyBlog";
 	}
 	
 	@GetMapping("/blog/myBlog")
-	public String myBlog() {
+	public String myBlog(HttpServletRequest request, Model model) {
 		// 내 게시글로 이동
+		HttpSession session = request.getSession();
+		model.addAttribute("memberDTO", memberService.getMemberDetail((String)session.getAttribute("memberId")));
+		if(session.getAttribute("memberId") == null) {
+			return "redirect:/member/login";
+		}
 		return "blog/myBlog";
 	}
 	
+	@GetMapping("/blog/following")
+	public String following() {
+		return "blog/following";
+	}
+
+	@GetMapping("/blog/follower")
+	public String follower() {
+		return "blog/follower";
+	}
+	
+	/* 장바구니 관련 메서드 */
 	
 	@GetMapping("/member/cart")
 	public String cart() {
