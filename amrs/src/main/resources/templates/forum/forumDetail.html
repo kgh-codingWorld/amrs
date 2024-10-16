@@ -5,10 +5,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Blog Detail</title>
+    <title>Forum Detail</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
-        .blog-container {
+        .forum-container {
             max-width: 800px;
             margin: 50px auto;
             background-color: #fff;
@@ -17,23 +17,23 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .blog-header {
+        .forum-header {
             text-align: center;
             margin-bottom: 30px;
         }
 
-        .blog-header h1 {
+        .forum-header h1 {
             font-size: 2.5rem;
             color: #333;
         }
 
-        .blog-meta {
+        .forum-meta {
             text-align: center;
             color: #777;
             font-size: 0.9rem;
         }
 
-        .blog-content {
+        .forum-content {
             font-size: 1.1rem;
             line-height: 1.8;
             color: #444;
@@ -49,15 +49,15 @@
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .blog-container {
+            .forum-container {
                 padding: 15px;
             }
 
-            .blog-header h1 {
+            .forum-header h1 {
                 font-size: 2rem;
             }
 
-            .blog-content {
+            .forum-content {
                 font-size: 1rem;
             }
         }
@@ -92,12 +92,13 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let likeCount = parseInt(document.getElementById('likeCount').textContent);
-            let isLiked = false;
+            let isLiked = $('#likeCount').val();
+            console.log(isLiked);
 
             document.querySelector('.like-button').addEventListener('click', function() {
                 const likeIcon = document.getElementById('likeIcon');
                 const likeCountElem = document.getElementById('likeCount');
-                const blogId = document.querySelector('[name="blogId"]').value;
+                const forumId = document.querySelector('[name="forumId"]').value;
 
                 if (isLiked) {
                     likeIcon.classList.remove('fas');
@@ -114,7 +115,7 @@
                 
             	$.ajax({
             		
-            		url: '/blog/likeCount/' + blogId,
+            		url: '/like/likeCount/' + forumId,
             		type: 'post',
             		contentType: 'application/json; charset=utf-8',
             		data: JSON.stringify({ 
@@ -136,54 +137,52 @@
             	});
             });
         });
-        
-        	
-        	
     </script>
     
 </head>
 <body>
 
     <div layout:fragment="content">
-    	<div class="blog-background">
-        <div class="blog-container">
-            <div class="blog-header">
-                <!-- Blog Title -->
+    	<div class="forum-background">
+        <div class="forum-container">
+            <div class="forum-header">
+                <!-- forum Title -->
                 <div class="dropdown noto-serif-kr" style="width: 1rem; float: right; list-style: none;">
                     <a data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         <i class="fa-solid fa-bars"></i></a>
-                    <div class="dropdown-menu">
+                    <div class="dropdown-menu" th:if="${session.memberId != null and session.memberId == forum['memberId']}" >
                         <span class="dropdown-item-text">
-                            <a th:href="@{/blog/modifyBlog/{blogId}(blogId=${blog.blogId})}">수정하기</a>
+                            <a th:href="@{/forum/modifyForum/{forumId}(forumId=${forum['forumId']})}">수정하기</a>
                         </span>
                         <span class="dropdown-item-text">
-                            <a th:href="@{/blog/removeBlog/{blogId}(blogId=${blog.blogId})}">삭제하기</a>
+                            <a th:href="@{/forum/removeForum}">삭제하기</a>
                         </span>
                     </div>
                 </div>
-                <h1 class="noto-serif-kr" th:text="${blog.blogTitle}"></h1>
+                <h1 class="noto-serif-kr" th:text="${forum['forumTitle']}"></h1>
             </div>
-			<input type="hidden" name="blogId" th:value="${blog.blogId}">
-            <div class="blog-meta">
-                <!-- Blog Meta Data -->
+			<input type="hidden" name="forumId" th:value="${forum['forumId']}">
+            <div class="forum-meta">
+                <!-- forum Meta Data -->
                 <p class="noto-serif-kr">
                     작성자: <span th:text="${memberNm}"></span> &bull;
-                    작성일: <span th:text="${#dates.format(blog.createDt, 'yyyy-MM-dd')}"></span>
+                    작성일: <span th:text="${#dates.format(forum.createDt, 'yyyy-MM-dd')}"></span>
                 </p>
             </div>
 
-            <div class="blog-content noto-serif-kr">
-                <!-- Blog Content -->
-                <p style="padding: 1rem;" th:text="${blog.blogContent}"></p>
+            <div class="forum-content noto-serif-kr">
+                <!-- forum Content -->
+                <p style="padding: 1rem;" th:text="${forum['forumContent']}"></p>
             </div>
-			<input type="button" value="목록보기" class="btn noto-serif-kr" th:onclick="|location.href='@{/blog/blogList}'|">
-
+			<input type="button" value="목록보기" class="btn noto-serif-kr" th:onclick="|location.href='@{/forum/forumMain}'|">
+			
+			<input type="hidden" id="isLiked" value="${isLiked}">
 
             <div class="like-section">
 			    <button class="like-button">
-			        <i id="likeIcon" class="far fa-heart"></i> <!-- 빈 하트 -->
+			        <i id="likeIcon" th:classappend="${isLiked != false} ? 'fas fa-heart' : 'far fa-heart'"></i>
 			    </button>
-			    <span class="like-count" id="likeCount" th:text="${blog.likeCount}"></span>
+			    <span class="like-count" id="likeCount" th:text="${forum['likeCount']}"></span>
 			</div>
         </div>
         </div>

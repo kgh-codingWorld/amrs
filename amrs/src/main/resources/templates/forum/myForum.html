@@ -19,7 +19,7 @@
 <meta name="description" content="" />
 <meta name="keywords" content="bootstrap, bootstrap4" />
 
-<title>My Blog Page</title>
+<title>My Forum Page</title>
 </head>
 
 <body>
@@ -27,18 +27,18 @@
 	<div layout:fragment="content">
 	<span th:if="${session.memberId != null}">
 		<!-- Start Hero Section -->
-<div class="blog-background">
+<div class="forum-background">
     <div class="container" style="transform: translate(10px, 98px);">
         <div class="row justify-content-between">
             <div class="col-lg-5">
                 <div class="intro-excerpt">
                     <div class="noto-serif-kr" style="color: white;" th:text="|${memberDTO.memberNm}님의 블로그|"></div>
-                    <h1 class="libre-baskerville-bold">My Blog</h1>
+                    <h1 class="libre-baskerville-bold">My forum</h1>
                     
                     <!-- 왼쪽 정렬된 글쓰기 및 설정 버튼 -->
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <a th:href="@{/blog/registerPost}" class="btn btn-secondary me-2 noto-serif-kr">→ 글쓰기</a>
+                            <a th:href="@{/forum/registerPost}" class="btn btn-secondary me-2 noto-serif-kr">→ 글쓰기</a>
                             <a href="" class="btn btn-white-outline noto-serif-kr me-2"><i class="fa-solid fa-gear"></i></a>
                         </div>
 
@@ -82,8 +82,8 @@
 
 
 
-		<!-- Start Blog Section -->
-		<div class="blog-section">
+		<!-- Start forum Section -->
+		<div class="forum-section">
 			<div class="container">
 
 				<div class="row">
@@ -241,7 +241,7 @@
 				</div>
 			</div>
 		</div>
-		<!-- End Blog Section -->
+		<!-- End forum Section -->
 
 
 

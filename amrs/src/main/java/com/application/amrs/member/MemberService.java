@@ -15,7 +15,7 @@ public interface MemberService {
 	public void modifyMyInfo(MultipartFile uploadProfile, MemberDTO memberDTO) throws IllegalStateException, IOException;
 	public boolean removeAccount(String passwd, String memberId);
 	
-	public String getMemberId(String username);
+	public MemberDTO getMemberId(String username);
 	public String getPortOneAccessToken();
 	public String maskLastCharacter(String memberNm);
 	public String getMemberNameById(String memberId);

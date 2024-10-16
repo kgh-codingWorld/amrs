@@ -17,6 +17,10 @@
 	<link th:href="@{/bootstrap/scss/style.scss}" rel="stylesheet">
 
 	<title>Find Account Page</title>
+
+	<!-- axios 라이브러리 추가 (CDN) -->
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 	<style>
 		.login-background {
 			background-color: #f7f7f7;
@@ -61,27 +65,28 @@
 				}
 				// IMP.certification 실행
 				IMP.certification({
-					pg: "inicis", // 본인인증 설정이 2개 이상일 때 필수
-					merchant_uid: "AUTH" + new Date().toISOString().slice(0, 10).replace(/-/g, '') + "-USER123-" + Math.random().toString(36).substring(2, 8), // 주문 번호 고유값 생성
-					//m_redirect_url: "/member/phoneAuthenticationRedirect" // 리디렉션 URL
-					
+				    pg: "inicis", 
+				    merchant_uid: "AUTH" + new Date().toISOString().slice(0, 10).replace(/-/g, '') + "-USER123-" + Math.random().toString(36).substring(2, 8)
 				}, function(rsp) {
-					// 인증 성공 시 로직
-					console.log("rsp 표시");
-					if (rsp.success) {
-						axios.post("/certifications/confirm", { imp_uid: rsp.imp_uid })
-						.then(function(response) {
-							alert("인증이 성공적으로 처리되었습니다.");
-							// 인증이 성공한 후 다른 동작 처리
-						})
-						.catch(function(error) {
-							alert("서버 통신 중 오류가 발생했습니다.");
-						});
-					} else {
-						// 인증 실패 시 로직
-						alert("인증에 실패하였습니다. 에러 내용: " + rsp.error_msg);
-					}
+				    console.log("인증 결과: ", rsp);  // rsp 객체가 어떻게 반환되는지 확인
+				    if (rsp.success) {
+				        console.log("인증 성공. imp_uid: ", rsp.imp_uid);
+				        axios.post("/certifications/confirm", 
+				            { imp_uid: rsp.imp_uid }, 
+				            { headers: { 'Content-Type': 'application/json' } }
+				        )
+				        .then(function(response) {
+				            alert("인증이 성공적으로 처리되었습니다.");
+				        })
+				        .catch(function(error) {
+				            console.error("서버 통신 중 오류 발생:", error.response);
+				            alert("서버 통신 중 오류가 발생했습니다.");
+				        });
+				    } else {
+				        alert("인증에 실패하였습니다. 에러 내용: " + rsp.error_msg);
+				    }
 				});
+
 			});
 		});
 	</script>

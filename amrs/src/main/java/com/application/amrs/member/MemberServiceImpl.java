@@ -9,10 +9,14 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,10 +30,10 @@ public class MemberServiceImpl implements MemberService {
 	private String fileRepositoryPath;
 	
 	@Value("${iamport.api_key}")
-	private String impKey;
+	private String iamportApiKey;
 	
 	@Value("${iamport.api_secret}")
-	private String impSecret;
+	private String iamportApiSecret;
 	
 	@Autowired
 	private MemberDAO memberDAO;
@@ -55,9 +59,6 @@ public class MemberServiceImpl implements MemberService {
 		if(memberDTO.getEmailstsYn() == null) memberDTO.setEmailstsYn("n");
 		
 		memberDTO.setPasswd(passwordEncoder.encode(memberDTO.getPasswd()));
-		
-		System.out.println("role: " + memberDTO.getMemberRole());
-		System.out.println("ServiceImpl의 memberDTO" + memberDTO);
 		
 		memberDAO.insertMember(memberDTO);
 	}
@@ -166,7 +167,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
 	@Override
-	public String getMemberId(String memberId) {
+	public MemberDTO getMemberId(String memberId) {
 		return memberDAO.findMemberId(memberId);
 	}
 	
@@ -180,19 +181,41 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	@Transactional
 	public String getPortOneAccessToken() {
-		RestTemplate restTemplate = new RestTemplate();
-		String requestUrl = "https://api.iamport.kr/users/getToken";
-		
-		Map<String, String> iamportKey = new HashMap<>();
-	    iamportKey.put("imp_key", impKey); // REST API key
-	    iamportKey.put("imp_secret", impSecret); // REST API secret
+	    RestTemplate restTemplate = new RestTemplate();
+	    
+	    String tokenUrl = "https://api.iamport.kr/users/getToken";
 
-	    ResponseEntity<Object> responseData = restTemplate.postForEntity(requestUrl, iamportKey, Object.class);
-	    LinkedHashMap responseBody = (LinkedHashMap) responseData.getBody();
-	    LinkedHashMap responseBodyProps = (LinkedHashMap) responseBody.get("response");
-	    String accessToken = (String) responseBodyProps.get("access_token");
-		
-		return accessToken;
+	    // 요청 본문에 API 키와 시크릿을 포함
+	    Map<String, String> tokenRequest = new HashMap<>();
+	    tokenRequest.put("imp_key", iamportApiKey);
+	    tokenRequest.put("imp_secret", iamportApiSecret);
+
+	    // Content-Type을 JSON으로 설정
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.APPLICATION_JSON);
+
+	    // 요청 본문과 헤더를 포함하여 HttpEntity 생성
+	    HttpEntity<Map<String, String>> entity = new HttpEntity<>(tokenRequest, headers);
+
+	    // POST 요청 전송
+	    try {
+	        ResponseEntity<Map> tokenResponse = restTemplate.postForEntity(tokenUrl, entity, Map.class);
+	        Map<String, Object> response = tokenResponse.getBody();
+
+	        // 응답에서 액세스 토큰을 추출
+	        if (response != null && response.get("response") != null) {
+	            Map<String, Object> responseData = (Map<String, Object>) response.get("response");
+	            return (String) responseData.get("access_token");
+	        } else {
+	            throw new RuntimeException("포트원 액세스 토큰을 발급받을 수 없습니다.");
+	        }
+	    } catch (HttpClientErrorException e) {
+	        System.err.println("HttpClientErrorException 발생: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
+	        throw new RuntimeException("포트원 API 요청 중 오류 발생: " + e.getMessage());
+	    } catch (Exception e) {
+	        System.err.println("Exception 발생: " + e.getMessage());
+	        throw new RuntimeException("서버 오류: " + e.getMessage());
+	    }
 	}
 
 	@Override

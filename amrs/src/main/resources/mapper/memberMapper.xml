@@ -40,7 +40,7 @@
 		)
 	</insert>
 
-	<select id="findMemberId" resultType="String"
+	<select id="findMemberId" resultType="MemberDTO"
 		parameterType="String">
 		SELECT MEMBER_ID
 		FROM MEMBER

@@ -9,25 +9,25 @@
     <link rel="shortcut icon" href="favicon.png">
     <meta name="description" content="" />
     <meta name="keywords" content="bootstrap, bootstrap4" />
-    <title>Blog Page</title>
+    <title>Forum Page</title>
 </head>
 
 <body>
 
 <div layout:fragment="content">
 
-	<div class="blog-background">
+	<div class="forum-background">
     <div class="container" style="transform: translate(10px, 98px);">
         <div class="row justify-content-between">
             <div class="col-lg-5">
                 <div class="intro-excerpt">
-                    <h1 class="libre-baskerville-bold">Blog</h1>
+                    <h1 class="libre-baskerville-bold">포럼</h1>
                     
                     <!-- 왼쪽 정렬된 글쓰기 및 설정 버튼 -->
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <a th:href="@{/blog/registerBlog}" class="btn btn-secondary me-2 noto-serif-kr">→ 글쓰기</a>
-                            <a th:href="@{/blog/myBlog}" class="btn btn-white-outline noto-serif-kr me-2">내 블로그</a>
+                            <a th:href="@{/forum/registerForum}" class="btn btn-secondary me-2 noto-serif-kr">→ 글쓰기</a>
+                            <a th:href="@{/forum/myforum}" class="btn btn-white-outline noto-serif-kr me-2">내 글 보러가기</a>
                         </div>
 
                     </div>
@@ -40,31 +40,32 @@
         </div>
     </div>
 </div>
-    <!-- Blog Section -->
-    <div class="blog-section">
+    <!-- forum Section -->
+    <div class="forum-section">
         <div class="container">
             <div class="row">
                 <!-- 블로그 리스트 렌더링 -->
-                <div th:if="${#lists.isEmpty(blogList)}">
-				    <p>No blog posts available.</p>
+                <div th:if="${#lists.isEmpty(forumList)}">
+				    <p>No forum posts available.</p>
 				</div>
-                <div th:each="blog : ${blogList}" class="col-12 col-sm-6 col-md-4 mb-5">
+                <div th:each="forum : ${forumList}" class="col-12 col-sm-6 col-md-4 mb-5">
                     <div class="post-entry">
                         <!-- 썸네일 이미지 -->
-                        <a th:href="@{/blog/blogDetail/{blogId}(blogId=${blog.blogId})}" class="post-thumbnail">
-						    <img th:src="${blog['blogThumbnailUUID'] != null ? '/uploads/' + blog['blogThumbnailUUID'] : '/bootstrap/images/blog_basic.jpg'}" 
+                        <a th:href="@{/forum/forumDetail/{forumId}(forumId=${forum['forumId']})}" class="post-thumbnail">
+						    <img th:src="${forum['forumThumbnailUUID'] != null ? '/uploads/' + forum['forumThumbnailUUID'] : '/bootstrap/images/forum_basic.jpg'}" 
      						alt="Thumbnail" class="img-fluid">
 
 						</a>
 
                         <div class="post-content-entry">
                             <!-- 제목 -->
-                            <h3><a th:href="@{/blog/blogDetail/{blogId}(blogId=${blog.blogId})}" th:text="${blog.blogTitle}"></a></h3>
+                            <h3><a th:href="@{/forum/forumDetail/{forumId}(forumId=${forum['forumId']})}" th:text="${forum.forumTitle}"></a></h3>
                             <div class="meta">
                                 <!-- 작성자 -->
-                                <span>by <a href="#" th:text="${blog.memberNm}"></a></span>
+                                <span>by <a href="#" th:text="${forum.memberNm}"></a></span>
                                 <!-- 작성일 -->
-                                <span>on <a href="#" th:text="${#dates.format(blog.createDt, 'yyyy-MM-dd')}"></a></span>
+                                <span>on <a href="#" th:text="${#dates.format(forum.createDt, 'yyyy-MM-dd')}"></a></span>
+                                <span style="float:right;">조회수 <a href="#" th:text="${forum.readCnt}"></a></span>
                             </div>
                         </div>
                     </div>

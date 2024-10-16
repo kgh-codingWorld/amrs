@@ -8,12 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.application.amrs.blog.BlogDTO;
-import com.application.amrs.blog.BlogService;
-import com.application.amrs.member.MemberDTO;
+import com.application.amrs.forum.ForumService;
 import com.application.amrs.member.MemberService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +22,7 @@ public class CommonController {
 	private MemberService memberService;
 	
 	@Autowired
-	private BlogService blogService;
+	private ForumService forumService;
 
 	/* 페이지 이동용 컨트롤러 */
 	// .
@@ -113,6 +109,11 @@ public class CommonController {
 	
 	/* 전시 관련 메서드 */
 	
+	@GetMapping("/exhibition/sample")
+	public String sample() {
+		return "exhibition/sample";
+	}
+	
 	@GetMapping("/exhibition/exhibitionByMuseum")
 	public String exhibitionByMuseum() {
 		// 미술관별 전시 페이지로 이동
@@ -167,69 +168,70 @@ public class CommonController {
 
 	/* 블로그 관련 메서드 */
 	
-	@GetMapping("/blog/blogMain")
-    public String getBlogList(HttpServletRequest request, Model model) {
-        List<Map<String, Object>> blogList = blogService.getBlogList();
-        model.addAttribute("blogList", blogList); // Thymeleaf에 전달할 데이터
-        return "blog/blogMain"; 
+	@GetMapping("/forum/forumMain")
+    public String getForumBlogList(HttpServletRequest request, Model model) {
+        List<Map<String, Object>> forumList = forumService.getForumList();
+        model.addAttribute("forumList", forumList); // Thymeleaf에 전달할 데이터
+        return "forum/forumMain"; 
     }
+
+	@GetMapping("/forum/registerForum")
+	public String registerForum(HttpServletRequest request, Model model) {
+		HttpSession session = request.getSession();
+		String memberNm = (String) session.getAttribute("memberNm");
+		String maskedMemberNm = memberService.maskLastCharacter(memberNm);
+		model.addAttribute("maskedMemberNm", maskedMemberNm);
+		return "forum/registerForum";
+	}
 	
-	@GetMapping("/blog/blogDetail/{blogId}")
-	public String blogDetail(@PathVariable("blogId") int blogId, Model model) {
+	@GetMapping("/forum/forumDetail/{forumId}")
+	public String forumDetail(@PathVariable("forumId") int forumId, HttpServletRequest request, Model model) {
 		
-		Map<String, Object> blog = blogService.getBlogById(blogId, true);
-		String memberId = (String)blog.get("memberId");
+		String sessionMemberId = (String) request.getSession().getAttribute("memberId");
+		boolean isLiked = forumService.hasMemberLikedPost(sessionMemberId, forumId);
+		
+		Map<String, Object> forum = forumService.getForumById(forumId, true);
+		String memberId = (String)forum.get("memberId");
 		String memberNm = memberService.getMemberNameById(memberId);
 		String maskedMemberNm = memberService.maskLastCharacter(memberNm);
 		
-		model.addAttribute("blog", blog);
+		model.addAttribute("forum", forum);
 		model.addAttribute("memberNm", maskedMemberNm);
+		model.addAttribute("isLiked", isLiked);
 		
-		return "blog/blogDetail";
+		return "forum/forumDetail";
 	}
 	
-	
-	@GetMapping("/blog/registerBlog")
-	public String registerBlog(HttpServletRequest request, Model model) {
+	@GetMapping("/forum/modifyForum/{forumId}")
+	public String modifyForum(@PathVariable("forumId") int forumId, HttpServletRequest request, Model model) {
 		HttpSession session = request.getSession();
 		String memberNm = (String) session.getAttribute("memberNm");
 		String maskedMemberNm = memberService.maskLastCharacter(memberNm);
 		model.addAttribute("maskedMemberNm", maskedMemberNm);
-		return "blog/registerBlog";
-	}
-	
-	@GetMapping("/blog/modifyBlog/{blogId}")
-	public String modifyBlog(@PathVariable("blogId") int blogId, HttpServletRequest request, Model model) {
-		HttpSession session = request.getSession();
-		String memberNm = (String) session.getAttribute("memberNm");
-		String maskedMemberNm = memberService.maskLastCharacter(memberNm);
-		model.addAttribute("maskedMemberNm", maskedMemberNm);
-		System.out.println("maskedMemberNm : " + maskedMemberNm);
-		model.addAttribute("blog", blogService.getBlogById(blogId, true));
+		model.addAttribute("forum", forumService.getForumById(forumId, true));
 		
-		return "blog/modifyBlog";
+		return "forum/modifyForum";
 	}
 	
-	@GetMapping("/blog/myBlog")
-	public String myBlog(HttpServletRequest request, Model model) {
+	@GetMapping("/forum/removeForum/{forumId}")
+	public String removeForum(@PathVariable("forumId") int forumId, HttpServletRequest request, Model model) {
+		HttpSession session = request.getSession();
+		model.addAttribute("memberDTO", memberService.getMemberDetail((String)session.getAttribute("memberId")));
+		model.addAttribute("forum", forumService.getForumById(forumId, true));
+		return "forum/removeForum";
+	}
+	
+	@GetMapping("/forum/myForum")
+	public String myForum(HttpServletRequest request, Model model) {
 		// 내 게시글로 이동
 		HttpSession session = request.getSession();
 		model.addAttribute("memberDTO", memberService.getMemberDetail((String)session.getAttribute("memberId")));
 		if(session.getAttribute("memberId") == null) {
 			return "redirect:/member/login";
 		}
-		return "blog/myBlog";
+		return "forum/myForum";
 	}
 	
-	@GetMapping("/blog/following")
-	public String following() {
-		return "blog/following";
-	}
-
-	@GetMapping("/blog/follower")
-	public String follower() {
-		return "blog/follower";
-	}
 	
 	/* 장바구니 관련 메서드 */
 	

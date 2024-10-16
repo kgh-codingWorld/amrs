@@ -1,4 +1,4 @@
-package com.application.amrs.blog;
+package com.application.amrs.forum;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,18 +12,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/blog")
-public class BlogRestController {
+@RequestMapping("/like")
+public class LikeRestController {
 
 	@Autowired
-	private BlogService blogService;
+	private ForumService forumService;
 	
 	@PostMapping("/likeCount/{blogId}")
 	public ResponseEntity<?> likeCount(@PathVariable("blogId") int blogId, @RequestBody Map<String, Object> likeData) {
 		boolean isLiked = (boolean) likeData.get("isLiked");
 		int likeCount = (int) likeData.get("likeCount");
 		
-		blogService.likePost(blogId, likeCount);
+		forumService.likePost(blogId, likeCount);
 		System.out.println("blogId: " + blogId + ", likeCount: " + likeCount + ", isLiked: " + isLiked);
 		
 		Map<String, Object> response = new HashMap<>();

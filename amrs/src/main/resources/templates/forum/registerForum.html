@@ -7,16 +7,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="author" content="Untree.co">
     <link rel="shortcut icon" href="favicon.png">
-    <link rel="stylesheet" href="/bootstrap/css/blog.css">
+    <link rel="stylesheet" href="/bootstrap/css/forum.css">
     <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.1.1/ckeditor5.css">
 
     <meta name="description" content="" />
     <meta name="keywords" content="bootstrap, bootstrap4" />
 
-    <title>Register Blog Page</title>
+    <title>Register forum Page</title>
     <style>
         /* 배경 이미지 설정 */
-        .blog-background {
+        .forum-background {
             background-size: cover;
             background-position: center;
             min-height: 100vh;
@@ -92,9 +92,9 @@
 <body>
 	<div layout:fragment="content">
 		<!-- Start Hero Section -->
-		<div class="blog-background">
+		<div class="forum-background">
 			<div class="container form-container">
-				<form th:action="@{/blog/registerBlog}" method="post" enctype="multipart/form-data">
+				<form th:action="@{/forum/registerForum}" method="post" enctype="multipart/form-data">
 					<div class="main-container">
 						<table border="0" class="noto-serif-kr">
 							<tr>
@@ -103,7 +103,7 @@
 							</tr>
 							<tr>
 								<td>제목</td>
-								<td style="width:42rem;"><input type="text" name="blogTitle" size="100" required /></td>
+								<td style="width:42rem;"><input type="text" name="forumTitle" size="100" required /></td>
 							</tr>
 							<tr>
 								<td>메인<br>이미지</td>
@@ -112,15 +112,15 @@
 							<tr>
 								<td>글내용</td>
 								<td style="width:42rem;">
-									<textarea rows="10" cols="50" name="blogContent" required></textarea>
-									<script>CKEDITOR.replace("blogContent");</script>
+									<textarea rows="10" cols="50" name="forumContent" required></textarea>
+									<script>CKEDITOR.replace("forumContent");</script>
 								</td>
 							</tr>
 							<tr align="center">
 								<td colspan="2">
 									<input type="hidden" name="memberId" th:value="${session.memberId}" />
 									<input type="submit" value="작성하기" />
-									<input type="button" value="목록보기" th:onclick="|location.href='@{/blog/blogMain}'|" />
+									<input type="button" value="목록보기" th:onclick="|location.href='@{/forum/forumMain}'|" />
 								</td>
 							</tr>
 						</table>
@@ -140,7 +140,7 @@
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
 		$(document).ready(function() {
-			$('#blogPostForm').submit(function(e) {
+			$('#forumPostForm').submit(function(e) {
 				e.preventDefault(); // 폼 제출 기본 동작 방지
 
 				// 입력된 제목과 내용을 가져오기

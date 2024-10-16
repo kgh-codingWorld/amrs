@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="Untree.co">
+    <link rel="shortcut icon" href="favicon.png">
+    
+    <meta name="description" content="" />
+    <meta name="keywords" content="bootstrap, bootstrap4" />
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/bootstrap/css/login.css}" rel="stylesheet">
+    <link th:href="@{/bootstrap/scss/style.scss}" rel="stylesheet">
+
+    <title>Remove Account Page</title>
+    
+    <style>
+        /* 기본 스타일 설정 */
+        .login-background {
+            background-color: #f0f4f8;
+            padding: 40px;
+            min-height: 100vh; /* 화면 전체 높이 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .section {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            padding: 12px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            padding: 12px;
+            font-size: 16px;
+            width: 100%;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .error-message {
+            color: red;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        /* 작은 화면에서 폼 크기 조정 */
+        @media (max-width: 576px) {
+            .section {
+                padding: 20px;
+                max-width: 100%;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+        }
+    </style>
+<script th:src="@{/jquery/jquery-3.7.1.min.js}"></script>
+    <script>
+        $(document).ready(function() {
+            // 확인 버튼 클릭 시 Ajax 요청이 실행되도록 설정
+            $('.btn.btn-primary').click(function(e) {
+                e.preventDefault();  // 기본 폼 제출 동작을 막음
+
+                // 입력된 값을 가져옴
+                let passwd = $('#passwd').val();
+                let memberId = $('#memberId').val();
+				let forumId = $('#forumId').val();
+                
+                // 비밀번호와 멤버 ID가 입력되었을 때만 서버로 요청
+                if (passwd && memberId) {
+				    $.ajax({
+				        type: "post",
+				        url: "/member/isValidPasswd",  // 비밀번호 확인용 URL
+				        data: {"passwd": passwd, "memberId": memberId},
+				        contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+				        success: function(isValidPasswd) {
+				            if (isValidPasswd === "y") {
+				                // 비밀번호가 일치하면 게시물 삭제 요청을 보냄
+				                $.ajax({
+				                    type: "post",  // 게시물 삭제 요청도 POST로 처리
+				                    url: "/forum/removeForum" + forumId,  // 게시물 삭제 URL
+				                    contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+				                    success: function(response) {
+				                        // 삭제 성공 시 이동 처리
+				                        alert("게시물이 성공적으로 삭제되었습니다.");
+				                        location.href = "/forum/forumMain";  // 포럼 메인 페이지로 이동
+				                    },
+				                    error: function(xhr, status, error) {
+				                        console.log("게시물 삭제 중 오류 발생: ", error);
+				                        console.log("상태: ", status);
+				                        console.log("응답 내용: ", xhr.responseText);
+				                    }
+				                });
+				            } else {
+				                $('#error-message').show();  // 비밀번호가 틀렸을 경우 오류 메시지 표시
+				            }
+				        },
+				        error: function(xhr, status, error) {
+				            console.log("오류 발생: ", error);
+				            console.log("상태: ", status);
+				            console.log("응답 내용: ", xhr.responseText);
+				        }
+				    });
+				}
+ else {
+                    alert("비밀번호를 입력하세요.");  // 값이 비어 있을 때 경고
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="login-background">
+            <div class="section">
+                <h2>삭제하시려면 비밀번호를 입력해 주세요</h2>
+                
+                <!-- 비밀번호 확인 폼 -->
+                <div class="form-group">
+                    <input type="password" id="passwd" name="passwd" class="form-control" placeholder="비밀번호 입력" required>
+                </div>
+                
+                <div id="error-message" class="error-message">비밀번호가 일치하지 않습니다.</div>
+                
+                <input type="hidden" th:value="${memberDTO.memberId}" id="memberId" name="memberId"/>
+                <input type="hidden" th:value="${forum.forumId}" id="forumId" name="forumId"/>
+                
+                <button type="button" class="btn btn-primary">확인</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

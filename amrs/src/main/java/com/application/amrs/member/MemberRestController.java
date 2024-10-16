@@ -1,14 +1,11 @@
 package com.application.amrs.member;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.http.HttpEntity;
@@ -27,11 +24,17 @@ public class MemberRestController {
 	private MemberService memberService;
 	
 	@PostMapping("/confirm")
-	public ResponseEntity<String> confirmCertification(@RequestParam("imp_uid") String impUid){
+	public ResponseEntity<String> confirmCertification(@RequestBody Map<String, Object> payload){
 		
+		String impUid = (String) payload.get("imp_uid");
+		
+		if(impUid == null) {
+			return ResponseEntity.badRequest().body("impUid가 누락되었습니다.");
+		}
+
 		String accessToken = memberService.getPortOneAccessToken(); // 발급받은 Access Token 사용
 
-        // imp_uid로 본인인증 정보 확인
+		// imp_uid로 본인인증 정보 확인
         String certificationUrl = "https://api.iamport.kr/certifications/" + impUid;
 
         RestTemplate restTemplate = new RestTemplate();
@@ -39,9 +42,10 @@ public class MemberRestController {
         headers.set("Authorization", "Bearer " + accessToken);
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
+        
         ResponseEntity<Map> response = restTemplate.exchange(certificationUrl, HttpMethod.GET, entity, Map.class);
-
         Map<String, Object> responseBody = response.getBody();
+        
         if (responseBody != null && (boolean) responseBody.get("success")) {
             return ResponseEntity.ok("본인인증 성공");
         } else {
