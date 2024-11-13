@@ -79,4 +79,48 @@ public class ForumServiceImpl implements ForumService {
 	    params.put("forumId", forumId);
 	    return forumDAO.checkMemberLike(params);
 	}
+	
+	@Override
+    public int toggleLike(String memberId, int forumId, boolean liked) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("memberId", memberId);
+        params.put("forumId", forumId);
+        params.put("liked", liked);
+
+        boolean hasLiked = forumDAO.checkMemberLike(params); // 좋아요 여부 체크
+
+        if (hasLiked) {
+            // 이미 좋아요가 존재하면 상태 업데이트
+            forumDAO.updateLikeStatus(params);
+            System.out.println("updateLikeStatus 실행 확인");
+        } else {
+            // 좋아요가 존재하지 않으면 새로 삽입
+            forumDAO.insertLike(params);
+            System.out.println("insertLike 실행 확인");
+        }
+        
+        int likeCount = forumDAO.countLikesForForum(forumId);
+        
+        ForumDTO forumDTO = new ForumDTO();
+        forumDTO.setForumId(forumId);
+        forumDTO.setLikeCount(likeCount);
+        forumDAO.updateLikeCount(forumDTO);
+        
+        return likeCount; // 최종 좋아요 개수 반환
+    }
+
+	@Override
+	public List<Map<String, Object>> getMyForumList(String memberId) {
+		
+		List<Map<String, Object>> myForumList = forumDAO.selectMyForumList(memberId);
+		
+		for(Map<String, Object> myForum : myForumList) {
+			//String memberId = (String) myForum.get("memberId");
+			String memberNm = memberService.getMemberNameById(memberId);
+			String maskedMemberNm = memberService.maskLastCharacter(memberNm);
+			myForum.put("memberNm", maskedMemberNm);
+		}
+		
+		return myForumList;
+	}
 }

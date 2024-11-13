@@ -1,14 +1,13 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{layout/layout.html}">
+	>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="author" content="Untree.co">
     <link rel="shortcut icon" href="favicon.png">
     <link rel="stylesheet" href="/bootstrap/css/forum.css">
-    <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.1.1/ckeditor5.css">
+    <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.2.0/ckeditor5.css">
 
     <meta name="description" content="" />
     <meta name="keywords" content="bootstrap, bootstrap4" />
@@ -86,11 +85,9 @@
             display: none;
         }
     </style>
-    <script th:src="@{/ckeditor/ckeditor.js}"></script>
 </head>
 
 <body>
-	<div layout:fragment="content">
 		<!-- Start Hero Section -->
 		<div class="forum-background">
 			<div class="container form-container">
@@ -98,7 +95,7 @@
 					<div class="main-container">
 						<table border="0" class="noto-serif-kr">
 							<tr>
-								<td>작성자</td>
+								<td class="noto-serif-kr">작성자</td>
 								<td style="width:42rem;"><input type="text" size="100" th:value="${maskedMemberNm}" class="noto-serif-kr" readonly /></td>
 							</tr>
 							<tr>
@@ -109,21 +106,17 @@
 								<td>메인<br>이미지</td>
 								<td style="width:42rem; vertical-align: middle;"><input type="file" name="thumbnail" size="100" /></td>
 							</tr>
-							<tr>
-								<td>글내용</td>
-								<td style="width:42rem;">
-									<textarea rows="10" cols="50" name="forumContent" required></textarea>
-									<script>CKEDITOR.replace("forumContent");</script>
-								</td>
-							</tr>
-							<tr align="center">
-								<td colspan="2">
-									<input type="hidden" name="memberId" th:value="${session.memberId}" />
-									<input type="submit" value="작성하기" />
-									<input type="button" value="목록보기" th:onclick="|location.href='@{/forum/forumMain}'|" />
-								</td>
-							</tr>
 						</table>
+						<div>
+							<div class="editor-container editor-container_classic-editor" id="editor-container">
+								<div class="editor-container__editor"><textarea name="forumContent" id="editor"></textarea></div>
+							</div>	
+						</div>
+					</div>
+					<div align="center" style="margin-top: 1rem;">
+						<input type="hidden" name="memberId" th:value="${session.memberId}" />
+						<input type="submit" value="작성하기" />
+						<input type="button" value="목록보기" th:onclick="|location.href='@{/forum/forumMain}'|" />
 					</div>
 				</form>
 
@@ -135,7 +128,6 @@
 			</div>
 		</div>
 		<!-- End Hero Section -->
-	</div>
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
@@ -154,5 +146,14 @@
 			});
 		});
 	</script>
+	<script type="importmap">
+		{
+			"imports": {
+				"ckeditor5": "https://cdn.ckeditor.com/ckeditor5/43.2.0/ckeditor5.js",
+				"ckeditor5/": "https://cdn.ckeditor.com/ckeditor5/43.2.0/"
+			}
+		}
+		</script>
+		<script type="module" src="/main.js"></script>
 </body>
 </html>

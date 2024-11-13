@@ -32,7 +32,9 @@ public class MemberRestController {
 			return ResponseEntity.badRequest().body("impUid가 누락되었습니다.");
 		}
 
-		String accessToken = memberService.getPortOneAccessToken(); // 발급받은 Access Token 사용
+//		String accessToken = memberService.getPortOneAccessToken(); // 발급받은 Access Token 사용
+		String accessToken = "d1b7c54fcfaaddcc340506489a45607f8a8eb365";
+		System.out.println("accessToken~!!!!" + accessToken);
 
 		// imp_uid로 본인인증 정보 확인
         String certificationUrl = "https://api.iamport.kr/certifications/" + impUid;

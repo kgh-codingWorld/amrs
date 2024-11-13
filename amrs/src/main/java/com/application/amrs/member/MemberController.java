@@ -26,6 +26,12 @@ public class MemberController {
 	
 	@Value("${file.repo.path}")
 	private String fileRepositoryPath;
+
+	@Value("${admin.id}")
+	private String adminId;
+	
+	@Value("${admin.password}")
+	private String adminPwd;
 	
 	@Autowired
 	private MemberService memberService;
@@ -47,21 +53,27 @@ public class MemberController {
 	
 	// 로그인
 	@PostMapping("/login")
-	public String login(@ModelAttribute MemberDTO memberDTO, HttpServletRequest request) {
-		
-		if(memberService.login(memberDTO)) {
-			
-			HttpSession session = request.getSession();
-			session.setAttribute("memberId", memberDTO.getMemberId());
-			session.setAttribute("memberNm", memberDTO.getMemberNm());
-			
-			System.out.println("memberDTO : " + memberDTO);
-			System.out.println("memberId : " + memberDTO.getMemberId());
-			System.out.println("passwd : " + memberDTO.getPasswd());
-		}
-		
-		return "redirect:/";
-	}
+    public String login(@ModelAttribute MemberDTO memberDTO, HttpServletRequest request, Model model) {
+        HttpSession session = request.getSession();
+
+        if (isAdmin(memberDTO)) {
+            session.setAttribute("adminId", adminId);
+            session.setAttribute("adminNm", "관리자");
+            
+            System.out.println("adminId: " + adminId);
+            System.out.println("memberDTO.getMemberId(): " + memberDTO.getMemberId());
+            return "redirect:/admin/dashboard";
+        }
+
+        if (memberService.login(memberDTO)) {
+            session.setAttribute("memberId", memberDTO.getMemberId());
+            session.setAttribute("memberNm", memberDTO.getMemberNm());
+            return "redirect:/";
+        } else {
+            model.addAttribute("failMsg", "아이디 또는 비밀번호가 올바르지 않습니다.");
+            return "member/login"; // 로그인 실패 시 로그인 페이지로 돌아감
+        }
+    }
 	
 	
 	/* 로그아웃 기능은 CommonController에 있음 */
@@ -120,4 +132,8 @@ public class MemberController {
         }
     }
 	
+	// 관리자 여부 확인 메서드
+    private boolean isAdmin(MemberDTO memberDTO) {
+        return memberDTO.getMemberId().equals(adminId) && memberDTO.getPasswd().equals(adminPwd);
+    }
 }

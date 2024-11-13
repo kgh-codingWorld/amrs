@@ -113,7 +113,7 @@
 						 role="button" aria-haspopup="true"
 						aria-expanded="false">전시</a>
 						<div class="dropdown-menu">
-							<a class="dropdown-item">미술관별 전시</a> 
+							<a class="dropdown-item" th:href="@{/exhibition/exhibitionList}">미술관별 전시</a> 
 							<a class="dropdown-item" href="shop.html">종류별 전시</a>
 						        <ul class="dropdown-submenu">
 						            <li><a class="dropdown-item" href="current.html">현재 전시</a></li>
@@ -145,7 +145,7 @@
 					<li><a class="nav-link" href="blog.html">News & Events</a></li>
 					<li><a class="nav-link" th:href="@{/forum/forumMain}">ARTalks</a></li>
 				</ul>
-				<div th:if="${session.memberId == null}">
+				<div th:if="${session.adminId == null}">
 					<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
 						<li>
 							<a class="nav-link" th:href="@{/member/login}">
@@ -159,7 +159,7 @@
 						</li>
 					</ul>
 				</div>
-				<div th:unless="${session.memberId == null}">
+				<div th:unless="${session.adminId == null}">
 					<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
 						<li class="nav-item dropdown">
 							<a class="nav-link" data-bs-toggle="dropdown"
@@ -170,8 +170,7 @@
 							<div class="dropdown-menu">
 								<span class="dropdown-item-text">
 								<img th:src="@{/bootstrap/images/profile_basic2.webp}" style="border-radius: 15px; width:30px; height:30px;"/>
-								&nbsp;<strong th:text="${session.memberNm}"></strong> 님</span>
-								<a class="dropdown-item" th:href="@{/member/mypageMain}">My Page</a> 
+								&nbsp;<strong th:text="${session.adminId}"></strong> 님</span>
 								<a class="dropdown-item" th:href="@{/member/logout}">Logout</a>
 							</div>
 						</li>

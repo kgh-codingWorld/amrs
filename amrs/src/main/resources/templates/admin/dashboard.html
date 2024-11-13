@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/adminLayout.html}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h2>총 티켓 수량 설정</h2>
+		<form th:action="@{/admin/setTotalTicketCount}" method="post">
+			<label for="localId">Local ID:</label> 
+			<input type="text" id="localId" name="localId" required> 
+			<label for="totalCnt">총 구매 가능한 티켓 수:</label> 
+			<input type="number" id="totalCnt" name="totalCnt" min="1" required>
+			<input type="text" id="price" name="price">
+			<button type="submit">Set Ticket Count</button>
+			<input type="hidden" name="adminId" th:value="${adminId}">
+			<input type="hidden" name="reservDate" value="2024-11-11">
+		</form>
+	</div>
+</body>
+</html>

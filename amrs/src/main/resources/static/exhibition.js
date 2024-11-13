@@ -1,8 +1,15 @@
+$(document).ready(function() {
+    var exhibitionList = $('#exhibitionData').data('exhibitionlist');
+    console.log('result : ' + exhibitionList);
+});
+
+
+/*
 var numOfRows = 10;  // 한 번의 요청에서 가져올 데이터 수
 var pageNo = 1;      // 요청할 페이지 번호
 
 var xhr = new XMLHttpRequest();
-var url = 'http://localhost/exhibition/exhibitionList';  // 백엔드 프록시 엔드포인트로 변경
+var url = 'http://localhost/api/exhibitionList';  // JSON 응답을 반환하는 API 엔드포인트
 
 // 백엔드에서 numOfRows와 pageNo를 처리할 수 있으므로 URL에 추가하지 않음
 xhr.open('GET', url + '?numOfRows=' + numOfRows + '&pageNo=' + pageNo);  // queryParams 포함
@@ -50,3 +57,4 @@ xhr.onreadystatechange = function () {
 };
 
 xhr.send();
+*/

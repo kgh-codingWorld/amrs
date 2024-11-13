@@ -14,8 +14,12 @@ public interface ForumDAO {
 	public Map<String, Object> selectForumById(int forumId);
 	public void updateLikeCount(ForumDTO forumDTO);
 	public boolean checkMemberLike(Map<String, Object> params);
+	public void updateLikeStatus(Map<String, Object> params);
+	public void insertLike(Map<String, Object> params);
 	public void updateForum(ForumDTO forumDTO);
 	public void updateReadCnt(int forumId);
 	public void deleteForum(int forumId);
 	public int getLikeCount(int forumId);
+	public List<Map<String, Object>> selectMyForumList(String memberId);
+	public int countLikesForForum(int forumId);
 }

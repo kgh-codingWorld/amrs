@@ -3,29 +3,29 @@
 <mapper namespace="com.application.amrs.forum.ForumDAO">
 
 <resultMap id="forumMap" type="hashmap" >
-		<result column="FORUM_ID"  	   property="forumId"/>
-		<result column="FORUM_TITLE" 	   property="forumTitle"/>
-		<result column="FORUM_CONTENT" 	   property="forumContent"/>
-		<result column="READ_CNT" 	   property="readCnt"/>
-		<result column="CREATE_DT" 	   property="createDt"/>
-		<result column="UPDATE_DT"       property="updateDt"/>
-		<result column="LIKE_COUNT"     property="likeCount"/>
-		<result column="FORUM_THUMBNAIL_UUID"  property="forumThumbnailUUID"/>
-		<result column="MEMBER_ID"  property="memberId"/>
-	</resultMap>
+	<result column="FORUM_ID"  	   			property="forumId"/>
+	<result column="FORUM_TITLE" 	   		property="forumTitle"/>
+	<result column="FORUM_CONTENT" 	   		property="forumContent"/>
+	<result column="READ_CNT" 	   			property="readCnt"/>
+	<result column="CREATE_DT" 	   			property="createDt"/>
+	<result column="UPDATE_DT"       		property="updateDt"/>
+	<result column="LIKE_COUNT"     		property="likeCount"/>
+	<result column="FORUM_THUMBNAIL_UUID"  	property="forumThumbnailUUID"/>
+	<result column="MEMBER_ID"  			property="memberId"/>
+</resultMap>
 
 <select id="selectForumList" resultMap="forumMap">
-        SELECT  F.FORUM_ID    AS FORUM_ID,
-                F.FORUM_TITLE AS FORUM_TITLE,
-                F.FORUM_THUMBNAIL_UUID AS FORUM_THUMBNAIL_UUID,
-                F.READ_CNT AS READ_CNT, 
-                F.CREATE_DT  AS CREATE_DT,
-                M.MEMBER_ID  AS MEMBER_ID
-        FROM    FORUM F
-        JOIN    MEMBER M
-        ON      F.MEMBER_ID = M.MEMBER_ID
-        ORDER   BY F.CREATE_DT DESC
-    </select>
+    SELECT  F.FORUM_ID AS FORUM_ID,
+            F.FORUM_TITLE AS FORUM_TITLE,
+            F.FORUM_THUMBNAIL_UUID AS FORUM_THUMBNAIL_UUID,
+            F.READ_CNT AS READ_CNT, 
+            F.CREATE_DT AS CREATE_DT,
+            M.MEMBER_ID AS MEMBER_ID
+    FROM    FORUM F
+    JOIN    MEMBER M ON F.MEMBER_ID = M.MEMBER_ID
+    ORDER   BY F.CREATE_DT DESC
+</select>
+
 
 <insert id="insertForum" parameterType="ForumDTO">
 	INSERT INTO FORUM (
@@ -73,8 +73,21 @@
         FROM LIKE_POST
         WHERE FORUM_ID = #{forumId}
         AND MEMBER_ID = #{memberId}
+        AND LIKED = TRUE
     )
 </select>
+
+<update id="updateLikeStatus" parameterType="map">
+    UPDATE LIKE_POST
+    SET LIKED = #{liked}
+    WHERE FORUM_ID = #{forumId}
+    AND MEMBER_ID = #{memberId}
+</update>
+
+<insert id="insertLike" parameterType="map">
+    INSERT INTO LIKE_POST (FORUM_ID, MEMBER_ID, LIKED)
+    VALUES (#{forumId}, #{memberId}, TRUE)
+</insert>
 
 
 <select id="getLikeCount" resultType="int" parameterType="int">
@@ -106,4 +119,24 @@
 	DELETE 	FROM FORUM
 	WHERE	FORUM_ID = #{forumId}
 </delete>
+
+<select id="selectMyForumList" resultMap="forumMap">
+        SELECT  F.FORUM_ID    AS FORUM_ID,
+                F.FORUM_TITLE AS FORUM_TITLE,
+                F.FORUM_THUMBNAIL_UUID AS FORUM_THUMBNAIL_UUID,
+                F.READ_CNT AS READ_CNT, 
+                F.CREATE_DT  AS CREATE_DT,
+                M.MEMBER_ID  AS MEMBER_ID
+        FROM    FORUM F
+        JOIN    MEMBER M
+        ON      F.MEMBER_ID = M.MEMBER_ID
+        WHERE	M.MEMBER_ID = #{memberId}
+        ORDER   BY F.CREATE_DT DESC
+</select>
+<select id="countLikesForForum" resultType="int" parameterType="int">
+    SELECT COUNT(*)
+    FROM LIKE_POST
+    WHERE FORUM_ID = #{forumId}
+    AND LIKED = TRUE
+</select>
 </mapper>

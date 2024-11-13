@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.application.amrs.comment.CommentDAO">
+<resultMap id="commentMap" type="hashmap" >
+	<result column="COMMENT_ID"  	   property="commentId"/>
+	<result column="COMMENT_CONTENT" 	   property="commentContent"/>
+	<result column="CREATE_DT" 	   property="createDt"/>
+	<result column="UPDATE_DT"       property="updateDt"/>
+	<result column="FORUM_ID"  property="forumId"/>
+	<result column="MEMBER_ID"  property="memberId"/>
+</resultMap>
+
+
+	<insert id="insertComment" parameterType="CommentDTO">
+		INSERT INTO COMMENT (
+			COMMENT_CONTENT,
+			FORUM_ID,
+			MEMBER_ID
+		)
+		VALUES (
+			#{commentContent},
+			#{forumId},
+			#{memberId}
+		)
+	</insert>
+	<select id="selectCommentList" resultMap="commentMap" parameterType="Int">
+		SELECT	COMMENT_CONTENT,
+				CREATE_DT,
+				MEMBER_ID
+		FROM	COMMENT
+		WHERE	FORUM_ID = #{forumId}
+	</select>
+</mapper>

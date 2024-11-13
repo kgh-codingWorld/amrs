@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전체전시</title>
+    <style>
+        .all-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 4rem;
+            margin-bottom: 4rem;
+        }
+        .exhibition-item {
+            border: 1px solid #ccc;
+            padding: 15px;
+            text-align: center;
+        }
+        .exhibition-item img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <h2 class="noto-serif-kr">모든전시</h2>
+    <div class="all-list">
+	    <div th:each="item : ${exhibitionList}" class="exhibition-item">
+	        <!-- 전시 제목 리스트 렌더링 -->
+	        <img th:src="${item.imageUrl}" onerror="this.src='/bootstrap/images/img-grid-3.jpg'" alt="Exhibition Image">
+	        <a th:href="@{/exhibition/exhibitionDetail/{localId}(localId=${item.localId})}">
+	        	<h3 class="noto-serif-kr" style="font-size: small;" th:text="${item.title}">Exhibition Title</h3>
+			</a>	    
+	    </div>
+	</div>
+
+
+    <!-- JavaScript로 제목 리스트 출력 (확인용) -->
+    <div id="exhibitionData" th:attr="data-exhibitionList=${exhibitionList}"></div>
+    <script th:src="@{/exhibition.js}"></script>
+</div>
+</body>
+</html>

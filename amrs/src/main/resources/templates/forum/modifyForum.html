@@ -112,7 +112,7 @@
 							<tr>
 								<td>글내용</td>
 								<td style="width:42rem;">
-									<textarea rows="10" cols="50" th:text="${forum.forumContent}" name="forumContent" required></textarea>
+									<textarea rows="10" cols="50" th:utext="${forum.forumContent}" name="forumContent" required></textarea>
 									<script>CKEDITOR.replace("forumContent");</script>
 								</td>
 							</tr>

@@ -48,6 +48,9 @@
 
 	// 로그인 버튼 클릭 시 쿠키에 아이디 저장
 	$("#loginBtn").click(function() {
+		
+		$("#failMsg").text("");
+		
 	    let loginData = {
 	        "memberId": $("[name='memberId']").val()
 	    };
@@ -108,7 +111,7 @@
 										<div class="card-front">
 											<div class="center-wrap">
 													<div class="section text-center">
-														<span id="failMsg" class="noto-serif-kr"></span>
+														<span id="failMsg" class="noto-serif-kr" th:text="${failMsg}" style="color:red;"></span>
 														<form th:action="@{/member/login}" method="post">
 															<div class="form-group">
 																<input type="email" name="memberId" class="form-style"

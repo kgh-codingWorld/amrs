@@ -63,7 +63,7 @@ public class ForumController {
 	        forumService.registerForum(forumDTO);
 
 	        // 성공적으로 등록되었으면 블로그 리스트 페이지로 리다이렉트
-	        return "redirect:/forum/myForum";
+	        return "redirect:/forum/myForumList";
 	    }
 	
 	@PostMapping("/modifyForum")

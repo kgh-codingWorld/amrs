@@ -1,191 +1,436 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" 
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
-	  layout:decorate="~{layout/layout.html}">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout.html}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Forum Detail</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <style>
-        .forum-container {
-            max-width: 800px;
-            margin: 50px auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Forum Detail</title>
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+	rel="stylesheet">
+<style>
+.forum-container {
+	max-width: 800px;
+	margin: 50px auto;
+	background-color: #fff;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
 
-        .forum-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+.forum-header {
+	text-align: center;
+	margin-bottom: 30px;
+}
 
-        .forum-header h1 {
-            font-size: 2.5rem;
-            color: #333;
-        }
+.forum-header h1 {
+	font-size: 2.5rem;
+	color: #333;
+}
 
-        .forum-meta {
-            text-align: center;
-            color: #777;
-            font-size: 0.9rem;
-        }
+.forum-meta {
+	text-align: center;
+	color: #777;
+	font-size: 0.9rem;
+}
 
-        .forum-content {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: #444;
-            margin-bottom: 40px;
-        }
+.forum-content {
+	font-size: 1.1rem;
+	line-height: 1.8;
+	color: #444;
+	margin-bottom: 40px;
+}
 
-        .like-section {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 30px;
-        }
+.actions {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 30px;
+}
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .forum-container {
-                padding: 15px;
-            }
+.like-section {
+	display: flex;
+	justify-content: space-between; /* 버튼을 좌우로 배치 */
+}
 
-            .forum-header h1 {
-                font-size: 2rem;
-            }
+.like-button {
+	display: inline-flex;
+	align-items: center;
+	background-color: transparent;
+	border: none;
+	font-size: 1.5rem;
+	cursor: pointer;
+	transition: color 0.3s ease;
+}
 
-            .forum-content {
-                font-size: 1rem;
-            }
-        }
-	    .like-button {
-	        display: inline-flex;
-	        align-items: center;
-	        background-color: transparent;
-	        border: none;
-	        font-size: 1.5rem;
-	        cursor: pointer;
-	        transition: color 0.3s ease;
-	    }
+.fa-heart {
+	font-size: 2rem;
+	color: red; /* 기본 빨간색 하트 */
+	transition: color 0.3s ease;
+}
+
+.liked .fa-heart {
+	color: red; /* 좋아요 누르면 빨간 하트 유지 */
+}
+
+.like-count {
+	margin-left: 10px;
+	font-size: 1.2rem;
+	color: #333;
+}
+
+/* 댓글창 */
+.comment-section {
+	margin-top: 40px;
+}
+
+.comment-section h3 {
+	font-size: 1.5rem;
+	color: #333;
+	margin-bottom: 20px;
+}
+
+.comment-form textarea {
+	width: 100%;
+	padding: 10px;
+	font-size: 16px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	margin-bottom: 10px;
+}
+
+.comment-form button {
+	padding: 10px 20px;
+	background-color: #343a40;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.comment-list {
+	list-style: none;
+	padding-left: 0;
+	margin-top: 20px;
+}
+
+.comment-list li {
+	margin-bottom: 20px;
+	border-bottom: 1px solid #ddd;
+	padding-bottom: 10px;
+}
+
+.comment {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.comment-author {
+	font-weight: bold;
+	margin-right: 10px;
+}
+
+.comment-date {
+	font-size: 0.8rem;
+	color: #777;
+}
+
+.reply-button {
+	background-color: transparent;
+	border: none;
+	color: #007bff;
+	cursor: pointer;
+	font-size: 0.9rem;
+}
+
+.reply-section {
+	margin-left: 20px;
+}
+
+.textarea-container {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+}
+
+.textarea-container textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: none;
+}
+
+.textarea-container button {
+    position: absolute;
+    right: 10px;
+    bottom: 15px;
+    padding: 6px 12px;
+    background-color: #343a40;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+/* 추가 스타일 */
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.edit-delete-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.reply-button {
+    background-color: transparent;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+
+</style>
+<script th:src="@{/jquery/jquery-3.7.1.min.js}"></script>
+<!-- Simple JavaScript for Like Button -->
+<script>
+	document.addEventListener('DOMContentLoaded',function() {
+
+		document.querySelector('.like-button').addEventListener('click',function() {
+			const likeIcon = document.getElementById('likeIcon');
+			const likeCountElem = document.getElementById('likeCount');
+			const memberId = document.querySelector('[name="memberId"]').value;
+			const forumId = document.querySelector('[name="forumId"]').value;
+			const likeCount = document.querySelector('[name="likeCount"]').value;
+			let liked = likeIcon.classList.contains('fas');
+			liked = !liked;
+			
+			if (isLiked) {
+				likeIcon.classList.remove('far');
+				likeIcon.classList.add('fas');
+				likeCountElem.textContent = parseInt(likeCountElem.textContent) + 1;
+			} else {
+				likeIcon.classList.remove('fas');
+				likeIcon.classList.add('far');
+				likeCountElem.textContent = parseInt(likeCountElem.textContent) - 1;
+			}
+
+			console.log('memberId : ' + memberId);
+			console.log('forumId : ' + forumId);
+            console.log('liked : ' + liked);
+            console.log('likeCount : ' + likeCount);
+			
+			$.ajax({
+	            url: '/like/toggleLike',
+	            type: 'post',
+	            contentType: 'application/json',
+	            data: JSON.stringify({
+	            	memberId: memberId,
+	                forumId: forumId,
+	                liked: liked,
+	                likeCount: likeCount
+	            }),
+	            success: function(response) {
+	                console.log('좋아요 상태가 성공적으로 업데이트되었습니다.');
+	            },
+	            error: function(xhr, status, error) {
+	                console.log('좋아요 상태 업데이트 중 오류가 발생했습니다: ', error);
+	                console.log("서버 응답:", xhr.responseText);
+	                console.log('memberId : ' + memberId);
+	                console.log('forumId : ' + forumId);
+	                console.log('liked : ' + liked);
+	                console.log('likeCount : ' + likeCount);
+	            }
+	        });
+		});
+	});
 	
-	    .fa-heart {
-	        font-size: 2rem;
-	        color: #ccc; /* 기본 빈 하트 색상 */
-	        transition: color 0.3s ease;
-	    }
-	
-	    .liked .fa-heart {
-	        color: red; /* 좋아요 누르면 빨간 하트 */
-	    }
-	
-	    .like-count {
-	        margin-left: 10px;
-	        font-size: 1.2rem;
-	        color: #333;
-	    }
-    </style>
-    <script th:src="@{/jquery/jquery-3.7.1.min.js}"></script>
-    <!-- Simple JavaScript for Like Button -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let likeCount = parseInt(document.getElementById('likeCount').textContent);
-            let isLiked = $('#likeCount').val();
-            console.log(isLiked);
+	$().ready(function(){
+		$('#submitComment').click(function(){
+			
+			let forumId = $('[name="forumId"]').val(); // 데이터 속성에서 get
+			let commentContent = $('#commentContent').val();
+			let memberId = $('[name="memberId"]').val();
+			
+			if(!commentContent.trim()) {
+				alert('댓글 내용을 입력하세요.');
+				return;
+			}
+			
+			$.ajax({
+				url : '/comment/registerComment/' + forumId,
+				type : 'post',
+				contentType: 'application/json',
+				data : JSON.stringify({
+					commentContent : commentContent,
+					memberId : memberId
+				}),
+				success : function(response) {
+					console.log('response:' + response);
+					console.log('response.memberNm:' + response.memberNm);
+					console.log('response.commentContent:' + response.commentContent);
+					console.log('response.createDt:' + response.createDt);
 
-            document.querySelector('.like-button').addEventListener('click', function() {
-                const likeIcon = document.getElementById('likeIcon');
-                const likeCountElem = document.getElementById('likeCount');
-                const forumId = document.querySelector('[name="forumId"]').value;
+					$('#commentContent').val('');  // 텍스트 영역 초기화
+	                $('.comment-list').append(
+	                    '<li>' +
+	                        '<div class="comment">' +
+	                            '<span class="comment-author">' + response.memberNm + '</span>' +
+	                            '<span class="comment-date">' + response.createDt + '</span>' +
+	                        '</div>' +
+	                        '<p>' + response.commentContent + '</p>' +
+	                        '<button class="reply-button" onclick="toggleReplyForm(this)">대댓글 달기</button>' +
+	                    '</li>'
+	                );
+				},
+				error : function(xhr, status, error) {
+					console.error('댓글 작성 중 오류 발생:', error);
+					console.log('forumId: ' + forumId);
+					console.log('commentContent: ' + commentContent);
+					console.log('memberId: ' + memberId);
+					alert('댓글 작성 중 오류가 발생했습니다.');
+				}
+			});
+		});
+		
+		
+	});
+</script>
 
-                if (isLiked) {
-                    likeIcon.classList.remove('fas');
-                    likeIcon.classList.add('far');
-                    likeCount--;
-                } else {
-                    likeIcon.classList.remove('far');
-                    likeIcon.classList.add('fas');
-                    likeCount++;
-                }
-
-                isLiked = !isLiked;
-                likeCountElem.textContent = likeCount;
-                
-            	$.ajax({
-            		
-            		url: '/like/likeCount/' + forumId,
-            		type: 'post',
-            		contentType: 'application/json; charset=utf-8',
-            		data: JSON.stringify({ 
-            			'likeCount': likeCount, 
-            			'isLiked': isLiked
-           			}),
-            		success: function(response) {
-                        // 서버로부터 응답이 성공적으로 왔을 때 처리
-                        // 서버에서 좋아요 처리 후 새로운 카운트를 반환할 수 있음
-                        likeCount = response.updatedLikeCount;  // 서버에서 새로운 카운트 값을 받아 업데이트
-                        $('#likeCount').text(likeCount);  // 좋아요 카운트 화면에 표시
-                        console.log('서버 응답: ', response);
-                    },
-                    error: function(xhr, status, error) {
-                        // 오류가 발생했을 때 처리
-                        console.log('Error occurred: ' + error);
-                    }
-            		
-            	});
-            });
-        });
-    </script>
-    
 </head>
 <body>
 
-    <div layout:fragment="content">
-    	<div class="forum-background">
-        <div class="forum-container">
-            <div class="forum-header">
-                <!-- forum Title -->
-                <div class="dropdown noto-serif-kr" style="width: 1rem; float: right; list-style: none;">
-                    <a data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa-solid fa-bars"></i></a>
-                    <div class="dropdown-menu" th:if="${session.memberId != null and session.memberId == forum['memberId']}" >
-                        <span class="dropdown-item-text">
-                            <a th:href="@{/forum/modifyForum/{forumId}(forumId=${forum['forumId']})}">수정하기</a>
-                        </span>
-                        <span class="dropdown-item-text">
-                            <a th:href="@{/forum/removeForum}">삭제하기</a>
-                        </span>
-                    </div>
-                </div>
-                <h1 class="noto-serif-kr" th:text="${forum['forumTitle']}"></h1>
-            </div>
-			<input type="hidden" name="forumId" th:value="${forum['forumId']}">
-            <div class="forum-meta">
-                <!-- forum Meta Data -->
-                <p class="noto-serif-kr">
-                    작성자: <span th:text="${memberNm}"></span> &bull;
-                    작성일: <span th:text="${#dates.format(forum.createDt, 'yyyy-MM-dd')}"></span>
-                </p>
-            </div>
+	<div layout:fragment="content">
+		<div class="forum-background">
+			<div class="section">
+				<div class="container">
+					<div class="forum-container">
+						<div class="forum-header">
+							<!-- forum Title -->
+							<div class="dropdown noto-serif-kr"
+								style="width: 1rem; float: right; list-style: none;">
+								<a data-bs-toggle="dropdown" role="button" aria-haspopup="true"
+									aria-expanded="false"> <i class="fa-solid fa-bars"></i></a>
+								<div class="dropdown-menu"
+									th:if="${session.memberId != null and session.memberId == forum['memberId']}">
+									<span class="dropdown-item-text"> <a
+										th:href="@{/forum/modifyForum/{forumId}(forumId=${forum['forumId']})}" style="text-decoration: none;">수정하기</a>
+									</span> <span class="dropdown-item-text"> <a
+										th:href="@{/forum/removeForum}" style="text-decoration: none;">삭제하기</a>
+									</span>
+								</div>
+							</div>
+							<h1 class="noto-serif-kr" th:text="${forum['forumTitle']}"></h1>
+						</div>
+						<input type="hidden" name="memberId" th:value="${forum['memberId']}">
+						<input type="hidden" name="forumId" th:value="${forum['forumId']}">
+						<input type="hidden" id="isLiked" th:value="${isLiked}">
+						<input type="hidden" name="likeCount" th:value="${forum['likeCount']}">
+						<div class="forum-meta">
+							<!-- forum Meta Data -->
+							<p class="noto-serif-kr">
+								작성자: <span th:text="${memberNm}"></span>&nbsp; | &nbsp;작성일: <span
+									th:text="${#dates.format(forum.createDt, 'yyyy-MM-dd')}"></span>
+							</p>
+						</div>
 
-            <div class="forum-content noto-serif-kr">
-                <!-- forum Content -->
-                <p style="padding: 1rem;" th:text="${forum['forumContent']}"></p>
-            </div>
-			<input type="button" value="목록보기" class="btn noto-serif-kr" th:onclick="|location.href='@{/forum/forumMain}'|">
-			
-			<input type="hidden" id="isLiked" value="${isLiked}">
+						<div class="forum-content noto-serif-kr">
+							<!-- forum Content -->
+							<p style="padding: 1rem;" th:utext="${forum['forumContent']}"></p>
+						</div>
 
-            <div class="like-section">
-			    <button class="like-button">
-			        <i id="likeIcon" th:classappend="${isLiked != false} ? 'fas fa-heart' : 'far fa-heart'"></i>
-			    </button>
-			    <span class="like-count" id="likeCount" th:text="${forum['likeCount']}"></span>
+						<!-- 목록보기 및 좋아요 버튼 -->
+						<div class="actions">
+							<!-- 좋아요 버튼 -->
+							<div class="like-section">
+								<button class="like-button">
+									<i id="likeIcon" th:classappend="${isLiked != false} ? 'fas fa-heart' : 'far fa-heart'"></i>
+								</button>
+								<span class="like-count" id="likeCount" th:text="${forum['likeCount']}"></span>
+							</div>
+
+							<!-- 목록보기 버튼 -->
+							<input type="button" value="목록보기" class="btn noto-serif-kr"
+								th:onclick="|location.href='@{/forum/forumMain}'|">
+						</div>
+
+						<!-- 댓글 작성 폼 -->
+						<div class="comment-section noto-serif-kr">
+							<h6>댓글</h6>
+							<div class="comment-form">
+								<div class="textarea-container">
+									<textarea name="commentContent" id="commentContent" rows="1" placeholder="댓글을 입력하세요"></textarea>
+									<button type="submit" id="submitComment">댓글 작성</button>
+								</div>
+									<input type="hidden" name="forumId" th:value="${forum['forumId']}">
+							</div>
+
+							<!-- 댓글 목록 -->
+							<ul class="comment-list">
+								<li th:each="comment : ${commentList}">
+									<div class="comment">
+										<span class="comment-author" th:text="${comment.memberId}"></span>
+										<span class="comment-date" th:text="${#dates.format(comment.createDt, 'yyyy-MM-dd HH:mm')}"></span>
+									</div>
+									<p th:text="${comment.commentContent}"></p>
+									<div class="button-container">
+										<!-- 대댓글 버튼 -->
+										<button class="reply-button" onclick="toggleReplyForm(this)">대댓글 달기</button>
+										<div class="edit-delete-buttons" th:if="${session.memberId != null and session.memberId == forum['memberId']}">
+											<button class="btn">수정하기</button>
+											<button class="btn">삭제하기</button>
+										</div>
+									</div>
+									<!-- 대댓글 작성 폼 (숨김) -->
+									<div class="reply-form" style="display: none;">
+										<form th:action="@{/forum/reply}" method="post">
+											<textarea name="replyContent" rows="2" placeholder="대댓글을 입력하세요"></textarea>
+											<!-- <input type="hidden" name="parentCommentId" th:value="${comment.commentId}"> -->
+											<input type="hidden" name="forumId" th:value="${forum['forumId']}">
+											<button type="submit">대댓글 작성</button>
+										</form>
+									</div>
+
+									<!-- 대댓글 목록 -->
+									<!-- <ul class="comment-list reply-section" th:each="reply : ${comment.replies}">
+										<li>
+											<div class="comment">
+												<span class="comment-author" th:text="${reply.author}"></span>
+												<span class="comment-date" th:text="${#dates.format(reply.createDate, 'yyyy-MM-dd HH:mm')}"></span>
+											</div>
+											<p th:text="${reply.content}"></p>
+										</li>
+									</ul> -->
+								</li>
+							</ul>
+						</div>
+
+					</div>
+				</div>
 			</div>
-        </div>
-        </div>
-    </div>
+		</div>
+	</div>
+
+	<script>
+		// 대댓글 입력 폼 토글 함수
+		function toggleReplyForm(button) {
+			var replyForm = button.nextElementSibling;
+			if (replyForm.style.display === "none") {
+				replyForm.style.display = "block";
+			} else {
+				replyForm.style.display = "none";
+			}
+		}
+	</script>
+
 </body>
 </html>

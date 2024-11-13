@@ -1,16 +1,25 @@
 package com.application.amrs.common;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import com.application.amrs.comment.CommentService;
+import com.application.amrs.exhibition.ExhibitionRestController;
+import com.application.amrs.exhibition.ExhibitionRestController.ExhibitionItem;
 import com.application.amrs.forum.ForumService;
+import com.application.amrs.member.MemberDTO;
 import com.application.amrs.member.MemberService;
+import com.application.amrs.payment.PaymentDTO;
+import com.application.amrs.payment.PaymentService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -23,7 +32,16 @@ public class CommonController {
 	
 	@Autowired
 	private ForumService forumService;
-
+	
+	@Autowired
+	private CommentService commentService;
+	
+	@Autowired
+	private PaymentService paymentService;
+	
+//	@Autowired
+//    private ExhibitionRestController exhibitionRestController;
+	
 	/* 페이지 이동용 컨트롤러 */
 	// .
 	// .
@@ -69,7 +87,22 @@ public class CommonController {
 	}
 
 	@GetMapping("/member/mypageMain")
-	public String mypageMain() {
+	public String mypageMain(HttpServletRequest request, Model model) {
+		
+		HttpSession session = request.getSession();
+		String memberId = (String)session.getAttribute("memberId");
+		
+		if(memberId != null) {
+			// 현재 로그인된 아이디로 payment 정보 호출
+			List<Map<String, Object>> paymentList = paymentService.getPaymentList(memberId);
+			model.addAttribute("paymentList", paymentList);
+			
+			
+		} else {
+			model.addAttribute("paymentList", Collections.emptyList());
+		}
+		model.addAttribute("memberId", memberId);
+		
 		// 마이페이지 메인으로 이동
 		return "member/mypageMain";
 	}
@@ -106,12 +139,37 @@ public class CommonController {
 		// 소개 페이지로 이동
 		return "main/about";
 	}
-	
 	/* 전시 관련 메서드 */
 	
-	@GetMapping("/exhibition/sample")
-	public String sample() {
-		return "exhibition/sample";
+	@GetMapping("/exhibition/exhibitionList")
+    public String exhibitionList(Model model) {
+		ExhibitionRestController exhibitionRestController = new ExhibitionRestController();
+        List<ExhibitionItem> items = exhibitionRestController.getExhibitionItems();
+        model.addAttribute("exhibitionList", items);
+        return "exhibition/exhibitionList";
+    }
+	
+	@GetMapping("/exhibition/exhibitionDetail/{localId}")
+	public String exhibitionDetail(Model model, @PathVariable("localId") String localId, HttpServletRequest request) {
+
+		System.out.println(" ~~~~ exhibitionDetail : 전 localId : " + localId);
+
+		HttpSession session = request.getSession();
+		ExhibitionRestController exhibitionRestController = new ExhibitionRestController();
+		ExhibitionItem items = exhibitionRestController.exhibitionDetail(localId);
+		System.out.println(" ~~~~ exhibitionDetail : items imageurl : " + items.getImageUrl());
+		
+		model.addAttribute("exhibitionDetail", items);
+		model.addAttribute("memberDTO", memberService.getMemberDetail((String)session.getAttribute("memberId")));
+		
+		int totalCnt = paymentService.getTotalTicketCount(localId);
+		int restCnt = paymentService.getTicketRestCnt(localId);
+		model.addAttribute("totalCnt", totalCnt);
+		model.addAttribute("restCnt", restCnt);
+
+		System.out.println(" ~~~~ exhibitionDetail : 후 localId : " + localId);
+
+		return "exhibition/getExhibitionDetail";
 	}
 	
 	@GetMapping("/exhibition/exhibitionByMuseum")
@@ -184,6 +242,15 @@ public class CommonController {
 		return "forum/registerForum";
 	}
 	
+	@GetMapping("/forum/test")
+	public String test(HttpServletRequest request, Model model) {
+		HttpSession session = request.getSession();
+		String memberNm = (String) session.getAttribute("memberNm");
+		String maskedMemberNm = memberService.maskLastCharacter(memberNm);
+		model.addAttribute("maskedMemberNm", maskedMemberNm);
+		return "forum/test";
+	}
+	
 	@GetMapping("/forum/forumDetail/{forumId}")
 	public String forumDetail(@PathVariable("forumId") int forumId, HttpServletRequest request, Model model) {
 		
@@ -195,9 +262,21 @@ public class CommonController {
 		String memberNm = memberService.getMemberNameById(memberId);
 		String maskedMemberNm = memberService.maskLastCharacter(memberNm);
 		
+		// 댓글
+		List<Map<String, Object>> commentList = commentService.getCommentList(forumId);
+		
+		for(Map<String, Object> comment : commentList) {
+			String commentMemberId = (String)comment.get("memberId");
+			String commentMemberNm = memberService.getMemberNameById(commentMemberId);
+			String commentMaskedMemberNm = memberService.maskLastCharacter(commentMemberNm);
+			
+			comment.put("memberId", commentMaskedMemberNm);
+		}
+		
 		model.addAttribute("forum", forum);
 		model.addAttribute("memberNm", maskedMemberNm);
 		model.addAttribute("isLiked", isLiked);
+		model.addAttribute("commentList", commentList);
 		
 		return "forum/forumDetail";
 	}
@@ -221,15 +300,20 @@ public class CommonController {
 		return "forum/removeForum";
 	}
 	
-	@GetMapping("/forum/myForum")
+	@GetMapping("/forum/myForumList")
 	public String myForum(HttpServletRequest request, Model model) {
 		// 내 게시글로 이동
 		HttpSession session = request.getSession();
-		model.addAttribute("memberDTO", memberService.getMemberDetail((String)session.getAttribute("memberId")));
+		MemberDTO memberDTO = memberService.getMemberDetail((String)session.getAttribute("memberId"));
+		
+		List<Map<String, Object>> myForumList = forumService.getMyForumList((String)session.getAttribute("memberId"));
+        model.addAttribute("myForumList", myForumList); // Thymeleaf에 전달할 데이터
+		
+		model.addAttribute("memberDTO", memberDTO);
 		if(session.getAttribute("memberId") == null) {
 			return "redirect:/member/login";
 		}
-		return "forum/myForum";
+		return "forum/myForumList";
 	}
 	
 	

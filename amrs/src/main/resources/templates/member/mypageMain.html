@@ -152,6 +152,7 @@ tbody tr:last-child td {
 	font-size: larger;
 	width: auto;
 	flex: none;
+	border: none;
 }
 
 .delete-button-zone {
@@ -163,10 +164,39 @@ tbody tr:last-child td {
 	gap: 136px; /* 아이콘과 버튼 사이 간격 */
 }
 </style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchInput = document.getElementById("searchInput");
+        const features = document.querySelectorAll(".feature");
+
+        searchInput.addEventListener("input", function() {
+            const filter = searchInput.value.toLowerCase();
+
+            features.forEach(feature => {
+                const titleElement = feature.querySelector("h3");
+                if (titleElement) {
+                    const titleText = titleElement.textContent.toLowerCase();
+                    if (titleText.includes(filter)) {
+                        feature.style.display = "block";
+                    } else {
+                        feature.style.display = "none";
+                    }
+                }
+            });
+        });
+    });
+</script>
+
 </head>
 <body>
 	<div layout:fragment="content">
 		<!-- Profile Section -->
+		<div th:if="${session.memberId == null}">
+			<script type="text/javascript">
+		        window.location.href = '/member/login'; // 로그인 페이지 URL로 변경
+		    </script>
+		</div>
 		<div class="login-background">
 			<div class="container">
 				<!-- Account Settings -->
@@ -199,24 +229,24 @@ tbody tr:last-child td {
 				<!-- Features Section -->
 				<div class="features noto-serif-kr">
 					<div class="payment-search">
-						<p class="payment-search-placeholder">결제한 전시를 검색해 보세요!</p>
-						<i class="fa-solid fa-magnifying-glass"></i>
+					    <input type="text" id="searchInput" placeholder="결제한 전시를 검색해 보세요!">
+					    <i class="fa-solid fa-magnifying-glass"></i>
 					</div>
-					<div class="feature">
-						<div class="payment-date">
-							2024.09.09
+					<div class="feature" th:each="payment : ${paymentList}">
+						결제일자: <div class="payment-date" th:text="${#dates.format(payment.createDt, 'yyyy-MM-dd')}">
 							<p align="right">
 								<a href="" class="order-detail-link">주문 상세보기</a>
 							<p>
 						</div>
 						<div class="feature-same-date-ordered">
-							<img src="https://via.placeholder.com/150x200"
+							<img th:src="${payment.exhibitionImage}"
 								class="introduce-card" alt="전시 포스터"
 								style="width: 150px; height: 200px;">
 							<div class="same-date-ordered-info">
-								<h3>결제 전시 제목</h3>
+								<h3 th:text="${payment.exhibitionTitle}"></h3>
 								<hr />
-								<p>원</p>
+								<span>가격</span><p th:text="${payment.price}"></p>
+								<span>관람일 </span><p th:text="${payment.reservDate}"></p>
 							</div>
 							<div class="delete-button-zone">
 								<i class="fa-solid fa-bars-staggered"></i>
@@ -228,9 +258,8 @@ tbody tr:last-child td {
 								<span class="close-btn" id="closeBtn">&times;</span>
 								<p>팝업 창 내용입니다.</p>
 							</div>
-
 						</div>
-					</div>
+						</div>
 				</div>
 			</div>
 		</div>

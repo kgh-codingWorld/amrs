@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.application.amrs.payment.PaymentDAO">
+
+<resultMap id="paymentMap" type="hashmap">
+	<result column="LOCAL_ID" 		property="localId"/>
+	<result column="MEMBER_ID" 		property="memberId"/>
+	<result column="PRICE"			property="price"/>
+	<result column="TOTAL_CNT" 		property="totalCnt"/>
+	<result column="ORDER_CNT" 		property="orderCnt"/>
+	<result column="REST_CNT" 		property="restCnt"/>
+	<result column="EXHIBITION_TITLE" property="exhibitionTitle"/>
+	<result column="EXHIBITION_IMAGE" property="exhibitionImage"/>
+	<result column="RESERV_DATE" 	property="reservDate"/>
+	<result column="CREATE_DT" 		property="createDt"/>
+</resultMap>
+
+<!-- insertPayment: 새 결제 정보 삽입, TOTAL_CNT는 처음 설정된 값으로 유지 -->
+<insert id="insertPayment" parameterType="PaymentDTO">
+	INSERT INTO PAYMENT (
+		LOCAL_ID,
+		MEMBER_ID,
+		PRICE,
+		TOTAL_CNT,
+		ORDER_CNT,
+		REST_CNT,
+		EXHIBITION_TITLE,
+		EXHIBITION_IMAGE,
+		RESERV_DATE
+	)
+	VALUES (
+		#{localId},
+		#{memberId},
+		#{price},
+		#{totalCnt},
+		#{orderCnt},
+		#{totalCnt} - #{orderCnt},
+		#{exhibitionTitle},
+		#{exhibitionImage},
+		#{reservDate}
+	);
+</insert>
+
+<select id="selectTotalTicketCnt" resultType="int" parameterType="String">
+	SELECT TOTAL_CNT
+	FROM PAYMENT
+	WHERE LOCAL_ID = #{localId}
+	LIMIT 1
+</select>
+
+<select id="selectRestTicketCnt" resultType="int" parameterType="String">
+	SELECT (MAX(TOTAL_CNT)- SUM(ORDER_CNT)) AS REST_CNT
+	FROM PAYMENT
+	WHERE LOCAL_ID = #{localId}
+	GROUP BY LOCAL_ID
+</select>
+
+<select id="selectPaymentList" resultMap="paymentMap" parameterType="String">
+	SELECT 	*
+	FROM 	PAYMENT
+	WHERE	MEMBER_ID = #{memberId}
+	ORDER	BY CREATE_DT DESC
+</select>
+
+<select id="selectPaymentInfo" resultType="PaymentDTO" parameterType="String">
+	SELECT *
+	FROM PAYMENT
+	WHERE MEMBER_ID = #{memberId}
+	LIMIT 1
+</select>
+</mapper>
