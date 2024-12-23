@@ -1,4 +1,4 @@
-package com.application.amrs.forum;
+package com.application.amrs.blog;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,74 +23,65 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/forum")
-public class ForumController {
+@RequestMapping("/blog")
+public class BlogController {
 	
 	@Value("${file.repo.path}")
 	private String fileRepositoryPath; 
 
 	@Autowired
-	private ForumService forumService;
+	private BlogService blogService;
 	
-	 @PostMapping("/registerForum")
-	    public String registerforum(@ModelAttribute ForumDTO forumDTO,
-//	    		@RequestParam("memberId") String memberId, 
-//	    							@RequestParam("forumTitle") String forumTitle,
-//	    							@RequestParam("forumContent") String forumContent,
-	    		@RequestParam(value = "thumbnail", required = false) MultipartFile uploadProfile) throws IOException {
+	 @PostMapping("/registerBlog")
+	    public String registerBlog(@ModelAttribute BlogDTO blogDTO,
+	    							@RequestParam(value = "thumbnail", required = false) MultipartFile uploadProfile) throws IOException {
 		 
-//		 ForumDTO forumDTO = new ForumDTO();
-//		 forumDTO.setMemberId(memberId);
-//		 forumDTO.setForumTitle(forumTitle);
-//		 forumDTO.setForumContent(forumContent);
-		 
-		 forumDTO.setMemberId(forumDTO.getMemberId());
-		 forumDTO.setForumTitle(forumDTO.getForumTitle());
-		 forumDTO.setForumContent(forumDTO.getForumContent());
+		 blogDTO.setMemberId(blogDTO.getMemberId());
+		 blogDTO.setBlogTitle(blogDTO.getBlogTitle());
+		 blogDTO.setBlogContent(blogDTO.getBlogContent());
 		 
 		 if(!uploadProfile.isEmpty()) {
 			 String originalFilename = uploadProfile.getOriginalFilename();
-			 forumDTO.setForumOriginalThumbnailName(originalFilename);
+			 blogDTO.setBlogOriginalThumbnailName(originalFilename);
 			 
 			 String extension = originalFilename.substring(originalFilename.indexOf("."));
 			 String uploadFile = UUID.randomUUID() + extension;
-			 forumDTO.setForumThumbnailUUID(uploadFile);
+			 blogDTO.setBlogThumbnailUUID(uploadFile);
 			 
 			 uploadProfile.transferTo(new File(fileRepositoryPath + uploadFile));
 		 }
 
 	        // 블로그 포스트 등록 서비스 호출
-	        forumService.registerForum(forumDTO);
+	        blogService.registerBlog(blogDTO);
 
 	        // 성공적으로 등록되었으면 블로그 리스트 페이지로 리다이렉트
-	        return "redirect:/forum/myForumList";
+	        return "redirect:/blog/myBlogPostList";
 	    }
 	
-	@PostMapping("/modifyForum")
-	public String modifyForum(@RequestParam("memberId") String memberId,
-							  @RequestParam("forumId") int forumId,
-							  @RequestParam("forumTitle") String forumTtile,
-							  @RequestParam("forumContent") String forumContent,
+	@PostMapping("/modifyBlog")
+	public String modifyBlog(@RequestParam("blogId") int blogId,
+							  @RequestParam("blogTitle") String blogTitle,
+							  @RequestParam("blogContent") String blogContent,
 			@RequestParam(value = "thumbnail", required = false) MultipartFile uploadProfile) throws IllegalStateException, IOException {
 		
-		ForumDTO forumDTO = new ForumDTO();
-		forumDTO.setMemberId(memberId);
-		forumDTO.setForumId(forumId);
-		forumDTO.setForumTitle(forumTtile);
-		forumDTO.setForumContent(forumContent);
+		BlogDTO blogDTO = new BlogDTO();
+		blogDTO.setBlogId(blogId);
+		blogDTO.setBlogTitle(blogTitle);
+		blogDTO.setBlogContent(blogContent);
 		
 		if(!uploadProfile.isEmpty()) {
 			 String originalFilename = uploadProfile.getOriginalFilename();
-			 forumDTO.setForumOriginalThumbnailName(originalFilename);
+			 blogDTO.setBlogOriginalThumbnailName(originalFilename);
 			 
 			 String extension = originalFilename.substring(originalFilename.indexOf("."));
 			 String uploadFile = UUID.randomUUID() + extension;
-			 forumDTO.setForumThumbnailUUID(uploadFile);
+			 blogDTO.setBlogThumbnailUUID(uploadFile);
 			 
 			 uploadProfile.transferTo(new File(fileRepositoryPath + uploadFile));
 		 }
-		forumService.modifyForum(forumDTO);
-		return "redirect:/forum/forumMain";
+		blogService.modifyBlog(blogDTO);
+		return "redirect:/blog/blogMain";
 	}
+	
 	
 }

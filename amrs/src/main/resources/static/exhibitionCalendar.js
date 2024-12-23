@@ -37,8 +37,11 @@ document.addEventListener("DOMContentLoaded", function() {
 			console.log("  >  "+calendarMonth.innerText );
 			console.log('day: ', day);
 			
+			// 두 자리 형식으로 변환
+			const formattedDay = day < 10 ? '0${day}' : day;
+			
 			// 'yyyy-MM-dd' 형식으로 변환
-			var yyyymmdd = calendarMonth.innerText + day ;
+			var yyyymmdd = calendarMonth.innerText + formattedDay ;
 			yyyymmdd = yyyymmdd.replace("년","-").replace("월","-").replace(" ","");
 			
 			// reservDate 입력 필드를 querySelector로 직접 선택
@@ -59,15 +62,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             
 
-            // 예매 가능한 시간 표시 (예제 데이터)
-            /*const selectedDate = new Date(currentYear, currentMonth, day);
-            displayBookingTimes(selectedDate);*/
         }
-
-        /*function displayBookingTimes(date) {
-            const availableTimes = ["10:00 AM", "2:00 PM", "4:00 PM"];
-            bookingTimesContainer.innerHTML = `<strong>Available Times for ${date.toLocaleDateString("ko-KR")}:</strong> ${availableTimes.join(', ')}`;
-        }*/
 
         function prevMonth() {
             currentMonth = currentMonth === 0 ? 11 : currentMonth - 1;

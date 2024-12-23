@@ -1,4 +1,4 @@
-package com.application.amrs.comment;
+package com.application.amrs.replyComment;
 
 import java.util.Date;
 
@@ -7,17 +7,16 @@ import org.springframework.format.annotation.DateTimeFormat;
 import lombok.Data;
 
 @Data
-public class CommentDTO {
+public class ReplyCommentDTO {
 
+	private int replyId;
+	private String replyContent;
 	private int commentId;
-	private String commentContent;
-	private int commentCnt;
+	private String memberId;
 	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private Date createDt;
 	private Date updateDt;
-	private int blogId;
-	private String memberId;
 	
-	// 임시 필드
+	// 임시필드
 	private String memberNm;
 }

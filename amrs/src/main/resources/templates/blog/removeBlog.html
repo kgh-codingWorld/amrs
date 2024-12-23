@@ -16,7 +16,7 @@
     <link th:href="@{/bootstrap/css/login.css}" rel="stylesheet">
     <link th:href="@{/bootstrap/scss/style.scss}" rel="stylesheet">
 
-    <title>Remove Account Page</title>
+    <title>Remove blog Page</title>
     
     <style>
         /* 기본 스타일 설정 */
@@ -97,7 +97,7 @@
                 // 입력된 값을 가져옴
                 let passwd = $('#passwd').val();
                 let memberId = $('#memberId').val();
-				let forumId = $('#forumId').val();
+				let blogId = $('#blogId').val();
                 
                 // 비밀번호와 멤버 ID가 입력되었을 때만 서버로 요청
                 if (passwd && memberId) {
@@ -111,12 +111,13 @@
 				                // 비밀번호가 일치하면 게시물 삭제 요청을 보냄
 				                $.ajax({
 				                    type: "post",  // 게시물 삭제 요청도 POST로 처리
-				                    url: "/forum/removeForum" + forumId,  // 게시물 삭제 URL
+				                    url: "/blog/removeBlog/" + blogId,  // 게시물 삭제 URL
 				                    contentType: "application/x-www-form-urlencoded; charset=UTF-8",
 				                    success: function(response) {
+				                    	console.log(response);
 				                        // 삭제 성공 시 이동 처리
 				                        alert("게시물이 성공적으로 삭제되었습니다.");
-				                        location.href = "/forum/forumMain";  // 포럼 메인 페이지로 이동
+				                        location.href = "/blog/blogMain";  // 포럼 메인 페이지로 이동
 				                    },
 				                    error: function(xhr, status, error) {
 				                        console.log("게시물 삭제 중 오류 발생: ", error);
@@ -147,18 +148,17 @@
         <div class="login-background">
             <div class="section">
                 <h2>삭제하시려면 비밀번호를 입력해 주세요</h2>
-                
-                <!-- 비밀번호 확인 폼 -->
-                <div class="form-group">
-                    <input type="password" id="passwd" name="passwd" class="form-control" placeholder="비밀번호 입력" required>
-                </div>
-                
-                <div id="error-message" class="error-message">비밀번호가 일치하지 않습니다.</div>
-                
-                <input type="hidden" th:value="${memberDTO.memberId}" id="memberId" name="memberId"/>
-                <input type="hidden" th:value="${forum.forumId}" id="forumId" name="forumId"/>
-                
-                <button type="button" class="btn btn-primary">확인</button>
+	                <!-- 비밀번호 확인 폼 -->
+	                <div class="form-group">
+	                    <input type="password" id="passwd" name="passwd" class="form-control" placeholder="비밀번호 입력" required>
+	                </div>
+	                
+	                <div id="error-message" class="error-message">비밀번호가 일치하지 않습니다.</div>
+	                
+	                <input type="hidden" th:value="${memberDTO.memberId}" id="memberId" name="memberId"/>
+	                <input type="hidden" th:value="${blog.blogId}" id="blogId" name="blogId"/>
+	                
+	                <button type="submit" class="btn btn-primary">확인</button>
             </div>
         </div>
     </div>

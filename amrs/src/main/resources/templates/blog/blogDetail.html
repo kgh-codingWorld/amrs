@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Blog Detail</title>
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+	rel="stylesheet">
+<style>
+.blog-container {
+	max-width: 800px;
+	margin: auto;
+	background-color: #fff;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.blog-header {
+	text-align: center;
+	margin-bottom: 30px;
+}
+
+.blog-header h1 {
+	font-size: 2.5rem;
+	color: #333;
+}
+
+.blog-meta {
+	text-align: center;
+	color: #777;
+	font-size: 0.9rem;
+}
+
+.blog-content {
+	font-size: 1.1rem;
+	line-height: 1.8;
+	color: #444;
+	margin-bottom: 40px;
+}
+
+.actions {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 30px;
+}
+
+.like-section {
+	display: flex;
+	justify-content: space-between; /* 버튼을 좌우로 배치 */
+}
+
+.like-button {
+	display: inline-flex;
+	align-items: center;
+	background-color: transparent;
+	border: none;
+	font-size: 1.5rem;
+	cursor: pointer;
+	transition: color 0.3s ease;
+}
+
+.fa-heart {
+	font-size: 2rem;
+	color: red; /* 기본 빨간색 하트 */
+	transition: color 0.3s ease;
+}
+
+.liked .fa-heart {
+	color: red; /* 좋아요 누르면 빨간 하트 유지 */
+}
+
+.like-count {
+	margin-left: 10px;
+	font-size: 1.2rem;
+	color: #333;
+}
+
+/* 댓글창 */
+.comment-section {
+	margin-top: 40px;
+}
+
+.comment-section h6 {
+	font-size: 1.5rem;
+	color: #333;
+	margin-bottom: 20px;
+}
+
+.comment-list {
+	list-style: none;
+	padding-left: 0;
+}
+
+.comment-list li {
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.comment-form textarea {
+	width: 100%;
+	padding: 10px;
+	font-size: 16px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	margin-bottom: 10px;
+}
+
+.comment-form button {
+	padding: 10px 20px;
+	background-color: #343a40;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* align-items: flex-start; */
+    /* margin-bottom: 10px; */
+}
+
+.comment-author {
+    font-weight: bold;
+    color: #333;
+    flex: 1;
+}
+
+.comment-date {
+    /* font-size: 0.8rem;
+    color: #777;
+    margin-left: 10px;
+    flex-shrink: 0; */
+    margin-right: auto;
+}
+
+.remove-comment, .modify-comment, .modify-reply-comment, .remove-reply-comment {
+    margin-left: 10px;
+    background-color: transparent;
+    border: none;
+    color: red;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.modify-comment, .modify-reply-comment {
+	color: blue;
+}
+
+.comment-content {
+    font-size: 1rem;
+    color: #444;
+    margin-bottom: 10px;
+    line-height: 1.6
+}
+
+.reply-button {
+    background-color: transparent;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-decoration: underline;
+}
+
+.reply-section {
+    margin-left: 20px;
+    padding-left: 10px;
+    border-left: 2px solid #ddd;
+}
+
+.reply-form{
+	margin-top: 15px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+.reply-form textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: none;
+}
+
+.reply-form button {
+	align-self: flex-end;
+    background-color: #343a40;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.textarea-container {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+}
+
+.textarea-container textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: none;
+}
+
+.textarea-container button {
+    position: absolute;
+    right: 10px;
+    bottom: 15px;
+    padding: 6px 12px;
+    background-color: #343a40;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+/* 추가 스타일 */
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.edit-remove-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.reply-button {
+    background-color: transparent;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+
+</style>
+<script th:src="@{/jquery/jquery-3.7.1.min.js}"></script>
+<!-- Simple JavaScript for Like Button -->
+<script>
+	// 좋아요 기능 
+	document.addEventListener('DOMContentLoaded',function() {
+
+		document.querySelector('.like-button').addEventListener('click',function() {
+			const likeIcon = document.getElementById('likeIcon');
+			const likeCountElement = document.getElementById('likeCount');
+			const memberId = document.querySelector('[name="memberId"]').value;
+			const blogId = document.querySelector('[name="blogId"]').value;
+			const likeCount = document.querySelector('[name="likeCount"]').value;
+			const liked = likeIcon.classList.contains('fas') ? false : true; // 현재 상태
+			
+			console.log('liked : ', liked);
+
+			$.ajax({
+	            url: '/like/toggleLike',
+	            type: 'post',
+	            contentType: 'application/json',
+	            data: JSON.stringify({
+	            	memberId: memberId,
+	                blogId: blogId,
+	                liked: liked,
+	                likeCount: likeCount
+	            }),
+	            success: function(response) {
+	                console.log('좋아요 상태가 성공적으로 업데이트되었습니다.');
+	                console.log("서버 응답:", response);
+	                
+	                if(response.likeCount !== undefined) {
+	                	
+	                	likeCountElement.textContent = response.likeCount;
+	                	
+	                	if (liked) {
+	                        likeIcon.classList.remove('far');
+	                        likeIcon.classList.add('fas');
+	                    } else {
+	                        likeIcon.classList.remove('fas');
+	                        likeIcon.classList.add('far');
+	                    }
+	                }
+	            },
+	            error: function(xhr, status, error) {
+	                console.log('좋아요 상태 업데이트 중 오류가 발생했습니다: ', error);
+	                console.log("서버 응답:", xhr.responseText);
+	                
+	             	// 에러 발생 시 상태를 롤백
+	                if (liked) {
+	                    likeIcon.classList.remove('fas');
+	                    likeIcon.classList.add('far');
+	                    likeCountElement.textContent = parseInt(likeCountElement.textContent) - 1;
+	                } else {
+	                    likeIcon.classList.remove('far');
+	                    likeIcon.classList.add('fas');
+	                    likeCountElement.textContent = parseInt(likeCountElement.textContent) + 1;
+	                }
+	            }
+	        });
+		});
+	});
+	
+	$().ready(function(){
+		// 댓글 등록
+		$('#submitComment').click(function(){
+			
+			let blogId = $('[name="blogId"]').val();
+			let commentContent = $('#commentContent').val();
+			let memberId = $('[name="sessionMemberId"]').val();
+			
+			if(!commentContent.trim()) {
+				alert('댓글 내용을 입력하세요.');
+				return;
+			}
+			
+			$.ajax({
+				url : '/comment/registerComment/' + blogId,
+				type : 'post',
+				contentType: 'application/json',
+				data : JSON.stringify({
+					commentContent : commentContent,
+					memberId : memberId
+				}),
+				success : function(response) {
+					
+					$('#commentContent').val('');  // 텍스트 영역 초기화
+	                $('.comment-list').append(
+	                    '<li style="display: inline-grid; width: 47rem; margin-top: 2rem;">' +
+                        	'<div class="comment-header">' +
+	                            '<span class="comment-author">' + response.memberNm + '</span>' +
+	                            '<span class="comment-date">' + new Date(response.createDt).toLocaleString() + '</span>' +
+	                            '<div>' +
+		                            '<button class="modify-comment">수정</button>' +
+		                            '<button class="remove-comment">삭제</button>' +
+	                            '</div>' +
+	                            '<input type="hidden" name="commentId" value="' + response.commentId + '">' +
+                            '</div>' + 
+                            '<div class="comment-content">' +
+                            	'<p class="comment-content">' + response.commentContent + '</p>' +
+                           	'</div>' +
+                            '<div class="reply-form">' +
+	                            '<textarea name="replyContent" rows="2" placeholder="대댓글을 입력하세요.">' + '</textarea>' +
+	                            '<button class="submit-reply-button">작성</button>' +
+	                            '<input type="hidden" name="commentId" value="' + response.commentId + '">' +
+                            '</div>' +
+	                        '</div>' +
+	                    '</li>'
+	                );
+				},
+				error : function(xhr, status, error) {
+					console.error('댓글 작성 중 오류 발생:', error);
+					console.log('blogId: ' + blogId);
+					console.log('commentContent: ' + commentContent);
+					console.log('memberId: ' + memberId);
+					alert('댓글 작성 중 오류가 발생했습니다.');
+				}
+			});
+		});
+		
+		// 댓글 수정
+		$(document).on('click', '.modify-comment', function() {
+			const commentElement = $(this).closest('li');
+		    const commentContent = commentElement.find('.comment-content p');
+		    const commentId = commentElement.find('input[name="commentId"]').val();
+		    const originalContent = commentContent.text();
+
+		    // 입력창 및 저장 버튼 동적 생성
+		    const textarea = $('<textarea>').val(originalContent).attr('rows', 3);
+		    const saveButton = $('<button>').text('저장').on('click', function() {
+		        const updatedContent = textarea.val().trim();
+		        if (!updatedContent) {
+		            alert('내용을 입력하세요.');
+		            return;
+		        }
+		    
+		
+		        $.ajax({
+		        	url: '/comment/modifyComment/' + commentId,
+		        	type: 'post',
+		        	contentType: 'application/json',
+		        	data: JSON.stringify({
+			            commentContent: updatedContent
+			        }),
+			        success: function (response) {
+			            alert('댓글이 수정되었습니다.');
+
+			            commentContent.text(updatedContent).show();
+		                textarea.remove();
+		                saveButton.remove();
+			        },
+			        error: function (xhr, status, error) {
+			            alert('댓글 수정 중 오류가 발생하였습니다.');
+			        }
+		        });
+		    });
+		
+		    commentContent.hide();
+		    commentContent.after(textarea, saveButton);
+		});
+		
+		// 댓글 삭제
+		$(document).on('click', '.remove-comment', function() {
+		    const commentElement = $(this).closest("li");
+		    const commentId = commentElement.find('input[name="commentId"]').val();
+		
+		    console.log('commentId: ', commentId);
+		    
+		    if (confirm("댓글을 삭제하시겠습니까?")) {
+		        
+		        $.ajax({
+		        	url: '/comment/removeComment/' + commentId,
+		        	type: 'POST',
+		        	success: function(response){
+		        		alert('댓글이 삭제되었습니다.');
+		        		commentElement.remove();
+		        	},
+		        	error: function (xhr, status, error) {
+			            alert('댓글 삭제 중 오류가 발생하였습니다.');
+			        }
+		        });
+		
+		        
+		    }
+		});
+		
+		// 대댓글 등록
+		$(document).on('click', '.submit-reply-button', function() {
+			const parentLi = $(this).closest('li');
+		    const replyContent = parentLi.find('textarea[name="replyContent"]').val().trim();
+		    const commentId = parentLi.find('input[name="commentId"]').val();
+		    const blogId = $('[name="blogId"]').val();
+		    const memberId = $('[name="sessionMemberId"]').val();
+
+		    if (!replyContent) {
+		        alert('대댓글 내용을 입력하세요.');
+		        return;
+		    }
+
+		    $.ajax({
+		        url: '/comment/registerReply/' + commentId,
+		        type: 'post',
+		        contentType: 'application/json',
+		        data: JSON.stringify({
+		            blogId: blogId,
+		            memberId: memberId,
+		            commentId: commentId,
+		            replyContent: replyContent
+		        }),
+		        success: function(response) {
+		        	const replySection = parentLi.find('.reply-section');
+		            if (!replySection.length) {
+		                parentLi.append('<ul class="reply-section"></ul>');
+		            }
+		            parentLi.find('.reply-section').append(`
+		                <li>
+		                    <div class="comment-header">
+		                        <span class="comment-author">${response.memberNm}</span>
+		                        <span class="comment-date">${new Date(response.createDt).toLocaleString()}</span>
+		                    </div>
+		                    <button class="modify-reply-comment">수정</button>
+		                    <button class="remove-reply-comment">삭제</button>
+		                    <p class="replyComment-content">${response.replyContent}</p>
+		                    <input type="hidden" name="replyId" value="${response.replyId}"/>
+		                </li>
+		            `);
+		            parentLi.find('textarea[name="replyContent"]').val('');
+		        },
+		        error: function(xhr, status, error) {
+		            alert('대댓글 작성 중 오류가 발생하였습니다.');
+		        }
+		    });
+		});
+		
+		// 대댓글 수정
+		$(document).on('click', '.modify-reply-comment', function() {
+			const replyElement = $(this).closest('li');
+		    const replyContentElement = replyElement.find('.replyComment-content');
+		    const replyId = replyElement.find('input[name="replyId"]').val();
+		    const originalContent = replyContentElement.text();
+
+		    // 기존 내용을 숨기고 textarea와 저장 버튼 추가
+		    replyContentElement.hide();
+		    const textarea = $('<textarea>').val(originalContent).attr('rows', 2);
+		    const saveButton = $('<button>').text('저장').on('click', function() {
+		        const updatedContent = textarea.val().trim();
+
+		        if (!updatedContent) {
+		            alert('내용을 입력하세요.');
+		            return;
+		        }
+		
+		        $.ajax({
+		        	url: '/comment/modifyReply/' + replyId,
+		        	type: 'post',
+		        	contentType: 'application/json',
+		        	data: JSON.stringify({
+			            replyContent: updatedContent
+			        }),
+			        success: function (response) {
+			            alert('대댓글이 수정되었습니다.');
+
+			            replyContentElement.text(updatedContent).show();
+		                textarea.remove();
+		                saveButton.remove();
+			        },
+			        error: function (xhr, status, error) {
+			            alert('대댓글 수정 중 오류가 발생하였습니다.');
+			        }
+		        });
+		    });
+		
+		    replyContentElement.after(textarea, saveButton);
+		});
+		
+		// 대댓글 삭제
+		$(document).on('click', '.remove-reply-comment', function() {
+			const replyElement = $(this).closest('li');
+		    const replyId = replyElement.find('input[name="replyId"]').val();
+		    
+		    if (confirm("댓글을 삭제하시겠습니까?")) {
+		        $.ajax({
+		        	url: '/comment/removeReply/' + replyId,
+		        	type: 'post',
+		        	success: function(response){
+		        		alert('댓글이 삭제되었습니다.');
+		        		replyElement.remove();
+		        	},
+		        	error: function (xhr, status, error) {
+			            alert('댓글 삭제 중 오류가 발생하였습니다.');
+			        }
+		        });
+		    }
+		});
+	});
+
+</script>
+</head>
+<body>
+
+	<div layout:fragment="content">
+		<div class="blog-background">
+			<div class="section">
+				<div class="container">
+					<div class="blog-container">
+						<div class="blog-header">
+							<!-- blog Title -->
+							<div class="dropdown noto-serif-kr" style="width: 1rem; float: right; list-style: none;">
+									<a data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> 
+										<i class="fa-solid fa-bars"></i>
+									</a>
+								<div class="dropdown-menu" th:if="${session.memberId != null and session.memberId == blog['memberId']}">
+									<span class="dropdown-item-text"> 
+										<a th:href="@{/blog/modifyBlog/{blogId}(blogId=${blog['blogId']})}" style="text-decoration: none;">수정하기</a>
+									</span> 
+									<span class="dropdown-item-text"> 
+										<a th:href="@{/blog/removeBlog/{blogId}(blogId=${blog['blogId']})}" style="text-decoration: none;">삭제하기</a>
+									</span>
+								</div>
+							</div>
+							<h1 class="noto-serif-kr" th:text="${blog['blogTitle']}"></h1>
+						</div>
+						<input type="hidden" name="memberId" th:value="${blog['memberId']}">
+						<input type="hidden" name="blogId" th:value="${blog['blogId']}">
+						<input type="hidden" id="isLiked" th:value="${isLiked}">
+						<input type="hidden" name="likeCount" th:value="${blog['likeCount']}">
+						<div class="blog-meta">
+							<!-- blog Meta Data -->
+							<p class="noto-serif-kr">
+								작성자: <span th:text="${memberNm}"></span>&nbsp; | &nbsp;작성일: <span
+									th:text="${#dates.format(blog.createDt, 'yyyy-MM-dd')}"></span>
+							</p>
+						</div>
+
+						<div class="blog-content noto-serif-kr">
+							<!-- blog Content -->
+							<p style="padding: 1rem;" th:utext="${blog['blogContent']}"></p>
+						</div>
+
+						<!-- 목록보기 및 좋아요 버튼 -->
+						<div class="actions">
+							<!-- 좋아요 버튼 -->
+							<div class="like-section">
+								<button class="like-button">
+									<i id="likeIcon" th:classappend="${isLiked != false} ? 'fas fa-heart' : 'far fa-heart'"></i>
+								</button>
+								<span class="like-count" id="likeCount" th:text="${blog['likeCount']}"></span>
+							</div>
+
+							<!-- 목록보기 버튼 -->
+							<input type="button" value="목록보기" class="btn noto-serif-kr"
+								th:onclick="|location.href='@{/blog/blogMain}'|">
+						</div>
+						<hr>
+						<!-- 댓글 작성 폼 -->
+						<div class="comment-section noto-serif-kr">
+							<h6>댓글&nbsp;<span class="commentCnt" th:text="${commentCnt}"></span></h6>
+							<div class="comment-form">
+									<textarea name="commentContent" id="commentContent" rows="1" placeholder="댓글을 입력하세요"></textarea>
+									<button type="submit" id="submitComment" style="float: right;">댓글 작성</button>
+									<input type="hidden" name="sessionMemberId" th:value="${session.memberId}">
+							</div>
+
+							<!-- 댓글 목록 -->
+							<ul class="comment-list">
+								<li th:each="comment : ${commentList}" style="display: inline-grid; width: 47rem; margin-top: 2rem;">
+									<div class="comment-header">
+										<span class="comment-author" th:text="${comment['memberNm']}"></span>
+										<span class="comment-date" th:text="${#dates.format(comment.createDt, 'yyyy-MM-dd HH:mm')}"></span>
+										<div th:if="${session.memberId != null and session.memberId == comment['memberId']}">
+											<button class="modify-comment">수정</button>
+											<button class="remove-comment">삭제</button>
+										</div>
+										<input type="hidden" name="commentId" th:value="${comment['commentId']}">
+									</div>
+									
+									<div class="comment-content">
+										<p class="comment-content" th:text="${comment.commentContent}"></p>
+									</div>
+									
+									<!-- 대댓글 작성 폼 -->
+									<div class="reply-form">
+										<textarea name="replyContent" rows="2" placeholder="대댓글을 입력하세요"></textarea>
+										<button class="submit-reply-button">작성</button>
+										<input type="hidden" name="commentId" th:value="${comment['commentId']}">
+									</div>
+									
+									<!-- 대댓글 목록 -->
+									<ul class="reply-section" th:if="${comment.replyCommentList != null}">
+										<li th:each="reply : ${comment.replyCommentList}">
+											<div class="comment-header">
+												<span class="comment-author" th:text="${reply.memberNm}"></span>
+												<span class="comment-date" th:text="${#dates.format(reply.createDt, 'yyyy-MM-dd HH:mm')}"></span>
+											</div>
+											<div th:if="${session.memberId != null and session.memberId == reply['memberId']}">
+												<button class="modify-reply-comment">수정</button>
+												<button class="remove-reply-comment">삭제</button>
+											</div>
+											<input type="hidden" name="replyId" th:value="${reply['replyId']}">
+											<p class="replyComment-content" th:text="${reply.replyContent}"></p>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	
+</body>
+</html>

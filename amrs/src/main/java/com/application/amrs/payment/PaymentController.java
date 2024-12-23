@@ -18,7 +18,6 @@ public class PaymentController {
 	@PostMapping("/doPayment")
 	public ResponseEntity<String> doPayment(@RequestBody PaymentDTO paymentDTO) {
 		paymentService.registerPayment(paymentDTO);
-		System.out.println("dopayment 찍히는지 확인!!!@@");
 		return ResponseEntity.status(HttpStatus.OK).body("Payment data successfully saved");
 	}
 	

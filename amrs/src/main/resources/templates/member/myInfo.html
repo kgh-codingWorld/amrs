@@ -209,19 +209,6 @@ tbody tr:last-child td {
 			});
         });
 		
-		
-        $('#editHpBtn').click(function() {
-            var emailInput = document.getElementById('editHp');
-            
-            // 입력 필드가 보이지 않는 상태면 나타내고, 보이는 상태면 숨김
-            if (emailInput.classList.contains('hidden')) {
-                emailInput.classList.remove('hidden'); // 입력 필드 보이기
-            } else {
-                emailInput.classList.add('hidden'); // 입력 필드 숨기기
-            }
-        });
-        
-        
         
         // 프로필 변경 버튼 클릭 시 file input 트리거
         $('#changeProfileBtn').click(function() {
@@ -359,7 +346,7 @@ tbody tr:last-child td {
 									<span id="isValidPasswdMsg"></span>
 									<input type="password" placeholder="새로운 비밀번호" class="form-control" id="newPasswd" style="width: 16rem; margin: 10px;" >
 									<input type="password" placeholder="비밀번호 확인" class="form-control" id="chkNewPasswd" style="width: 16rem;">
-									<span><input type="button" class="btn btn-sm" id="editPasswd" value="비밀번호 변경"></span>
+									<span><input type="button" class="btn btn-sm" id="editPasswd" style="margin-top: 10px;" value="비밀번호 변경"></span>
 								</td>
 							</tr>
 							<tr align="center">
@@ -392,7 +379,7 @@ tbody tr:last-child td {
 								    <input type="text" name="roadAddress" th:field="${memberDTO.roadAddress}" class="form-control" placeholder="도로명주소"><br>
 								    <input type="text" name="jibunAddress" th:field="${memberDTO.jibunAddress}" class="form-control" placeholder="지번"><br>
 								    <input type="text" name="namujiAddress" th:field="${memberDTO.namujiAddress}" class="form-control" placeholder="상세주소">
-								    <input type="button" th:onclick="javascript:execDaumPostcode()" value="주소 변경" class="btn btn-register-page btn-sm">
+								    <input type="button" th:onclick="javascript:execDaumPostcode()" style="margin-top: 10px;" value="주소 변경" class="btn btn-register-page btn-sm">
 								</td>
 							</tr>
 							<tr align="center">

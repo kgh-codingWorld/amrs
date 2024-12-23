@@ -61,7 +61,7 @@
 		WHERE MEMBER_ID = #{memberId}
 	</select>
 
-	<select id="isValidPasswd" parameterType="String" resultType="MemberDTO">
+	<select id="isValidPasswd" parameterType="String" resultType="String">
 		SELECT	PASSWD
 		FROM	MEMBER
 		WHERE	MEMBER_ID = #{memberId}

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.application.amrs.replyComment.ReplyCommentDAO">
+	
+	<resultMap id="replyMap" type="hashmap">
+		<result column="REPLY_ID" 			property="replyId"/>
+		<result column="REPLY_CONTENT" 		property="replyContent"/>
+		<result column="COMMENT_ID" 		property="commentId"/>
+		<result column="MEMBER_ID" 			property="memberId"/>
+		<result column="CREATE_DT" 			property="createDt"/>
+		<result column="UPDATE_DT" 			property="updateDt"/>
+	</resultMap>
+
+	<insert id="insertReply" parameterType="ReplyCommentDTO">
+		INSERT INTO REPLYCOMMENT (
+			REPLY_CONTENT,
+			COMMENT_ID,
+			MEMBER_ID,
+			CREATE_DT
+		) VALUES (
+			#{replyContent},
+			#{commentId},
+			#{memberId},
+			#{createDt}
+		)
+		<selectKey keyProperty="replyId" resultType="int" order="AFTER">
+	        SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	
+	<select id="selectOneReply" parameterType="int" resultType="ReplyCommentDTO">
+		SELECT		R.REPLY_ID,
+					R.REPLY_CONTENT,
+					R.COMMENT_ID,
+					R.MEMBER_ID,
+					R.CREATE_DT,
+					R.UPDATE_DT,
+					M.MEMBER_NM AS memberNm
+		FROM		REPLYCOMMENT R
+		LEFT JOIN	MEMBER M ON R.MEMBER_ID = M.MEMBER_ID
+		WHERE		R.REPLY_ID = #{replyId}
+	</select>
+	
+	<select id="selectReplyList" resultMap="replyMap" parameterType="int">
+		SELECT	REPLY_ID,
+				REPLY_CONTENT,
+				COMMENT_ID,
+				MEMBER_ID,
+				CREATE_DT,
+				UPDATE_DT
+		FROM	REPLYCOMMENT
+		WHERE 	COMMENT_ID = #{commentId}
+	</select>
+	
+	<update id="updateReply" parameterType="ReplyCommentDTO">
+		UPDATE	REPLYCOMMENT
+		SET		REPLY_CONTENT = #{replyContent},
+				UPDATE_DT = CURRENT_TIMESTAMP
+		WHERE	REPLY_ID = #{replyId}
+	</update>
+	
+	<delete id="deleteReply" parameterType="int">
+		DELETE	FROM REPLYCOMMENT
+		WHERE	REPLY_ID = #{replyId}
+	</delete>
+</mapper>

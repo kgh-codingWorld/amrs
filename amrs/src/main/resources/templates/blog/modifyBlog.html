@@ -7,16 +7,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="author" content="Untree.co">
     <link rel="shortcut icon" href="favicon.png">
-    <link rel="stylesheet" href="/bootstrap/css/forum.css">
+    <link rel="stylesheet" href="/bootstrap/css/blog.css">
     <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.1.1/ckeditor5.css">
 
     <meta name="description" content="" />
     <meta name="keywords" content="bootstrap, bootstrap4" />
 
-    <title>Modify Forum Page</title>
+    <title>Modify Blog Page</title>
     <style>
         /* 배경 이미지 설정 */
-        .forum-background {
+        .blog-background {
             background-size: cover;
             background-position: center;
             min-height: 100vh;
@@ -92,9 +92,9 @@
 <body>
 	<div layout:fragment="content">
 		<!-- Start Hero Section -->
-		<div class="forum-background">
+		<div class="blog-background">
 			<div class="container form-container">
-				<form th:action="@{/forum/modifyForum}" method="post" enctype="multipart/form-data">
+				<form th:action="@{/blog/modifyBlog}" method="post" enctype="multipart/form-data">
 					<div class="main-container">
 						<table border="0" class="noto-serif-kr">
 							<tr>
@@ -103,25 +103,25 @@
 							</tr>
 							<tr>
 								<td>제목</td>
-								<td style="width:42rem;"><input type="text" th:value="${forum.forumTitle}" name="forumTitle" size="100" required /></td>
+								<td style="width:42rem;"><input type="text" th:value="${blog.blogTitle}" name="blogTitle" size="100" required /></td>
 							</tr>
 							<tr>
 								<td>메인<br>이미지</td>
-								<td style="width:42rem; vertical-align: middle;"><input type="file" th:value="${forum['forumThumbnailUUID']}" name="thumbnail" size="100" /></td>
+								<td style="width:42rem; vertical-align: middle;"><input type="file" th:value="${blog['blogThumbnailUUID']}" name="thumbnail" size="100" /></td>
 							</tr>
 							<tr>
 								<td>글내용</td>
 								<td style="width:42rem;">
-									<textarea rows="10" cols="50" th:utext="${forum.forumContent}" name="forumContent" required></textarea>
-									<script>CKEDITOR.replace("forumContent");</script>
+									<textarea rows="10" cols="50" th:utext="${blog.blogContent}" name="blogContent" required></textarea>
+									<script>CKEDITOR.replace("blogContent");</script>
 								</td>
 							</tr>
 							<tr align="center">
 								<td colspan="2">
 									<input type="hidden" name="memberId" th:value="${session.memberId}" />
-									<input type="hidden" name="forumId" th:value="${forum.forumId}" />
+									<input type="hidden" name="blogId" th:value="${blog.blogId}" />
 									<input type="submit" value="수정완료" />
-									<input type="button" value="목록보기" th:onclick="|location.href='@{/forum/forumMain}'|" />
+									<input type="button" value="목록보기" th:onclick="|location.href='@{/blog/blogMain}'|" />
 								</td>
 							</tr>
 						</table>
@@ -139,9 +139,9 @@
 	</div>
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script>
+	<!-- <script>
 		$(document).ready(function() {
-			$('#forumPostForm').submit(function(e) {
+			$('#blogPostForm').submit(function(e) {
 				e.preventDefault(); // 폼 제출 기본 동작 방지
 
 				// 입력된 제목과 내용을 가져오기
@@ -154,6 +154,6 @@
 				$('#postPreview').show();
 			});
 		});
-	</script>
+	</script> -->
 </body>
 </html>

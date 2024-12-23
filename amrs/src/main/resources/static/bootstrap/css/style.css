@@ -510,31 +510,31 @@ a {
 .before-footer-section {
   padding: 7rem 0 12rem 0 !important; }
 
-.forum-section {
+.blog-section {
   padding: 4rem 0 12rem 0; }
-  .forum-section .post-entry a {
+  .blog-section .post-entry a {
     text-decoration: none; }
-  .forum-section .post-entry .post-thumbnail {
+  .blog-section .post-entry .post-thumbnail {
     display: block;
     margin-bottom: 20px; }
-    .forum-section .post-entry .post-thumbnail img {
+    .blog-section .post-entry .post-thumbnail img {
       border-radius: 20px;
       -webkit-transition: .3s all ease;
       -o-transition: .3s all ease;
       transition: .3s all ease; }
-  .forum-section .post-entry .post-content-entry {
+  .blog-section .post-entry .post-content-entry {
     padding-left: 15px;
     padding-right: 15px; }
-    .forum-section .post-entry .post-content-entry h3 {
+    .blog-section .post-entry .post-content-entry h3 {
       font-size: 16px;
       margin-bottom: 0;
       font-weight: 600;
       margin-bottom: 7px; }
-    .forum-section .post-entry .post-content-entry .meta {
+    .blog-section .post-entry .post-content-entry .meta {
       font-size: 14px; }
-      .forum-section .post-entry .post-content-entry .meta a {
+      .blog-section .post-entry .post-content-entry .meta a {
         font-weight: 600; }
-  .forum-section .post-entry:hover .post-thumbnail img, .forum-section .post-entry:focus .post-thumbnail img {
+  .blog-section .post-entry:hover .post-thumbnail img, .blog-section .post-entry:focus .post-thumbnail img {
     opacity: .7; }
 
 .footer-section {
@@ -735,13 +735,16 @@ textarea {
 	height: 54rem;
 }
 
-.forum-background {
+.blog-background {
 	background: url("/bootstrap/images/main5.jpg") no-repeat fixed center center;
 	background-size: cover;
 	background-color: rgba(0, 0, 0, 1.0);
+	position: relative; /* 배경은 고정된 상태로 */
+    padding-top: 25px;
+    padding-bottom: 25px;
 	
 }
-.forum-background h1 {
+.blog-background h1 {
 	font-weight: 700;
     color: #ffffff;
     margin-bottom: 30px;

@@ -6,16 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="author" content="Untree.co">
     <link rel="shortcut icon" href="favicon.png">
-    <link rel="stylesheet" href="/bootstrap/css/forum.css">
+    <link rel="stylesheet" href="/bootstrap/css/blog.css">
     <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.2.0/ckeditor5.css">
 
     <meta name="description" content="" />
     <meta name="keywords" content="bootstrap, bootstrap4" />
 
-    <title>Register forum Page</title>
+    <title>Register blog Page</title>
     <style>
         /* 배경 이미지 설정 */
-        .forum-background {
+        .blog-background {
             background-size: cover;
             background-position: center;
             min-height: 100vh;
@@ -89,9 +89,9 @@
 
 <body>
 		<!-- Start Hero Section -->
-		<div class="forum-background">
+		<div class="blog-background">
 			<div class="container form-container">
-				<form th:action="@{/forum/registerForum}" method="post" enctype="multipart/form-data">
+				<form th:action="@{/blog/registerBlog}" method="post" enctype="multipart/form-data">
 					<div class="main-container">
 						<table border="0" class="noto-serif-kr">
 							<tr>
@@ -100,7 +100,7 @@
 							</tr>
 							<tr>
 								<td>제목</td>
-								<td style="width:42rem;"><input type="text" name="forumTitle" size="100" required /></td>
+								<td style="width:42rem;"><input type="text" name="blogTitle" size="100" required /></td>
 							</tr>
 							<tr>
 								<td>메인<br>이미지</td>
@@ -109,28 +109,28 @@
 						</table>
 						<div>
 							<div class="editor-container editor-container_classic-editor" id="editor-container">
-								<div class="editor-container__editor"><textarea name="forumContent" id="editor"></textarea></div>
+								<div class="editor-container__editor"><textarea name="blogContent" id="editor"></textarea></div>
 							</div>	
 						</div>
 					</div>
 					<div align="center" style="margin-top: 1rem;">
 						<input type="hidden" name="memberId" th:value="${session.memberId}" />
 						<input type="submit" value="작성하기" />
-						<input type="button" value="목록보기" th:onclick="|location.href='@{/forum/forumMain}'|" />
+						<input type="button" value="목록보기" th:onclick="|location.href='@{/blog/blogMain}'|" />
 					</div>
 				</form>
 
 				<!-- 미리보기 영역 -->
-				<div id="postPreview" class="post-preview">
+				<!-- <div id="postPreview" class="post-preview">
 					<h3 id="previewTitle"></h3>
 					<p id="previewContent"></p>
 				</div>
-			</div>
+			</div> -->
 		</div>
 		<!-- End Hero Section -->
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script>
+	<!-- <script>
 		$(document).ready(function() {
 			$('#forumPostForm').submit(function(e) {
 				e.preventDefault(); // 폼 제출 기본 동작 방지
@@ -145,7 +145,7 @@
 				$('#postPreview').show();
 			});
 		});
-	</script>
+	</script> -->
 	<script type="importmap">
 		{
 			"imports": {

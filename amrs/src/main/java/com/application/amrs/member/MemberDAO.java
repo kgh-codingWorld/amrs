@@ -10,7 +10,7 @@ public interface MemberDAO {
 	public MemberDTO findMemberId(String memberId);
 	public MemberDTO login(String memberId);
 	public MemberDTO selectOneMember(String memberId);
-	public MemberDTO isValidPasswd(String memberId);
+	public String isValidPasswd(String memberId);
 	public void updateMyPasswd(MemberDTO memberDTO);
 	public void updateMyInfo(MemberDTO memberDTO);
 	public void deleteAccount(String memberId);

@@ -13,21 +13,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.application.amrs.forum.ForumService;
+import com.application.amrs.blog.BlogService;
 
 @RestController
 @RequestMapping("/like")
-public class LikeRestController {
+public class LikePostRestController {
 
 	@Autowired
-	private ForumService forumService;
+	private BlogService blogService;
 	
 	@PostMapping("/likeCount/{blogId}")
 	public ResponseEntity<?> likeCount(@PathVariable("blogId") int blogId, @RequestBody Map<String, Object> likeData) {
 		boolean isLiked = (boolean) likeData.get("isLiked");
 		int likeCount = (int) likeData.get("likeCount");
 		
-		forumService.likePost(blogId, likeCount);
+		blogService.likePost(blogId, likeCount);
 		System.out.println("blogId: " + blogId + ", likeCount: " + likeCount + ", isLiked: " + isLiked);
 		
 		Map<String, Object> response = new HashMap<>();
@@ -39,11 +39,11 @@ public class LikeRestController {
 	public ResponseEntity<?> toggleLike(@RequestBody LikePostDTO likePostDTO) {
 	    try {
 	        String memberId = likePostDTO.getMemberId();
-	        int forumId = likePostDTO.getForumId();
+	        int blogId = likePostDTO.getBlogId();
 	        boolean liked = likePostDTO.isLiked();
 
 	        // 좋아요 상태 업데이트 및 최신 LIKE_COUNT 반환
-	        int updatedLikeCount = forumService.toggleLike(memberId, forumId, liked);
+	        int updatedLikeCount = blogService.toggleLike(memberId, blogId, liked);
 
 	        return ResponseEntity.ok().body(Map.of("likeCount", updatedLikeCount));
 	    } catch (Exception e) {

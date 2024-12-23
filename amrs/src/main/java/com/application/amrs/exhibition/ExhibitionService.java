@@ -18,7 +18,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class ExhibitionRestController {
+public class ExhibitionService {
 
     // 전시 제목과 이미지 URL을 담기 위한 내부 클래스 정의
     public static class ExhibitionItem {

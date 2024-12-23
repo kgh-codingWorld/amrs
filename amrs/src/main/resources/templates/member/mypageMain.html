@@ -101,7 +101,7 @@ tbody tr:last-child td {
 	margin-bottom: 15px;
 }
 
-.payment-search {
+#searchInput {
 	background-color: #fff;
 	flex: auto;
 	border-radius: 10px;
@@ -109,6 +109,30 @@ tbody tr:last-child td {
 	display: flex;
 	justify-content: flex-start;
 }
+
+.payment-search {
+    width: 100%; 
+    margin: 20px 0; /* 위아래 여백 추가 */
+    display: flex;
+    align-items: center;
+    position: relative; /* 위치를 조정할 수 있도록 설정 */
+}
+
+.payment-search input[type="text"] {
+    flex: 1; 
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.payment-search i {
+    position: absolute;
+    right: 10px; /* 돋보기 아이콘을 오른쪽에 위치 */
+    color: #555;
+    cursor: pointer;
+}
+
 
 .payment-date {
 	display: flex;
@@ -146,14 +170,14 @@ tbody tr:last-child td {
 	color: #333; /* 원하는 색상으로 변경 가능 */
 }
 
-.payment-search-placeholder {
+/* .payment-search-placeholder {
 	padding: 9px 5px;
 	margin-left: 17px;
 	font-size: larger;
 	width: auto;
 	flex: none;
 	border: none;
-}
+} */
 
 .delete-button-zone {
 	margin-left: auto;
@@ -205,7 +229,7 @@ tbody tr:last-child td {
 						<tr align="center">
 							<td><a th:href="@{/member/mypageMain}">결제내역</a></td>
 						</tr>
-						<tr align="center">
+						<!-- <tr align="center">
 							<td>취소/환불내역</td>
 						</tr>
 						<tr align="center">
@@ -216,13 +240,13 @@ tbody tr:last-child td {
 						</tr>
 						<tr align="center">
 							<td>리뷰관리</td>
-						</tr>
+						</tr> -->
 						<tr align="center">
 							<td><a th:href="@{/member/checkPassword}">개인정보확인/수정</a></td>
 						</tr>
-						<tr align="center">
+						<!-- <tr align="center">
 							<td>결제수단관리</td>
-						</tr>
+						</tr> -->
 					</table>
 				</div>
 
@@ -245,13 +269,13 @@ tbody tr:last-child td {
 							<div class="same-date-ordered-info">
 								<h3 th:text="${payment.exhibitionTitle}"></h3>
 								<hr />
-								<span>가격</span><p th:text="${payment.price}"></p>
+								<span>결제</span><p th:text="${payment.price}"></p>
 								<span>관람일 </span><p th:text="${payment.reservDate}"></p>
 							</div>
-							<div class="delete-button-zone">
+							<!-- <div class="delete-button-zone">
 								<i class="fa-solid fa-bars-staggered"></i>
 								<button class="btn btn-create-review">리뷰 작성</button>
-							</div>
+							</div> -->
 							<!-- 팝업 창 -->
 							<div class="modal-overlay" id="modalOverlay"></div>
 							<div class="modal" id="modal">

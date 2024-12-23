@@ -108,13 +108,13 @@
 						th:href="@{/}">Home</a></li>
 					<li><a class="nav-link" th:href="@{/main/about}">AMRS
 							소개</a></li>
-					<li class="nav-item dropdown"><a
+					<!-- <li class="nav-item dropdown"><a
 						class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
 						 role="button" aria-haspopup="true"
 						aria-expanded="false">전시</a>
 						<div class="dropdown-menu">
 							<a class="dropdown-item">미술관별 전시</a> 
-							<a class="dropdown-item" href="shop.html">종류별 전시</a>
+							<a class="dropdown-item">종류별 전시</a>
 						        <ul class="dropdown-submenu">
 						            <li><a class="dropdown-item" href="current.html">현재 전시</a></li>
 						            <li><a class="dropdown-item" href="past.html">과거 전시</a></li>
@@ -122,7 +122,8 @@
 						            <li><a class="dropdown-item" href="online.html">온라인 전시</a></li>
 						        </ul>
 							<a class="dropdown-item" href="shop.html">전시 일정</a>
-						</div></li>
+						</div>
+					</li> -->
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
 						href="shop.html" role="button" aria-haspopup="true"
@@ -130,20 +131,20 @@
 						컬렉션
 						</a>
 						<div class="dropdown-menu">
-							<a class="dropdown-item" href="shop.html">대표 전시</a> 
+							<!-- <a class="dropdown-item" href="shop.html">대표 전시</a>  -->
 							<a class="dropdown-item" th:href="@{/exhibition/exhibitionList}">모든 전시</a>
 						</div>
 					</li>
-					<li class="nav-item dropdown"><a
+					<!-- <li class="nav-item dropdown"><a
 						class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
 						href="shop.html" role="button" aria-haspopup="true"
 						aria-expanded="false">예매</a>
 						<div class="dropdown-menu">
 							<a class="dropdown-item" href="shop.html">티켓 구매</a> <a
 								class="dropdown-item" href="shop.html">가격 안내</a>
-						</div></li>
-					<li><a class="nav-link" href="blog.html">News & Events</a></li>
-					<li><a class="nav-link" th:href="@{/forum/forumMain}">ARTalks</a></li>
+						</div>
+					</li> -->
+					<li><a class="nav-link" th:href="@{/blog/blogMain}">ARTalks</a></li>
 				</ul>
 				<div th:if="${session.memberId == null}">
 					<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
@@ -160,26 +161,32 @@
 					</ul>
 				</div>
 				<div th:unless="${session.memberId == null}">
-					<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
-						<li class="nav-item dropdown">
-							<a class="nav-link" data-bs-toggle="dropdown"
-							 role="button" aria-haspopup="true"
-							aria-expanded="false">
-								<img th:src="@{/bootstrap/images/user.svg}">
-							</a>
-							<div class="dropdown-menu">
-								<span class="dropdown-item-text">
-								<img th:src="@{/bootstrap/images/profile_basic2.webp}" style="border-radius: 15px; width:30px; height:30px;"/>
-								&nbsp;<strong th:text="${session.memberNm}"></strong> 님</span>
-								<a class="dropdown-item" th:href="@{/member/mypageMain}">My Page</a> 
-								<a class="dropdown-item" th:href="@{/member/logout}">Logout</a>
-							</div>
-						</li>
-								
-						<li><a class="nav-link" th:href="@{/member/cart}"><img
-								th:src="@{/bootstrap/images/cart.svg}"></a></li>
-					</ul>
+				    <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+				        <li class="nav-item dropdown">
+				            <a class="nav-link" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+				                <img th:src="@{/bootstrap/images/user.svg}">
+				            </a>
+				            <div class="dropdown-menu">
+				                <span class="dropdown-item-text" style="padding: 1rem; padding-bottom: 0;">
+				                    <img th:src="${memberDTO != null && memberDTO.memberProfileUUID != null 
+				                                ? '/uploads/' + memberDTO.memberProfileUUID 
+				                                : '/bootstrap/images/profile_basic2.webp'}"
+				                         style="border-radius: 15px; width:30px; height:30px;" />
+				                    &nbsp;<strong th:text="${session.memberNm}"></strong> 님
+				                </span>
+				                <hr/>
+				                <a class="dropdown-item" th:href="@{/member/mypageMain}">My Page</a> 
+				                <a class="dropdown-item" th:href="@{/member/logout}">Logout</a>
+				            </div>
+				        </li>
+				        <li>
+				            <a class="nav-link" th:href="@{/member/cartMain}">
+				                <img th:src="@{/bootstrap/images/cart.svg}">
+				            </a>
+				        </li>
+				    </ul>
 				</div>
+
 			</div>
 		</div>
 	</nav>

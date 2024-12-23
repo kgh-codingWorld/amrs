@@ -2,32 +2,70 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.application.amrs.comment.CommentDAO">
 <resultMap id="commentMap" type="hashmap" >
-	<result column="COMMENT_ID"  	   property="commentId"/>
-	<result column="COMMENT_CONTENT" 	   property="commentContent"/>
-	<result column="CREATE_DT" 	   property="createDt"/>
-	<result column="UPDATE_DT"       property="updateDt"/>
-	<result column="FORUM_ID"  property="forumId"/>
-	<result column="MEMBER_ID"  property="memberId"/>
+	<result column="COMMENT_ID"  	   	property="commentId"/>
+	<result column="COMMENT_CONTENT" 	property="commentContent"/>
+	<result column="COMMENT_CNT" 	   	property="commentCnt"/>
+	<result column="CREATE_DT" 	   		property="createDt"/>
+	<result column="UPDATE_DT"       	property="updateDt"/>
+	<result column="BLOG_ID"  			property="blogId"/>
+	<result column="MEMBER_ID"  		property="memberId"/>
 </resultMap>
-
-
 	<insert id="insertComment" parameterType="CommentDTO">
 		INSERT INTO COMMENT (
 			COMMENT_CONTENT,
-			FORUM_ID,
+			BLOG_ID,
 			MEMBER_ID
 		)
 		VALUES (
 			#{commentContent},
-			#{forumId},
+			#{blogId},
 			#{memberId}
 		)
+		<selectKey keyProperty="commentId" resultType="int" order="AFTER">
+	        SELECT LAST_INSERT_ID()
+	    </selectKey>
 	</insert>
+	
 	<select id="selectCommentList" resultMap="commentMap" parameterType="Int">
-		SELECT	COMMENT_CONTENT,
+		SELECT	COMMENT_ID,
+				COMMENT_CONTENT,
 				CREATE_DT,
 				MEMBER_ID
 		FROM	COMMENT
-		WHERE	FORUM_ID = #{forumId}
+		WHERE	BLOG_ID = #{blogId}
+	</select>
+	
+	<select id="countCommentByBlogId" resultType="int" parameterType="int">
+		SELECT  	COUNT(DISTINCT C.COMMENT_ID) + COUNT(R.REPLY_ID) AS TotalCounr
+		FROM 		COMMENT C
+		LEFT JOIN	REPLYCOMMENT R 
+		ON 			C.COMMENT_ID = R.COMMENT_ID
+		WHERE 		C.BLOG_ID = #{blogId}
+	</select>
+	<!-- LEFT JOIN: 대댓글이 없는 댓글도 포함하기 위함 -->
+	<update id="updateComment" parameterType="CommentDTO">
+		UPDATE	COMMENT
+    	SET 	COMMENT_CONTENT = #{commentContent},
+        		UPDATE_DT = CURRENT_TIMESTAMP
+    	WHERE 	COMMENT_ID = #{commentId}
+	</update>
+	
+	<delete id="deleteComment" parameterType="int">
+		DELETE 	FROM COMMENT
+		WHERE	COMMENT_ID = #{commentId}
+	</delete>
+	
+	<select id="selectOneComment" parameterType="int" resultType="CommentDTO">
+		SELECT		C.COMMENT_ID,
+					C.BLOG_ID,
+					C.MEMBER_ID,
+					C.COMMENT_CONTENT,
+					C.COMMENT_CNT,
+					C.CREATE_DT,
+					C.UPDATE_DT,
+					M.MEMBER_NM AS memberNm
+		FROM		COMMENT C
+		LEFT JOIN	MEMBER M ON C.MEMBER_ID = M.MEMBER_ID
+		WHERE		C.COMMENT_ID = #{commentId}
 	</select>
 </mapper>

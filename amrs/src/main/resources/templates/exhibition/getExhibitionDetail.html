@@ -2,6 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200..900&display=swap"
+		rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>전시상세</title>
@@ -166,87 +170,104 @@
 	    .exhibition-calendar .btn:hover {
 	        background-color: #5d7a97;
 	    }
-	    .modal-content {
-    position: relative;
-    width: 90%;
-    max-width: 600px;
-    padding: 20px 30px;
-    border-radius: 15px;
-    background-color: #1e1e1e;
-    color: #e0e0e0;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-}
+	    .modal {
+		    display: none;
+		    position: fixed;
+		    top: 0;
+		    left: 0;
+		    width: 100%;
+		    height: 100%;
+		    background-color: rgba(0, 0, 0, 0.5);
+		    z-index: 1000;
+		    visibility: hidden;
+		    opacity: 0;
+		    transition: opacity 0.3s ease, bisibility 0.3s ease;
+		}
 
-.modal-content h2 {
-    text-align: center;
-    color: #e0e0e0;
-    font-size: 24px;
-    margin-bottom: 15px;
-}
-
-.modal-content p {
-    margin: 15px 0;
-    font-size: 16px;
-    line-height: 1.6;
-}
-
-.modal-content p strong {
-    color: #64ffda;
-}
-
-.modal-content button {
-    width: calc(50% - 10px);
-    padding: 12px;
-    background-color: #0077b6;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    margin: 10px 5px 0;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.modal-content button:hover {
-    background-color: #005f8d;
-}
-
-.modal-content .close {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    color: #e0e0e0;
-    font-size: 20px;
-    cursor: pointer;
-    transition: color 0.3s;
-}
-
-.modal-content .close:hover {
-    color: #ff6b6b;
-}
-.modal-content .button-container {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-}
-
-.modal-content .button-container button {
-    width: 48%; /* 버튼이 나란히 놓일 수 있도록 너비 조정 */
-    padding: 12px;
-    background-color: #0077b6;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.modal-content .button-container button:hover {
-    background-color: #005f8d;
-}
-
-	    
+		.modal-content {
+		    position: absolute;
+		    top: 50%;
+		    left: 50%;
+		    transform: translate(-50%, -50%);
+		    width: 90%;
+		    max-width: 600px;
+		    background-color: #e0e0e0;
+		    color: #1e1e1e;
+		    padding: 20px;
+		    border-radius: 15px;
+		    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+		}
+		
+		.modal-content h2 {
+		    text-align: center;
+		    color: #e0e0e0;
+		    font-size: 24px;
+		    margin-bottom: 15px;
+		}
+		
+		.modal-content p {
+		    margin: 15px 0;
+		    font-size: 16px;
+		    line-height: 1.6;
+		}
+		
+		.modal-content p strong {
+		    color: #3b5d50;
+		}
+		
+		.modal-content button {
+		    width: calc(50% - 10px);
+		    padding: 12px;
+		    background-color: #2f2f2f;
+		    color: #fff;
+		    border: none;
+		    border-radius: 8px;
+		    margin: 10px 5px 0;
+		    font-size: 16px;
+		    cursor: pointer;
+		    transition: background-color 0.3s;
+		}
+		
+		.modal-content button:hover {
+		    background-color: #005f8d;
+		}
+		
+		.modal-content .close {
+		    position: absolute;
+		    top: 15px;
+		    right: 20px;
+		    color: #e0e0e0;
+		    font-size: 20px;
+		    cursor: pointer;
+		    transition: color 0.3s;
+		}
+		
+		.modal-content .close:hover {
+		    color: #ff6b6b;
+		}
+		.modal-content .button-container {
+		    display: flex;
+		    justify-content: space-between;
+		    margin-top: 20px;
+		}
+		
+		.modal-content .button-container button {
+		    width: 48%; /* 버튼이 나란히 놓일 수 있도록 너비 조정 */
+		    padding: 12px;
+		    background-color: #2f2f2f;
+		    color: #fff;
+		    border: none;
+		    border-radius: 8px;
+		    font-size: 16px;
+		    cursor: pointer;
+		    transition: background-color 0.3s;
+		}
+		
+		.modal-content .button-container button:hover {
+		    background-color: #3b5d50;
+		}
+		
+			    
     </style>
     
     <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
@@ -276,7 +297,11 @@
         const confirmPaymentButton = document.getElementById("confirmPayment");
         const cancelPaymentButton = document.getElementById("cancelPayment");
 
-        $('#payment').click(function(e) {
+        modal.style.display = "none";
+        modal.style.visibility = "hidden";
+        modal.style.opacity = "0";
+        
+        $('#payment').off('click').on('click', function(e) {
             e.preventDefault();
 
             const reservDate = $("input[name='reservDate']").val();
@@ -286,12 +311,6 @@
             const orderCnt = $("input[name='orderCnt']").val();
             const exhibitionTitle = $(".exhibition-title").text();
 
-            
-            console.log("localId: ",localId);
-            console.log("memberId: ",memberId);
-            console.log("reservDate: ",reservDate);
-            console.log("orderCnt: ",orderCnt);
-            
             if (!localId || !memberId || !reservDate || !orderCnt) {
                 alert("모든 정보를 입력해 주세요.");
                 return;
@@ -309,28 +328,40 @@
 
             // 모달 열기
             modal.style.display = "block";
+            setTimeout(() => {
+                modal.style.visibility = "visible";
+                modal.style.opacity = "1";
+            }, 10);
         });
 
         // 모달 닫기 버튼
         closeModal.onclick = function() {
-            modal.style.display = "none";
+        	closeModalModal();
         };
 
         // 취소 버튼 클릭 시 모달 닫기
         cancelPaymentButton.onclick = function() {
-            modal.style.display = "none";
+        	closeModalModal();
         };
 
         // 모달 외부를 클릭하면 모달 닫기
         window.onclick = function(event) {
             if (event.target == modal) {
-                modal.style.display = "none";
+            	closeModalModal();
             }
         };
 
+        function closeModalModal() {
+            modal.style.opacity = "0";
+            modal.style.visibility = "hidden";
+            setTimeout(() => {
+                modal.style.display = "none";
+            }, 300); // 애니메이션 시간 후 숨김
+        }
+        
         // 결제 확인 버튼 클릭 시 결제 진행
         confirmPaymentButton.onclick = function() {
-            modal.style.display = "none";
+        	closeModalModal();
             processPayment();
         };
 
@@ -434,14 +465,14 @@
 <body>
 
 <div layout:fragment="content">
-    <div class="exhibition-container">
+    <div class="exhibition-container noto-serif-kr">
         <!-- Left Column: Image, Title, Period, Event Period, and Description -->
         <div class="exhibition-left" th:each="item : ${exhibitionDetail}">
             <!-- 포스터 이미지 -->
             <img th:src="${item.imageUrl}" class="exhibition-image" onerror="this.src='/bootstrap/images/img-grid-3.jpg'" alt="Exhibition Image">
 
             <!-- Title, Period, Event Period -->
-            <div class="exhibition-details-container">
+            <div class="exhibition-details-container noto-serif-kr">
             	<h2 class="exhibition-title noto-serif-kr" th:text="${item.title}"></h2>
             	<ul class="exhibition-info" style="list-style: none;">
 	                <li><strong>연계기관</strong>&nbsp;<span class="noto-serif-kr" th:text="${item.cntcInsttNm}"></span></li>
@@ -476,20 +507,19 @@
             <label for="orderCnt">매수</label>
             <input type="number" name="orderCnt" min="1">
             
-            <label for="priceDisplay">가격</label>
-            <span id="priceDisplay">10000원</span>
+            <span id="priceDisplay" style="color: red; font: bold">10,000원</span>
 	            <input type="date" name="reservDate" style="display:none;"/>
 	            <input type="hidden" name="localId" th:value="${exhibitionDetail != null ? exhibitionDetail.localId : ''}" />
 	            <input type="hidden" name="memberId" th:value="${memberDTO.memberId}"/>
 	            <input type="hidden" name="memberNm" th:value="${memberDTO.memberNm}"/>
 	            <input type="hidden" name="totalCnt" th:value="${totalCnt}">
 	            <input type="hidden" name="price" value="10000">
-	       		<button type="submit" class="btn me-2 noto-serif-kr" style="height: 3rem; width: 23rem;" id="payment">결제하기</button>
+	       		<button type="submit" class="btn me-2 noto-serif-kr" style="height: 3rem; width: 23rem; margin-top: 25px" id="payment">결제하기</button>
         </div>
     </div>
     <!-- 결제 확인 모달 -->
 	<div id="paymentModal" class="modal">
-	    <div class="modal-content" style="bottom: 750px;width: 34rem;height: 27rem;left: 505px;border-radius: 25px;background-color: black;">
+	    <div class="modal-content">
 	        <span class="close" style="text-align:right; margin-right: 15px; color: #fff;">&times;</span>
 	        <h2 class="noto-serif-kr" style="text-align: center; color: #fff;">결제 정보</h2>
 	        <p><strong>결제자 이름:</strong> <span id="modalUserName"></span></p>

@@ -67,7 +67,7 @@ public class MemberServiceImpl implements MemberService {
 	public String checkDuplicatedId(String memberId) {
 		
 		String isDuplicatedId = "n";
-		if(memberDAO.findMemberId(memberId) == null) {
+		if(memberDAO.findMemberId(memberId) == null) { // 중복되는 아이디가 없으면
 			isDuplicatedId = "y";
 		}
 		return isDuplicatedId;
@@ -99,19 +99,21 @@ public class MemberServiceImpl implements MemberService {
 
 
 	@Override
-	public boolean isValidPasswd(String passwd, MemberDTO memberDTO) {
+	public boolean isValidPasswd(String passwd, String memberId) {
 
-		MemberDTO validateData = memberDAO.isValidPasswd(memberDTO.getMemberId());
+		//MemberDTO validateData = memberDAO.isValidPasswd(memberDTO.getMemberId());
+		String validateData = memberDAO.isValidPasswd(memberId);
 		
+		// 기존 DB의 passwd와 일치 시 true 반환
 		if(validateData != null) {
-			if(passwordEncoder.matches(passwd, validateData.getPasswd())) {
+			if(passwordEncoder.matches(passwd, validateData)) {
 				return true;
 			} else {
-				log.warn("Login failed: incorrect password for memberId - {}", memberDTO.getMemberId());
+				//log.warn("로그인 실패", memberDTO.getMemberId());
 			    return false;
 			}
 		} else {
-			log.warn("Login failed: memberId not found - {}", memberDTO.getMemberId());
+			//log.warn("로그인 실패", memberDTO.getMemberId());
 		    return false;
 		}
 		

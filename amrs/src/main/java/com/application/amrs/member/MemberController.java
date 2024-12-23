@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.application.amrs.blog.BlogService;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -85,12 +87,15 @@ public class MemberController {
 	public String isValidPasswd(@RequestParam("passwd") String passwd, @RequestParam("memberId") String memberId) {
 		
 		String isValidPasswd = "n";
-		MemberDTO memberDTO = new MemberDTO();
-		memberDTO.setMemberId(memberId);
+		//MemberDTO memberDTO = new MemberDTO();
+		//memberDTO.setMemberId(memberId);
 		
-		if(memberService.isValidPasswd(passwd, memberDTO)) {
+		if(memberService.isValidPasswd(passwd, memberId)) {
 			isValidPasswd = "y";
 		}
+		
+		System.out.println("#@@@@" + memberId);
+		System.out.println("#@@@@" + isValidPasswd);
 		return isValidPasswd;
 	}
 

@@ -42,4 +42,24 @@ public class CommentServiceImpl implements CommentService{
 		return comments;
 	}
 
+	@Override
+	public int countCommentByBlogId(int forumId) {
+		return commentDAO.countCommentByBlogId(forumId);
+	}
+
+	@Override
+	public void modifyComment(CommentDTO commentDTO) {
+		commentDAO.updateComment(commentDTO);
+	}
+
+	@Override
+	public void removeComment(int commentId) {
+		commentDAO.deleteComment(commentId);
+	}
+
+	@Override
+	public CommentDTO getOneComment(int commentId) {
+		return commentDAO.selectOneComment(commentId);
+	}
+
 }
