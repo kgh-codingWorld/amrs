@@ -33,11 +33,11 @@ public class CommentRestController {
     @Autowired
     private ReplyCommentService replyCommentService;
     
-    @PostMapping("/registerComment/{blogId}")
-    public ResponseEntity<CommentDTO> registerComment(@PathVariable("blogId") int blogId, @RequestBody CommentDTO commentDTO, HttpSession session) {
+    @PostMapping("/registerComment/{communityId}")
+    public ResponseEntity<CommentDTO> registerComment(@PathVariable("communityId") int communityId, @RequestBody CommentDTO commentDTO, HttpSession session) {
         try {
-            // blogId를 CommentDTO에 설정 (필요한 경우)
-            commentDTO.setBlogId(blogId);
+            // communityId를 CommentDTO에 설정 (필요한 경우)
+            commentDTO.setCommunityId(communityId);
 
             String loggedInMemberId = (String) session.getAttribute("memberId");
             if (loggedInMemberId == null) {
@@ -93,7 +93,6 @@ public class CommentRestController {
 			
 			ReplyCommentDTO savedReply = replyCommentService.registerReply(replyCommentDTO);
 			ReplyCommentDTO returnReply = replyCommentService.getOneReply(savedReply.getReplyId());
-			System.out.println("EEEEE" + savedReply.getReplyId());
 			
 			return ResponseEntity.status(HttpStatus.CREATED).body(returnReply);
 		} catch (Exception e) {

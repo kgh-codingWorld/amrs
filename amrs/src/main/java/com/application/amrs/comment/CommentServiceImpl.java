@@ -43,8 +43,8 @@ public class CommentServiceImpl implements CommentService{
 	}
 
 	@Override
-	public int countCommentByBlogId(int forumId) {
-		return commentDAO.countCommentByBlogId(forumId);
+	public int countCommentByCommunityId(int forumId) {
+		return commentDAO.countCommentByCommunityId(forumId);
 	}
 
 	@Override

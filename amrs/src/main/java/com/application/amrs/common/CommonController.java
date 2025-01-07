@@ -10,8 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import com.application.amrs.blog.BlogService;
 import com.application.amrs.comment.CommentService;
+import com.application.amrs.community.CommunityService;
 import com.application.amrs.exhibition.ExhibitionService;
 import com.application.amrs.exhibition.ExhibitionService.ExhibitionItem;
 import com.application.amrs.member.MemberDTO;
@@ -29,7 +29,7 @@ public class CommonController {
 	private MemberService memberService;
 	
 	@Autowired
-	private BlogService blogService;
+	private CommunityService communityService;
 	
 	@Autowired
 	private CommentService commentService;
@@ -49,8 +49,16 @@ public class CommonController {
 	// .
 	
 	@GetMapping("/")
-	public String main() {
+	public String main(Model model) {
 		// 메인 화면으로 이동
+		ExhibitionService exhibitionService = new ExhibitionService();
+		List<ExhibitionItem> randomExhibitions = exhibitionService.getRandomExhibitions(3);
+		
+		List<Map<String, Object>> communityList = communityService.getRecentCommunityList(3);
+		System.out.println("!@@@@###" + communityList);
+		
+		model.addAttribute("exhibitions", randomExhibitions);
+		model.addAttribute("communityList", communityList);
 		return "main/index";
 	}
 	
@@ -140,6 +148,7 @@ public class CommonController {
 		// 소개 페이지로 이동
 		return "main/about";
 	}
+	
 	/* 전시 관련 메서드 */
 	
 	@GetMapping("/exhibition/exhibitionList")
@@ -172,92 +181,42 @@ public class CommonController {
 
 		return "exhibition/getExhibitionDetail";
 	}
-	
-	@GetMapping("/exhibition/exhibitionByMuseum")
-	public String exhibitionByMuseum() {
-		// 미술관별 전시 페이지로 이동
-		return "exhibition/exhibitionByMuseum";
-	}
-
-	@GetMapping("/exhibition/exhibitionByType")
-	public String exhibitionByType() {
-		// 종류별 전시 페이지로 이동
-		return "exhibition/exhibitionByType";
-	}
-
-	@GetMapping("calendar/calendar")
-	public String calendar() {
-		// 전시 일정 페이지로 이동
-		return "calendar/calendar";
-	}
-
-	@GetMapping("/exhibition/allExhibition")
-	public String allExhibition() {
-		// 모든 전시 페이지로 이동
-		return "exhibition/allExhibition";
-	}
-
-	@GetMapping("/exhibition/presidentExhibition")
-	public String presidentExhibition() {
-		// 대표 전시 페이지로 이동
-		return "exhibition/presidentExhibition";
-	}
-
-	/* 티켓 관련 메서드 */
-	
-	@GetMapping("/ticket/ticket")
-	public String ticket() {
-		// 티켓 구매 페이지로 이동
-		return "ticket/ticket";
-	}
-	
-	@GetMapping("/ticket/price")
-	public String price() {
-		// 가격 안내 페이지로 이동
-		return "ticket/price";
-	}
-	
-	/* 뉴스 관련 메서드 */
-	
-	@GetMapping("main/news")
-	public String news() {
-		// 뉴스 페이지로 이동
-		return "news/news";
-	}
 
 	/* 블로그 관련 메서드 */
 	
-	@GetMapping("/blog/blogMain")
-    public String getBlogList(HttpServletRequest request, Model model) {
-        List<Map<String, Object>> blogList = blogService.getBlogList();
-        model.addAttribute("blogList", blogList);
-        return "blog/blogMain"; 
+	@GetMapping("/community/communityMain")
+    public String getCommunityList(HttpServletRequest request, Model model) {
+        List<Map<String, Object>> communityList = communityService.getCommunityList();
+        model.addAttribute("communityList", communityList);
+        return "community/communityMain"; 
     }
 
-	@GetMapping("/blog/registerBlog")
-	public String registerBlog(HttpServletRequest request, Model model) {
+	@GetMapping("/community/registerCommunity")
+	public String registerCommunity(HttpServletRequest request, Model model) {
 		HttpSession session = request.getSession();
 		String memberNm = (String) session.getAttribute("memberNm");
 		String maskedMemberNm = memberService.maskLastCharacter(memberNm);
 		model.addAttribute("maskedMemberNm", maskedMemberNm);
-		return "blog/registerBlog";
+		return "community/registerCommunity";
 	}
 	
-	@GetMapping("/blog/blogDetail/{blogId}")
-	public String blogDetail(@PathVariable("blogId") int blogId, HttpServletRequest request, Model model) {
+	@GetMapping("/community/communityDetail/{communityId}")
+	public String communityDetail(@PathVariable("communityId") int communityId, HttpServletRequest request, Model model) {
 
 	    String sessionMemberId = (String) request.getSession().getAttribute("memberId");
+	    System.out.println("^^^^sessionMember: " + sessionMemberId);
 	    
-	    boolean isLiked = blogService.hasMemberLikedPost(sessionMemberId, blogId);
+	    boolean isLiked = communityService.hasMemberLikedPost(sessionMemberId, communityId);
 	    
-	    Map<String, Object> blog = blogService.getBlogById(blogId, true);
+	    Map<String, Object> community = communityService.getCommunityById(communityId, true);
 	    
-	    String memberId = (String) blog.get("memberId");
+	    String memberId = (String) community.get("memberId");
 	    String memberNm = memberService.getMemberNameById(memberId);
+	    System.out.println("^^^^memberId: " + memberId);
 	    
 	    String maskedMemberNm = memberService.maskLastCharacter(memberNm);
 
-	    List<Map<String, Object>> commentList = commentService.getCommentList(blogId);
+	    List<Map<String, Object>> commentList = commentService.getCommentList(communityId);
 	    
 	    for (Map<String, Object> comment : commentList) {
 	        String commentMemberId = (String) comment.get("memberId");
@@ -285,51 +244,51 @@ public class CommonController {
 	        comment.put("replyCommentList", replyCommentList);
 	    }
 
-	    int commentCnt = commentService.countCommentByBlogId(blogId);
+	    int commentCnt = commentService.countCommentByCommunityId(communityId);
 	    
 	    model.addAttribute("commentCnt", commentCnt); 	// 댓글 수
-	    model.addAttribute("blog", blog);          	// 게시글 정보
+	    model.addAttribute("community", community);     // 게시글 정보
 	    model.addAttribute("memberNm", maskedMemberNm); // 게시글 작성자의 마스킹된 이름
 	    model.addAttribute("isLiked", isLiked);      	// 현재 사용자의 '좋아요' 여부
 	    model.addAttribute("commentList", commentList); // 댓글 목록 (대댓글 포함)
 
-	    return "blog/blogDetail";
+	    return "community/communityDetail";
 	}
 
 	
-	@GetMapping("/blog/modifyBlog/{blogId}")
-	public String modifyBlog(@PathVariable("blogId") int blogId, HttpServletRequest request, Model model) {
+	@GetMapping("/community/modifyCommunity/{communityId}")
+	public String modifyCommunity(@PathVariable("communityId") int communityId, HttpServletRequest request, Model model) {
 		HttpSession session = request.getSession();
 		String memberNm = (String) session.getAttribute("memberNm");
 		String maskedMemberNm = memberService.maskLastCharacter(memberNm);
 		model.addAttribute("maskedMemberNm", maskedMemberNm);
-		model.addAttribute("blog", blogService.getBlogById(blogId, true));
+		model.addAttribute("community", communityService.getCommunityById(communityId, true));
 		
-		return "blog/modifyBlog";
+		return "community/modifyCommunity";
 	}
 	
-	@GetMapping("/blog/removeBlog/{blogId}")
-	public String removeBlog(@PathVariable("blogId") int blogId, HttpServletRequest request, Model model) {
+	@GetMapping("/community/removeCommunity/{communityId}")
+	public String removeCommunity(@PathVariable("communityId") int communityId, HttpServletRequest request, Model model) {
 		HttpSession session = request.getSession();
 		model.addAttribute("memberDTO", memberService.getMemberDetail((String)session.getAttribute("memberId")));
-		model.addAttribute("blog", blogService.getBlogById(blogId, true));
-		return "blog/removeBlog";
+		model.addAttribute("community", communityService.getCommunityById(communityId, true));
+		return "community/removeCommunity";
 	}
 	
-	@GetMapping("/blog/myBlogPostList")
-	public String myBlogPostList(HttpServletRequest request, Model model) {
+	@GetMapping("/community/myCommunityPostList")
+	public String myCommunityPostList(HttpServletRequest request, Model model) {
 		// 내 게시글로 이동
 		HttpSession session = request.getSession();
 		MemberDTO memberDTO = memberService.getMemberDetail((String)session.getAttribute("memberId"));
 		
-		List<Map<String, Object>> myBlogList = blogService.getMyBlogList((String)session.getAttribute("memberId"));
-        model.addAttribute("myBlogList", myBlogList);
+		List<Map<String, Object>> myCommunityList = communityService.getMyCommunityList((String)session.getAttribute("memberId"));
+        model.addAttribute("myCommunityList", myCommunityList);
 		
 		model.addAttribute("memberDTO", memberDTO);
 		if(session.getAttribute("memberId") == null) {
 			return "redirect:/member/login";
 		}
-		return "blog/myBlogPostList";
+		return "community/myCommunityPostList";
 	}
 	
 	@GetMapping("/member/cartMain")

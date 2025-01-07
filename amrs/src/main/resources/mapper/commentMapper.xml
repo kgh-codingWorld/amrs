@@ -7,18 +7,18 @@
 	<result column="COMMENT_CNT" 	   	property="commentCnt"/>
 	<result column="CREATE_DT" 	   		property="createDt"/>
 	<result column="UPDATE_DT"       	property="updateDt"/>
-	<result column="BLOG_ID"  			property="blogId"/>
+	<result column="COMMUNITY_ID"  			property="communityId"/>
 	<result column="MEMBER_ID"  		property="memberId"/>
 </resultMap>
 	<insert id="insertComment" parameterType="CommentDTO">
 		INSERT INTO COMMENT (
 			COMMENT_CONTENT,
-			BLOG_ID,
+			COMMUNITY_ID,
 			MEMBER_ID
 		)
 		VALUES (
 			#{commentContent},
-			#{blogId},
+			#{communityId},
 			#{memberId}
 		)
 		<selectKey keyProperty="commentId" resultType="int" order="AFTER">
@@ -32,15 +32,15 @@
 				CREATE_DT,
 				MEMBER_ID
 		FROM	COMMENT
-		WHERE	BLOG_ID = #{blogId}
+		WHERE	COMMUNITY_ID = #{communityId}
 	</select>
 	
-	<select id="countCommentByBlogId" resultType="int" parameterType="int">
+	<select id="countCommentByCommunityId" resultType="int" parameterType="int">
 		SELECT  	COUNT(DISTINCT C.COMMENT_ID) + COUNT(R.REPLY_ID) AS TotalCounr
 		FROM 		COMMENT C
 		LEFT JOIN	REPLYCOMMENT R 
 		ON 			C.COMMENT_ID = R.COMMENT_ID
-		WHERE 		C.BLOG_ID = #{blogId}
+		WHERE 		C.COMMUNITY_ID = #{communityId}
 	</select>
 	<!-- LEFT JOIN: 대댓글이 없는 댓글도 포함하기 위함 -->
 	<update id="updateComment" parameterType="CommentDTO">
@@ -56,14 +56,14 @@
 	</delete>
 	
 	<select id="selectOneComment" parameterType="int" resultType="CommentDTO">
-		SELECT		C.COMMENT_ID,
-					C.BLOG_ID,
-					C.MEMBER_ID,
-					C.COMMENT_CONTENT,
-					C.COMMENT_CNT,
-					C.CREATE_DT,
-					C.UPDATE_DT,
-					M.MEMBER_NM AS memberNm
+		SELECT		C.COMMENT_ID		AS COMMENT_ID,
+					C.COMMUNITY_ID		AS COMMUNITY_ID,
+					C.MEMBER_ID			AS MEMBER_ID,
+					C.COMMENT_CONTENT	AS COMMENT_CONTENT,
+					C.COMMENT_CNT		AS COMMENT_CNT,
+					C.CREATE_DT			AS CREATE_DT,
+					C.UPDATE_DT			AS UPDATE_DT,
+					M.MEMBER_NM 		AS MEMBER_NM
 		FROM		COMMENT C
 		LEFT JOIN	MEMBER M ON C.MEMBER_ID = M.MEMBER_ID
 		WHERE		C.COMMENT_ID = #{commentId}

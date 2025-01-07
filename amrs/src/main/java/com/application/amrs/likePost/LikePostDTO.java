@@ -6,7 +6,7 @@ import lombok.Data;
 public class LikePostDTO {
 
 	private int likePostId;
-	private int blogId;
+	private int communityId;
 	private String memberId;
 	private boolean liked;
 }

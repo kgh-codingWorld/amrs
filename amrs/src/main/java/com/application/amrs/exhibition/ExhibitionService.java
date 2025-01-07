@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import ch.qos.logback.core.pattern.SpacePadder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,7 +96,6 @@ public class ExhibitionService {
     }
 
     public List<ExhibitionItem> getExhibitionItems() {
-        // String apiUrl = "http://api.kcisa.kr/openapi/API_CCA_149/request?serviceKey=493f5e47-3544-4051-a637-8d79212890ed";
         String apiUrl = "http://api.kcisa.kr/openapi/API_CCA_145/request?serviceKey=948b06fb-3f09-4dcd-b4a7-c360995ff0ee";
         
         // 중복 제거를 위한 Map, key는 전시 ID
@@ -176,4 +176,17 @@ public class ExhibitionService {
         }
     }
 
+    
+    public List<ExhibitionItem> getRandomExhibitions(int count) {
+    	List<ExhibitionItem> allItems = getExhibitionItems();
+    	
+    	if(allItems.isEmpty()) {
+    		System.out.println("전시 데이터 없음");
+    		return Collections.emptyList();
+    	}
+    	
+    	Collections.shuffle(allItems);
+    	
+    	return allItems.subList(0, Math.min(count, allItems.size()));
+    }
 }

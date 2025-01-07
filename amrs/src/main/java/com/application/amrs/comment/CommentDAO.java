@@ -10,8 +10,8 @@ public interface CommentDAO {
 
 	public void insertComment(CommentDTO commentDTO);
 	public CommentDTO selectOneComment(int commentId);
-	public List<Map<String, Object>> selectCommentList(int blogId);
-	public int countCommentByBlogId(int blogId);
+	public List<Map<String, Object>> selectCommentList(int communityId);
+	public int countCommentByCommunityId(int communityId);
 	public void updateComment(CommentDTO commentDTO);
 	public void deleteComment(int commentId);
 }

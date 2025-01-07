@@ -1,22 +1,21 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{layout/layout.html}">
+	>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="author" content="Untree.co">
     <link rel="shortcut icon" href="favicon.png">
-    <link rel="stylesheet" href="/bootstrap/css/blog.css">
-    <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.1.1/ckeditor5.css">
+    <link rel="stylesheet" href="/bootstrap/css/community.css">
+    <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.2.0/ckeditor5.css">
 
     <meta name="description" content="" />
     <meta name="keywords" content="bootstrap, bootstrap4" />
 
-    <title>Modify Blog Page</title>
+    <title>Register Community Page</title>
     <style>
         /* 배경 이미지 설정 */
-        .blog-background {
+        .community-background {
             background-size: cover;
             background-position: center;
             min-height: 100vh;
@@ -86,62 +85,47 @@
             display: none;
         }
     </style>
-    <script th:src="@{/ckeditor/ckeditor.js}"></script>
 </head>
 
 <body>
-	<div layout:fragment="content">
 		<!-- Start Hero Section -->
-		<div class="blog-background">
+		<div class="community-background">
 			<div class="container form-container">
-				<form th:action="@{/blog/modifyBlog}" method="post" enctype="multipart/form-data">
+				<form th:action="@{/community/registerCommunity}" method="post" enctype="multipart/form-data">
 					<div class="main-container">
 						<table border="0" class="noto-serif-kr">
 							<tr>
-								<td>작성자</td>
+								<td class="noto-serif-kr">작성자</td>
 								<td style="width:42rem;"><input type="text" size="100" th:value="${maskedMemberNm}" class="noto-serif-kr" readonly /></td>
 							</tr>
 							<tr>
 								<td>제목</td>
-								<td style="width:42rem;"><input type="text" th:value="${blog.blogTitle}" name="blogTitle" size="100" required /></td>
+								<td style="width:42rem;"><input type="text" name="communityTitle" size="100" required /></td>
 							</tr>
 							<tr>
 								<td>메인<br>이미지</td>
-								<td style="width:42rem; vertical-align: middle;"><input type="file" th:value="${blog['blogThumbnailUUID']}" name="thumbnail" size="100" /></td>
-							</tr>
-							<tr>
-								<td>글내용</td>
-								<td style="width:42rem;">
-									<textarea rows="10" cols="50" th:utext="${blog.blogContent}" name="blogContent" required></textarea>
-									<script>CKEDITOR.replace("blogContent");</script>
-								</td>
-							</tr>
-							<tr align="center">
-								<td colspan="2">
-									<input type="hidden" name="memberId" th:value="${session.memberId}" />
-									<input type="hidden" name="blogId" th:value="${blog.blogId}" />
-									<input type="submit" value="수정완료" />
-									<input type="button" value="목록보기" th:onclick="|location.href='@{/blog/blogMain}'|" />
-								</td>
+								<td style="width:42rem; vertical-align: middle;"><input type="file" name="thumbnail" size="100" /></td>
 							</tr>
 						</table>
+						<div>
+							<div class="editor-container editor-container_classic-editor" id="editor-container">
+								<div class="editor-container__editor"><textarea name="communityContent" id="editor"></textarea></div>
+							</div>	
+						</div>
+					</div>
+					<div align="center" style="margin-top: 1rem;">
+						<input type="hidden" name="memberId" th:value="${session.memberId}" />
+						<input type="submit" value="작성하기" />
+						<input type="button" value="목록보기" th:onclick="|location.href='@{/community/communityMain}'|" />
 					</div>
 				</form>
-
-				<!-- 미리보기 영역 -->
-				<div id="postPreview" class="post-preview">
-					<h3 id="previewTitle"></h3>
-					<p id="previewContent"></p>
-				</div>
-			</div>
 		</div>
 		<!-- End Hero Section -->
-	</div>
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<!-- <script>
 		$(document).ready(function() {
-			$('#blogPostForm').submit(function(e) {
+			$('#forumPostForm').submit(function(e) {
 				e.preventDefault(); // 폼 제출 기본 동작 방지
 
 				// 입력된 제목과 내용을 가져오기
@@ -155,5 +139,14 @@
 			});
 		});
 	</script> -->
+	<script type="importmap">
+		{
+			"imports": {
+				"ckeditor5": "https://cdn.ckeditor.com/ckeditor5/43.2.0/ckeditor5.js",
+				"ckeditor5/": "https://cdn.ckeditor.com/ckeditor5/43.2.0/"
+			}
+		}
+		</script>
+		<script type="module" src="/main.js"></script>
 </body>
 </html>

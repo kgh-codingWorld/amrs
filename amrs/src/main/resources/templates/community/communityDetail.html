@@ -6,12 +6,12 @@
 <meta charset="UTF-8">
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Blog Detail</title>
+<title>Community Detail</title>
 <link
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
 	rel="stylesheet">
 <style>
-.blog-container {
+.community-container {
 	max-width: 800px;
 	margin: auto;
 	background-color: #fff;
@@ -20,23 +20,23 @@
 	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.blog-header {
+.community-header {
 	text-align: center;
 	margin-bottom: 30px;
 }
 
-.blog-header h1 {
+.community-header h1 {
 	font-size: 2.5rem;
 	color: #333;
 }
 
-.blog-meta {
+.community-meta {
 	text-align: center;
 	color: #777;
 	font-size: 0.9rem;
 }
 
-.blog-content {
+.community-content {
 	font-size: 1.1rem;
 	line-height: 1.8;
 	color: #444;
@@ -267,7 +267,7 @@
 			const likeIcon = document.getElementById('likeIcon');
 			const likeCountElement = document.getElementById('likeCount');
 			const memberId = document.querySelector('[name="memberId"]').value;
-			const blogId = document.querySelector('[name="blogId"]').value;
+			const communityId = document.querySelector('[name="communityId"]').value;
 			const likeCount = document.querySelector('[name="likeCount"]').value;
 			const liked = likeIcon.classList.contains('fas') ? false : true; // 현재 상태
 			
@@ -279,7 +279,7 @@
 	            contentType: 'application/json',
 	            data: JSON.stringify({
 	            	memberId: memberId,
-	                blogId: blogId,
+	                communityId: communityId,
 	                liked: liked,
 	                likeCount: likeCount
 	            }),
@@ -323,7 +323,7 @@
 		// 댓글 등록
 		$('#submitComment').click(function(){
 			
-			let blogId = $('[name="blogId"]').val();
+			let communityId = $('[name="communityId"]').val();
 			let commentContent = $('#commentContent').val();
 			let memberId = $('[name="sessionMemberId"]').val();
 			
@@ -333,7 +333,7 @@
 			}
 			
 			$.ajax({
-				url : '/comment/registerComment/' + blogId,
+				url : '/comment/registerComment/' + communityId,
 				type : 'post',
 				contentType: 'application/json',
 				data : JSON.stringify({
@@ -368,7 +368,7 @@
 				},
 				error : function(xhr, status, error) {
 					console.error('댓글 작성 중 오류 발생:', error);
-					console.log('blogId: ' + blogId);
+					console.log('communityId: ' + communityId);
 					console.log('commentContent: ' + commentContent);
 					console.log('memberId: ' + memberId);
 					alert('댓글 작성 중 오류가 발생했습니다.');
@@ -447,7 +447,7 @@
 			const parentLi = $(this).closest('li');
 		    const replyContent = parentLi.find('textarea[name="replyContent"]').val().trim();
 		    const commentId = parentLi.find('input[name="commentId"]').val();
-		    const blogId = $('[name="blogId"]').val();
+		    const communityId = $('[name="communityId"]').val();
 		    const memberId = $('[name="sessionMemberId"]').val();
 
 		    if (!replyContent) {
@@ -460,7 +460,7 @@
 		        type: 'post',
 		        contentType: 'application/json',
 		        data: JSON.stringify({
-		            blogId: blogId,
+		            communityId: communityId,
 		            memberId: memberId,
 		            commentId: commentId,
 		            replyContent: replyContent
@@ -557,42 +557,42 @@
 <body>
 
 	<div layout:fragment="content">
-		<div class="blog-background">
+		<div class="community-background">
 			<div class="section">
 				<div class="container">
-					<div class="blog-container">
-						<div class="blog-header">
-							<!-- blog Title -->
+					<div class="community-container">
+						<div class="community-header">
+							<!--  Title -->
 							<div class="dropdown noto-serif-kr" style="width: 1rem; float: right; list-style: none;">
 									<a data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> 
 										<i class="fa-solid fa-bars"></i>
 									</a>
-								<div class="dropdown-menu" th:if="${session.memberId != null and session.memberId == blog['memberId']}">
+								<div class="dropdown-menu" th:if="${session.memberId != null and session.memberId == community['memberId']}">
 									<span class="dropdown-item-text"> 
-										<a th:href="@{/blog/modifyBlog/{blogId}(blogId=${blog['blogId']})}" style="text-decoration: none;">수정하기</a>
+										<a th:href="@{/community/modifyCommunity/{communityId}(communityId=${community['communityId']})}" style="text-decoration: none;">수정하기</a>
 									</span> 
 									<span class="dropdown-item-text"> 
-										<a th:href="@{/blog/removeBlog/{blogId}(blogId=${blog['blogId']})}" style="text-decoration: none;">삭제하기</a>
+										<a th:href="@{/community/removeCommunity/{communityId}(communityId=${community['communityId']})}" style="text-decoration: none;">삭제하기</a>
 									</span>
 								</div>
 							</div>
-							<h1 class="noto-serif-kr" th:text="${blog['blogTitle']}"></h1>
+							<h1 class="noto-serif-kr" th:text="${community['communityTitle']}"></h1>
 						</div>
-						<input type="hidden" name="memberId" th:value="${blog['memberId']}">
-						<input type="hidden" name="blogId" th:value="${blog['blogId']}">
+						<input type="hidden" name="memberId" th:value="${community['memberId']}">
+						<input type="hidden" name="communityId" th:value="${community['communityId']}">
 						<input type="hidden" id="isLiked" th:value="${isLiked}">
-						<input type="hidden" name="likeCount" th:value="${blog['likeCount']}">
-						<div class="blog-meta">
-							<!-- blog Meta Data -->
+						<input type="hidden" name="likeCount" th:value="${community['likeCount']}">
+						<div class="community-meta">
+							<!--  Meta Data -->
 							<p class="noto-serif-kr">
 								작성자: <span th:text="${memberNm}"></span>&nbsp; | &nbsp;작성일: <span
-									th:text="${#dates.format(blog.createDt, 'yyyy-MM-dd')}"></span>
+									th:text="${#dates.format(community.createDt, 'yyyy-MM-dd')}"></span>
 							</p>
 						</div>
 
-						<div class="blog-content noto-serif-kr">
-							<!-- blog Content -->
-							<p style="padding: 1rem;" th:utext="${blog['blogContent']}"></p>
+						<div class="community-content noto-serif-kr">
+							<!--  Content -->
+							<p style="padding: 1rem;" th:utext="${community['communityContent']}"></p>
 						</div>
 
 						<!-- 목록보기 및 좋아요 버튼 -->
@@ -602,12 +602,12 @@
 								<button class="like-button">
 									<i id="likeIcon" th:classappend="${isLiked != false} ? 'fas fa-heart' : 'far fa-heart'"></i>
 								</button>
-								<span class="like-count" id="likeCount" th:text="${blog['likeCount']}"></span>
+								<span class="like-count" id="likeCount" th:text="${community['likeCount']}"></span>
 							</div>
 
 							<!-- 목록보기 버튼 -->
 							<input type="button" value="목록보기" class="btn noto-serif-kr"
-								th:onclick="|location.href='@{/blog/blogMain}'|">
+								th:onclick="|location.href='@{/community/communityMain}'|">
 						</div>
 						<hr>
 						<!-- 댓글 작성 폼 -->

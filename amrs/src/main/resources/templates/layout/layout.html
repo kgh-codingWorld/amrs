@@ -108,22 +108,6 @@
 						th:href="@{/}">Home</a></li>
 					<li><a class="nav-link" th:href="@{/main/about}">AMRS
 							소개</a></li>
-					<!-- <li class="nav-item dropdown"><a
-						class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
-						 role="button" aria-haspopup="true"
-						aria-expanded="false">전시</a>
-						<div class="dropdown-menu">
-							<a class="dropdown-item">미술관별 전시</a> 
-							<a class="dropdown-item">종류별 전시</a>
-						        <ul class="dropdown-submenu">
-						            <li><a class="dropdown-item" href="current.html">현재 전시</a></li>
-						            <li><a class="dropdown-item" href="past.html">과거 전시</a></li>
-						            <li><a class="dropdown-item" href="upcoming.html">예정 전시</a></li>
-						            <li><a class="dropdown-item" href="online.html">온라인 전시</a></li>
-						        </ul>
-							<a class="dropdown-item" href="shop.html">전시 일정</a>
-						</div>
-					</li> -->
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
 						href="shop.html" role="button" aria-haspopup="true"
@@ -144,7 +128,7 @@
 								class="dropdown-item" href="shop.html">가격 안내</a>
 						</div>
 					</li> -->
-					<li><a class="nav-link" th:href="@{/blog/blogMain}">ARTalks</a></li>
+					<li><a class="nav-link" th:href="@{/community/communityMain}">ARTalks</a></li>
 				</ul>
 				<div th:if="${session.memberId == null}">
 					<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
@@ -260,7 +244,7 @@
 							<ul class="list-unstyled">
 								<li><a href="/index">About us</a></li>
 								<li><a href="/index">Services</a></li>
-								<li><a href="/index">Blog</a></li>
+								<li><a href="/index">Community</a></li>
 								<li><a href="/index">Contact us</a></li>
 							</ul>
 						</div>

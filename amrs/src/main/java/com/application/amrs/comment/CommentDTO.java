@@ -15,7 +15,7 @@ public class CommentDTO {
 	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private Date createDt;
 	private Date updateDt;
-	private int blogId;
+	private int communityId;
 	private String memberId;
 	
 	// 임시 필드

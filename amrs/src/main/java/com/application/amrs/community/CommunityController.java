@@ -1,4 +1,4 @@
-package com.application.amrs.blog;
+package com.application.amrs.community;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,64 +23,64 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/blog")
-public class BlogController {
+@RequestMapping("/community")
+public class CommunityController {
 	
 	@Value("${file.repo.path}")
 	private String fileRepositoryPath; 
 
 	@Autowired
-	private BlogService blogService;
+	private CommunityService communityService;
 	
-	 @PostMapping("/registerBlog")
-	    public String registerBlog(@ModelAttribute BlogDTO blogDTO,
+	 @PostMapping("/registerCommunity")
+	    public String registerCommunity(@ModelAttribute CommunityDTO communityDTO,
 	    							@RequestParam(value = "thumbnail", required = false) MultipartFile uploadProfile) throws IOException {
 		 
-		 blogDTO.setMemberId(blogDTO.getMemberId());
-		 blogDTO.setBlogTitle(blogDTO.getBlogTitle());
-		 blogDTO.setBlogContent(blogDTO.getBlogContent());
+		 communityDTO.setMemberId(communityDTO.getMemberId());
+		 communityDTO.setCommunityTitle(communityDTO.getCommunityTitle());
+		 communityDTO.setCommunityContent(communityDTO.getCommunityContent());
 		 
 		 if(!uploadProfile.isEmpty()) {
 			 String originalFilename = uploadProfile.getOriginalFilename();
-			 blogDTO.setBlogOriginalThumbnailName(originalFilename);
+			 communityDTO.setCommunityOriginalThumbnailName(originalFilename);
 			 
 			 String extension = originalFilename.substring(originalFilename.indexOf("."));
 			 String uploadFile = UUID.randomUUID() + extension;
-			 blogDTO.setBlogThumbnailUUID(uploadFile);
+			 communityDTO.setCommunityThumbnailUUID(uploadFile);
 			 
 			 uploadProfile.transferTo(new File(fileRepositoryPath + uploadFile));
 		 }
 
 	        // 블로그 포스트 등록 서비스 호출
-	        blogService.registerBlog(blogDTO);
+		 	communityService.registerCommunity(communityDTO);
 
 	        // 성공적으로 등록되었으면 블로그 리스트 페이지로 리다이렉트
-	        return "redirect:/blog/myBlogPostList";
+	        return "redirect:/community/myCommunityPostList";
 	    }
 	
-	@PostMapping("/modifyBlog")
-	public String modifyBlog(@RequestParam("blogId") int blogId,
-							  @RequestParam("blogTitle") String blogTitle,
-							  @RequestParam("blogContent") String blogContent,
+	@PostMapping("/modifyCommunity")
+	public String modifyCommunity(@RequestParam("communityId") int communityId,
+							  @RequestParam("communityTitle") String communityTitle,
+							  @RequestParam("communityContent") String communityContent,
 			@RequestParam(value = "thumbnail", required = false) MultipartFile uploadProfile) throws IllegalStateException, IOException {
 		
-		BlogDTO blogDTO = new BlogDTO();
-		blogDTO.setBlogId(blogId);
-		blogDTO.setBlogTitle(blogTitle);
-		blogDTO.setBlogContent(blogContent);
+		CommunityDTO communityDTO = new CommunityDTO();
+		communityDTO.setCommunityId(communityId);
+		communityDTO.setCommunityTitle(communityTitle);
+		communityDTO.setCommunityContent(communityContent);
 		
 		if(!uploadProfile.isEmpty()) {
 			 String originalFilename = uploadProfile.getOriginalFilename();
-			 blogDTO.setBlogOriginalThumbnailName(originalFilename);
+			 communityDTO.setCommunityOriginalThumbnailName(originalFilename);
 			 
 			 String extension = originalFilename.substring(originalFilename.indexOf("."));
 			 String uploadFile = UUID.randomUUID() + extension;
-			 blogDTO.setBlogThumbnailUUID(uploadFile);
+			 communityDTO.setCommunityThumbnailUUID(uploadFile);
 			 
 			 uploadProfile.transferTo(new File(fileRepositoryPath + uploadFile));
 		 }
-		blogService.modifyBlog(blogDTO);
-		return "redirect:/blog/blogMain";
+		communityService.modifyCommunity(communityDTO);
+		return "redirect:/community/communityMain";
 	}
 	
 	

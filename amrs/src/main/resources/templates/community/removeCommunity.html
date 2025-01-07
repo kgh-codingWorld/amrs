@@ -16,7 +16,7 @@
     <link th:href="@{/bootstrap/css/login.css}" rel="stylesheet">
     <link th:href="@{/bootstrap/scss/style.scss}" rel="stylesheet">
 
-    <title>Remove blog Page</title>
+    <title>Remove community Page</title>
     
     <style>
         /* 기본 스타일 설정 */
@@ -97,7 +97,7 @@
                 // 입력된 값을 가져옴
                 let passwd = $('#passwd').val();
                 let memberId = $('#memberId').val();
-				let blogId = $('#blogId').val();
+				let communityId = $('#communityId').val();
                 
                 // 비밀번호와 멤버 ID가 입력되었을 때만 서버로 요청
                 if (passwd && memberId) {
@@ -111,13 +111,13 @@
 				                // 비밀번호가 일치하면 게시물 삭제 요청을 보냄
 				                $.ajax({
 				                    type: "post",  // 게시물 삭제 요청도 POST로 처리
-				                    url: "/blog/removeBlog/" + blogId,  // 게시물 삭제 URL
+				                    url: "/community/removeCommunity/" + communityId,  // 게시물 삭제 URL
 				                    contentType: "application/x-www-form-urlencoded; charset=UTF-8",
 				                    success: function(response) {
 				                    	console.log(response);
 				                        // 삭제 성공 시 이동 처리
 				                        alert("게시물이 성공적으로 삭제되었습니다.");
-				                        location.href = "/blog/blogMain";  // 포럼 메인 페이지로 이동
+				                        location.href = "/community/communityMain";  // 포럼 메인 페이지로 이동
 				                    },
 				                    error: function(xhr, status, error) {
 				                        console.log("게시물 삭제 중 오류 발생: ", error);
@@ -156,7 +156,7 @@
 	                <div id="error-message" class="error-message">비밀번호가 일치하지 않습니다.</div>
 	                
 	                <input type="hidden" th:value="${memberDTO.memberId}" id="memberId" name="memberId"/>
-	                <input type="hidden" th:value="${blog.blogId}" id="blogId" name="blogId"/>
+	                <input type="hidden" th:value="${community.communityId}" id="communityId" name="communityId"/>
 	                
 	                <button type="submit" class="btn btn-primary">확인</button>
             </div>

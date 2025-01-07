@@ -1,4 +1,4 @@
-package com.application.amrs.blog;
+package com.application.amrs.community;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,16 +9,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/blog")
-public class BlogRestController {
+@RequestMapping("/community")
+public class CommunityRestController {
     
     @Autowired
-    private BlogService blogService;
+    private CommunityService communityService;
     
-    @PostMapping("/removeBlog/{blogId}")
-    public ResponseEntity<String> removeBlog(@PathVariable("blogId") int blogId) {
+    @PostMapping("/removeCommunity/{communityId}")
+    public ResponseEntity<String> removeCommunity(@PathVariable("communityId") int communityId) {
         try {
-        	blogService.removeBlog(blogId);
+        	communityService.removeCommunity(communityId);
             return ResponseEntity.status(HttpStatus.OK).body(null);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

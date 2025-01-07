@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.application.amrs.community.CommunityDAO">
+
+<resultMap id="communityMap" type="hashmap" >
+	<result column="COMMUNITY_ID"  	   			property="communityId"/>
+	<result column="COMMUNITY_TITLE" 	   		property="communityTitle"/>
+	<result column="COMMUNITY_CONTENT" 	   		property="communityContent"/>
+	<result column="READ_CNT" 	   				property="readCnt"/>
+	<result column="CREATE_DT" 	   				property="createDt"/>
+	<result column="UPDATE_DT"       			property="updateDt"/>
+	<result column="LIKE_COUNT"     			property="likeCount"/>
+	<result column="COMMUNITY_THUMBNAIL_UUID"  	property="communityThumbnailUUID"/>
+	<result column="MEMBER_ID"  				property="memberId"/>
+</resultMap>
+
+<select id="selectCommunityList" resultMap="communityMap">
+    SELECT  C.COMMUNITY_ID 				AS COMMUNITY_ID,
+            C.COMMUNITY_TITLE 			AS COMMUNITY_TITLE,
+            C.COMMUNITY_THUMBNAIL_UUID 	AS COMMUNITY_THUMBNAIL_UUID,
+            C.READ_CNT 					AS READ_CNT, 
+            C.CREATE_DT 				AS CREATE_DT,
+            M.MEMBER_ID 				AS MEMBER_ID
+    FROM    COMMUNITY C
+    JOIN    MEMBER M ON C.MEMBER_ID = M.MEMBER_ID
+    ORDER   BY C.CREATE_DT DESC
+</select>
+
+<select id="selectCommunityById" resultMap="communityMap" parameterType="int">
+	SELECT	C.COMMUNITY_ID	 			AS COMMUNITY_ID,
+			C.COMMUNITY_TITLE 			AS COMMUNITY_TITLE,
+			C.COMMUNITY_CONTENT			AS COMMUNITY_CONTENT,
+			C.READ_CNT					AS READ_CNT,
+			C.CREATE_DT					AS CREATE_DT,
+			C.UPDATE_DT					AS UPDATE_DT,
+			C.LIKE_COUNT				AS LIKE_COUNT,
+			C.COMMUNITY_THUMBNAIL_UUID 	AS COMMUNITY_THUMBNAIL_UUID,
+			M.MEMBER_ID					AS MEMBER_ID
+	FROM	COMMUNITY C
+	JOIN	MEMBER M
+	ON		C.MEMBER_ID = M.MEMBER_ID
+	WHERE	COMMUNITY_ID = #{communityId}
+</select>
+
+<insert id="insertCommunity" parameterType="CommunityDTO">
+	INSERT INTO COMMUNITY (
+		MEMBER_ID, 
+		COMMUNITY_ORIGINAL_THUMBNAIL_NAME, 
+		COMMUNITY_THUMBNAIL_UUID, 
+		COMMUNITY_TITLE,
+		COMMUNITY_CONTENT
+	)
+    VALUES (
+	    #{memberId}, 
+	    #{communityOriginalThumbnailName}, 
+	    #{communityThumbnailUUID}, 
+	    #{communityTitle}, 
+	    #{communityContent}
+    )
+	
+</insert>
+
+<update id="updateCommunity" parameterType="CommunityDTO">
+	UPDATE COMMUNITY
+	<set>
+		<if test="communityTitle != null and communityTitle != ''">
+			COMMUNITY_TITLE = #{communityTitle},
+		</if>
+		<if test="communityContent != null and communityContent != ''">
+			COMMUNITY_CONTENT = #{communityContent}
+		</if> 
+	</set>
+	WHERE COMMUNITY_ID = #{communityId}
+</update>
+
+<delete id="deleteCommunity" parameterType="int">
+	DELETE 	FROM COMMUNITY
+	WHERE	COMMUNITY_ID = #{communityId}
+</delete>
+
+<select id="selectMyCommunityList" resultMap="communityMap">
+    SELECT  C.COMMUNITY_ID    			AS COMMUNITY_ID,
+            C.COMMUNITY_TITLE 			AS COMMUNITY_TITLE,
+            C.COMMUNITY_THUMBNAIL_UUID 	AS COMMUNITY_THUMBNAIL_UUID,
+            C.READ_CNT 					AS READ_CNT, 
+            C.CREATE_DT  				AS CREATE_DT,
+            M.MEMBER_ID  				AS MEMBER_ID
+    FROM    COMMUNITY C
+    JOIN    MEMBER M
+    ON      C.MEMBER_ID = M.MEMBER_ID
+    WHERE	M.MEMBER_ID = #{memberId}
+    ORDER   BY C.CREATE_DT DESC
+</select>
+
+<update id="updateReadCnt" parameterType="int">
+	UPDATE	COMMUNITY
+	SET		READ_CNT = READ_CNT + 1
+	WHERE	COMMUNITY_ID = #{communityId}
+</update>
+
+<update id="updateLikeCount" parameterType="CommunityDTO">
+    UPDATE COMMUNITY C
+    SET C.LIKE_COUNT = (
+    	SELECT 	COUNT(*)
+    	FROM	LIKE_POST LP
+    	WHERE 	LP.COMMUNITY_ID = #{communityId}
+    )
+    WHERE C.COMMUNITY_ID = #{communityId}
+</update>
+
+<select id="checkMemberLike" resultType="boolean" parameterType="map">
+    SELECT EXISTS (
+        SELECT 1 
+        FROM LIKE_POST
+        WHERE COMMUNITY_ID = #{communityId}
+        AND MEMBER_ID = #{memberId}
+        AND LIKED = TRUE
+    )
+</select>
+
+<insert id="insertLike" parameterType="map">
+    INSERT INTO LIKE_POST (
+	    COMMUNITY_ID, 
+	    MEMBER_ID, 
+	    LIKED
+    )
+    VALUES (
+	    #{communityId}, 
+	    #{memberId}, 
+	    TRUE
+    )
+</insert>
+
+<delete id="deleteLike" parameterType="map">
+	DELETE 	FROM LIKE_POST
+	WHERE	COMMUNITY_ID = #{communityId}
+	AND		MEMBER_ID = #{memberId}
+</delete>
+
+
+<select id="getLikeCount" resultType="int" parameterType="int">
+	SELECT 	LIKE_COUNT
+	FROM	COMMUNITY
+	WHERE	COMMUNITY_ID = #{communityId}
+</select>
+
+
+<select id="countLikesForCommunity" resultType="int" parameterType="int">
+    SELECT COUNT(*)
+    FROM LIKE_POST
+    WHERE COMMUNITY_ID = #{communityId}
+    AND LIKED = TRUE
+</select>
+</mapper>
