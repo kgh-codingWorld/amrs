@@ -9,5 +9,5 @@ public interface PaymentService {
 	public int getTotalTicketCount(String localId);
 	public int getTicketRestCnt(String localId);
 	public List<Map<String, Object>> getPaymentList(String memberId);
-	public PaymentDTO getPaymentInfo(String memberId);
+	//public PaymentDTO getPaymentInfo(String memberId);
 }

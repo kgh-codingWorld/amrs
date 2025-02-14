@@ -10,14 +10,13 @@ public interface MemberService {
 	public String checkDuplicatedId(String memberId);
 	public boolean login(MemberDTO memberDTO);
 	public MemberDTO getMemberDetail(String memberId);
-	//public boolean isValidPasswd(String passwd, MemberDTO memberDTO);
 	public boolean isValidPasswd(String passwd, String memberId);
-	public void modifyMyPasswd(String newPasswd, MemberDTO memberDTO);
+	public String modifyMyPasswd(String newPasswd, String memberId);
+	public String modifyMemberHp(String newMemberHp, String memberId);
 	public void modifyMyInfo(MultipartFile uploadProfile, MemberDTO memberDTO) throws IllegalStateException, IOException;
 	public boolean removeAccount(String passwd, String memberId);
 	
 	public MemberDTO getMemberId(String username);
-	public String getPortOneAccessToken();
 	public String maskLastCharacter(String memberNm);
 	public String getMemberNameById(String memberId);
 }

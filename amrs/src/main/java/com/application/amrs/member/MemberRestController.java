@@ -1,104 +1,133 @@
 package com.application.amrs.member;
 
+
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+import com.application.amrs.portone.PortOneAuthService;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
 @RestController
-@RequestMapping("/certifications")
-//@RequestMapping("/member")
+@RequestMapping("/member/api")
 public class MemberRestController {
 
 	@Autowired
 	private MemberService memberService;
+
+	@Autowired
+	private PortOneAuthService portOneAuthService;
 	
-	@PostMapping("/confirm")
-	public ResponseEntity<String> confirmCertification(@RequestBody Map<String, Object> payload){
+	// 아이디 중복체크
+	@PostMapping("/checkDuplicatedId")
+    public ResponseEntity<String> checkDuplicatedId(@RequestParam("memberId") String memberId) {
+        String isDuplicated = memberService.checkDuplicatedId(memberId);
+        return ResponseEntity.ok(isDuplicated);
+    }
+	
+	// 비밀번호 일치 여부
+	@PostMapping("/isValidPasswd")
+    public ResponseEntity<Boolean> isValidPasswd(@RequestParam("passwd") String passwd, 
+                                                 @RequestParam("memberId") String memberId) {
+        boolean isValid = memberService.isValidPasswd(passwd, memberId);
+        return ResponseEntity.ok(isValid);  // `true` 또는 `false` 반환
+    }
+	
+	// 비밀번호 수정
+	@PostMapping("/modifyMyPasswd")
+	public ResponseEntity<String> modifyMyPasswd(@RequestParam("newPasswd") String newPasswd, 
+												 @RequestParam("memberId") String memberId,
+												 HttpServletRequest request, HttpServletResponse response) {
+		String result = memberService.modifyMyPasswd(newPasswd, memberId);
 		
-		String impUid = (String) payload.get("imp_uid");
-		
-		if(impUid == null) {
-			return ResponseEntity.badRequest().body("impUid가 누락되었습니다.");
-		}
-
-//		String accessToken = memberService.getPortOneAccessToken(); // 발급받은 Access Token 사용
-		String accessToken = "d1b7c54fcfaaddcc340506489a45607f8a8eb365";
-		System.out.println("accessToken~!!!!" + accessToken);
-
-		// imp_uid로 본인인증 정보 확인
-        String certificationUrl = "https://api.iamport.kr/certifications/" + impUid;
-
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken);
-
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        
-        ResponseEntity<Map> response = restTemplate.exchange(certificationUrl, HttpMethod.GET, entity, Map.class);
-        Map<String, Object> responseBody = response.getBody();
-        
-        if (responseBody != null && (boolean) responseBody.get("success")) {
-            return ResponseEntity.ok("본인인증 성공");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("본인인증 실패");
-        }
+		// 세션 무효화
+	    request.getSession().invalidate();
+	    
+	    // 쿠키 삭제 (HttpServletResponse 사용)
+	    Cookie cookie = new Cookie("JSESSIONID", null);
+	    cookie.setMaxAge(0);
+	    cookie.setPath("/");
+	    response.addCookie(cookie);
+	    
+	    Cookie authToken = new Cookie("authToken", null);
+	    authToken.setMaxAge(0);
+	    authToken.setPath("/");
+	    response.addCookie(authToken);
+		return ResponseEntity.ok(result);
 	}
 	
-	// 포트원 인증 관련 설정
-//	@Value("${iamport.api_key}")
-//	private String iamportApiKey;
-//	
-//	@Value("${iamport.api_secret}")
-//    private String iamportApiSecret;
-//	
-//	@PostMapping("/phoneAuthentication")
-//	public ResponseEntity<Map<String, Object>> phoneAuthentication(@RequestBody Map<String, String> requestData) {
-//	    String impUid = requestData.get("imp_uid");
-//
-//	    // 1. Access Token 요청 (임포트 서버)
-//	    RestTemplate restTemplate = new RestTemplate();
-//	    String tokenUrl = "https://api.iamport.kr/users/getToken";
-//	    Map<String, String> tokenRequest = new HashMap<>();
-//	    tokenRequest.put("imp_key", iamportApiKey);
-//	    tokenRequest.put("imp_secret", iamportApiSecret);
-//
-//	    // Access Token 요청
-//	    ResponseEntity<Map> tokenResponse = restTemplate.postForEntity(tokenUrl, tokenRequest, Map.class);
-//	    String accessToken = (String) ((Map<String, Object>) tokenResponse.getBody().get("response")).get("access_token");
-//
-//	    // 2. 본인인증 결과 요청
-//	    String certificationUrl = "https://api.iamport.kr/certifications/" + impUid;
-//
-//	    // 헤더 설정
-//	    HttpHeaders headers = new HttpHeaders();
-//	    headers.set("Authorization", accessToken);
-//	    HttpEntity<String> entity = new HttpEntity<>(headers);
-//
-//	    // GET 요청 (imp_uid로 인증 정보 요청)
-//	    ResponseEntity<Map> certificationResponse = restTemplate.exchange(certificationUrl, HttpMethod.GET, entity, Map.class);
-//
-//	    Map<String, Object> response = certificationResponse.getBody();
-//	    if (response != null && (boolean) response.get("success")) {
-//	        // 인증 성공 처리
-//	        Map<String, Object> successResponse = new HashMap<>();
-//	        successResponse.put("message", "인증 성공");
-//	        return ResponseEntity.ok(successResponse);
-//	    } else {
-//	        // 인증 실패 처리
-//	        Map<String, Object> errorResponse = new HashMap<>();
-//	        errorResponse.put("message", "인증 실패");
-//	        return ResponseEntity.badRequest().body(errorResponse);
-//	    }
-//	}
+	// 휴대폰 번호 수정
+	@PostMapping("/newMemberHp")
+	public ResponseEntity<String> newMemberHp(@RequestParam("newMemberHp") String newMemberHp, @RequestParam("memberId")String memberId) {
+		String result = memberService.modifyMemberHp(newMemberHp, memberId);
+		return ResponseEntity.ok(result);
+	}
+	
+	// 본인인증 정보 조회
+		@PostMapping("/certifications/confirm")
+		public ResponseEntity<String> confirmCertification(@RequestBody Map<String, Object> payload){
+			String impUid = (String) payload.get("imp_uid");
+			
+			if(impUid == null) {
+				return ResponseEntity.badRequest().body("impUid가 누락되었습니다.");
+			}
+
+			// 최신 토큰
+			String accessToken = portOneAuthService.getValidAccessToken();
+
+			// imp_uid로 본인인증 정보 확인
+	        String certificationUrl = "https://api.iamport.kr/certifications/" + impUid;
+
+	        RestTemplate restTemplate = new RestTemplate();
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.set("Authorization", "Bearer " + accessToken);
+	        headers.setContentType(MediaType.APPLICATION_JSON);
+
+	        // 포트원 api에 토큰을 포함한 get 요청을 보내기 위함(반드시 Authorization과 헤더(토큰)가 필요)
+	        HttpEntity<String> entity = new HttpEntity<>(headers);
+	        
+	        ResponseEntity<Map> response = restTemplate.exchange(certificationUrl, HttpMethod.GET, entity, Map.class);
+
+	        Map<String, Object> responseBody = response.getBody();
+
+	        if (responseBody != null) {
+	            Integer responseCode = (Integer) responseBody.get("code");  // 성공 여부 확인
+	            Map<String, Object> responseData = (Map<String, Object>) responseBody.get("response");  // 응답 데이터
+	            
+	            if (responseCode != null && responseCode == 0) {  // 성공 여부 확인
+	                Boolean isCertified = responseData != null ? (Boolean) responseData.get("certified") : false;
+	                
+	                if (Boolean.TRUE.equals(isCertified)) {  // 인증 여부 확인
+	                    System.out.println("본인인증 성공");
+	                    return ResponseEntity.ok("본인인증 성공");
+	                } else {
+	                    System.out.println("본인인증 실패: " + responseBody);
+	                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("본인인증 실패");
+	                }
+	            } else {
+	                System.out.println("본인인증 실패: " + responseBody);
+	                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("본인인증 실패: " + responseBody);
+	            }
+	        } else {
+	            System.out.println("본인인증 응답이 null입니다.");
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("IAMPORT API 응답이 null입니다.");
+	        }
+
+		}
 }

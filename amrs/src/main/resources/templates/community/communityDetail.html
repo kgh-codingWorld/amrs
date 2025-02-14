@@ -536,7 +536,7 @@
 			const replyElement = $(this).closest('li');
 		    const replyId = replyElement.find('input[name="replyId"]').val();
 		    
-		    if (confirm("댓글을 삭제하시겠습니까?")) {
+		    if (confirm("대댓글을 삭제하시겠습니까?")) {
 		        $.ajax({
 		        	url: '/comment/removeReply/' + replyId,
 		        	type: 'post',

@@ -117,10 +117,8 @@ public class CommonController {
 	}
 	
 	@GetMapping("/member/checkPassword")
-	public String checkPassword(HttpServletRequest request, Model model) {
-		// 개인정보확인/수정 페이지 전 비밀번호 확인
-		HttpSession session = request.getSession();
-		model.addAttribute("memberDTO", memberService.getMemberDetail((String)session.getAttribute("memberId")));
+	public String checkPassword() { 
+		// 개인정보확인/수정 페이지 전 비밀번호 확인 페이지로 이동
 		return "member/checkPassword";
 	}
 	
@@ -204,7 +202,6 @@ public class CommonController {
 	public String communityDetail(@PathVariable("communityId") int communityId, HttpServletRequest request, Model model) {
 
 	    String sessionMemberId = (String) request.getSession().getAttribute("memberId");
-	    System.out.println("^^^^sessionMember: " + sessionMemberId);
 	    
 	    boolean isLiked = communityService.hasMemberLikedPost(sessionMemberId, communityId);
 	    
@@ -212,7 +209,6 @@ public class CommonController {
 	    
 	    String memberId = (String) community.get("memberId");
 	    String memberNm = memberService.getMemberNameById(memberId);
-	    System.out.println("^^^^memberId: " + memberId);
 	    
 	    String maskedMemberNm = memberService.maskLastCharacter(memberNm);
 

@@ -21,30 +21,22 @@ public class PaymentServiceImpl implements PaymentService{
 	@Override
 	public int getTotalTicketCount(String localId) {
 		Integer totalCount = paymentDAO.selectTotalTicketCnt(localId);
-		if(totalCount == null) {
+		if(totalCount == null || totalCount == 0) {
 			totalCount = 20;
 		} else {
 			totalCount = paymentDAO.selectRestTicketCnt(localId);
 		}
-		
 		int totalCnt = totalCount;
-		
 		return totalCnt;
 	}
 	
 	@Override
 	public int getTicketRestCnt(String localId) {
 		Integer restCount = paymentDAO.selectRestTicketCnt(localId);
-		
 		if (restCount == null) {
 			restCount = 20;
-			
-	        // 예외를 발생시키거나 기본값을 설정하여 null 상황을 처리합니다.
-	        //throw new IllegalStateException("해당 LOCAL_ID에 대한 TOTAL_CNT 값이 설정되지 않았습니다.");
 	    } 
-		
 		int restCnt = restCount;
-		
 		return restCnt;
 	}
 
@@ -53,10 +45,10 @@ public class PaymentServiceImpl implements PaymentService{
 		return paymentDAO.selectPaymentList(memberId);
 	}
 
-	@Override
-	public PaymentDTO getPaymentInfo(String memberId) {
-		return paymentDAO.selectPaymentInfo(memberId);
-	}
+//	@Override
+//	public PaymentDTO getPaymentInfo(String memberId) {
+//		return paymentDAO.selectPaymentInfo(memberId);
+//	}
 
 
 

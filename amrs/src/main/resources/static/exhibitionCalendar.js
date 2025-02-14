@@ -1,22 +1,24 @@
+// html 로드 시 DOMContentLoaded 이벤트 실행
 document.addEventListener("DOMContentLoaded", function() {
         const calendar = document.getElementById("calendar");
         const calendarMonth = document.getElementById("calendarMonth");
-        const bookingTimesContainer = document.getElementById("bookingTimes");
 
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
 
+		// 초기 달력 생성
         function renderCalendar() {
         	console.log("Rendering calendar for:", currentYear, currentMonth);
-            // 달력 내용 초기화
-            calendar.innerHTML = "";
+            calendar.innerHTML = ""; // 기존 달력 초기화
             
             // 달력에 표시할 월의 첫 날과 마지막 날짜 가져오기
-            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay(); // 첫 날의 요일(0~6)
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // 해당 월의 총 일 수
 
             // 현재 월과 연도 표시
-            calendarMonth.innerText = new Date(currentYear, currentMonth).toLocaleString('ko-KR', { month: 'long', year: 'numeric' });
+            const formattedMonth = String(currentMonth + 1).padStart(2, '0'); // 두 자리 숫자로 변환
+            calendarMonth.innerText = `${currentYear}년${formattedMonth}월`;
+            
             // 이전 달의 빈 칸 채우기
             for (let i = 0; i < firstDay; i++) {
                 const emptyCell = document.createElement("div");
@@ -29,25 +31,28 @@ document.addEventListener("DOMContentLoaded", function() {
                 const dayCell = document.createElement("div");
                 dayCell.className = "day";
                 dayCell.innerText = day;
-                dayCell.onclick = () => selectDate(day);
+                dayCell.onclick = () => selectDate(day); // 날짜 클릭 이벤트 추가
                 calendar.appendChild(dayCell);
             }
         }
+        
+        // 날짜 선택 시 동작
         function selectDate(day) {
 			console.log("  >  "+calendarMonth.innerText );
 			console.log('day: ', day);
 			
 			// 두 자리 형식으로 변환
-			const formattedDay = day < 10 ? '0${day}' : day;
+			const formattedDay = day.toString().padStart(2,'0');
 			
 			// 'yyyy-MM-dd' 형식으로 변환
-			var yyyymmdd = calendarMonth.innerText + formattedDay ;
-			yyyymmdd = yyyymmdd.replace("년","-").replace("월","-").replace(" ","");
+			let yyyymmdd = calendarMonth.innerText.replace("년", "-").replace("월","").trim();
+			yyyymmdd = `${yyyymmdd}-${formattedDay}`;
 			
 			// reservDate 입력 필드를 querySelector로 직접 선택
+			// 예약 날짜 입력 필드에 값 설정
 			const reservDateInput = document.querySelector("input[name='reservDate']");
 			if (reservDateInput) {
-				reservDateInput.value = yyyymmdd;
+				reservDateInput.value = yyyymmdd; // ex) 2025-02-13
 			}
 			else {
 				console.error("reservDate 입력 필드를 찾을 수 없습니다.")

@@ -69,12 +69,24 @@
 	
 	<update id="updateMyPasswd" parameterType="MemberDTO">
 		UPDATE MEMBER
-		
 		<set>
 			<if
 				test="passwd != null and passwd != ''">
-				PASSWD = #{passwd}	
+				PASSWD = #{passwd},
+				UPDATE_DT = NOW()
 			</if>
+		</set>
+		WHERE MEMBER_ID = #{memberId}
+	</update>
+	
+	<update id="updateMemberHp" parameterType="MemberDTO">
+		UPDATE MEMBER
+		<set>
+			<if test="memberHp != null and memberHp != ''">
+				MEMBER_HP = #{memberHp},
+				UPDATE_DT = NOW()
+			</if>
+			WHERE MEMBER_ID = #{memberId}
 		</set>
 	</update>
 	

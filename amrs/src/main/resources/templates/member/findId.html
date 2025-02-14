@@ -71,9 +71,8 @@
 				    console.log("인증 결과: ", rsp);  // rsp 객체가 어떻게 반환되는지 확인
 				    if (rsp.success) {
 				        console.log("인증 성공. imp_uid: ", rsp.imp_uid);
-				        axios.post("/certifications/confirm", 
-				            { imp_uid: rsp.imp_uid }, 
-				            { headers: { 'Content-Type': 'application/json' } }
+				        axios.post("/member/api/certifications/confirm", 
+				            { imp_uid: rsp.imp_uid }
 				        )
 				        .then(function(response) {
 				            alert("인증이 성공적으로 처리되었습니다.");

@@ -103,11 +103,11 @@
                 if (passwd && memberId) {
 				    $.ajax({
 				        type: "post",
-				        url: "/member/isValidPasswd",  // 비밀번호 확인용 URL
+				        url: "/member/api/isValidPasswd",  // 비밀번호 확인용 URL
 				        data: {"passwd": passwd, "memberId": memberId},
 				        contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-				        success: function(isValidPasswd) {
-				            if (isValidPasswd === "y") {
+				        success: function(isValid) {
+				            if (isValid) {
 				                // 비밀번호가 일치하면 게시물 삭제 요청을 보냄
 				                $.ajax({
 				                    type: "post",  // 게시물 삭제 요청도 POST로 처리
@@ -147,7 +147,7 @@
     <div layout:fragment="content">
         <div class="login-background">
             <div class="section">
-                <h2>삭제하시려면 비밀번호를 입력해 주세요</h2>
+                <h2 class="noto-serif-kr" style="font-size: 20px;">삭제하시려면 비밀번호를 입력해 주세요</h2>
 	                <!-- 비밀번호 확인 폼 -->
 	                <div class="form-group">
 	                    <input type="password" id="passwd" name="passwd" class="form-control" placeholder="비밀번호 입력" required>

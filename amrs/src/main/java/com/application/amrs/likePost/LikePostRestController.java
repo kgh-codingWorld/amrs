@@ -28,7 +28,6 @@ public class LikePostRestController {
 		int likeCount = (int) likeData.get("likeCount");
 		
 		communityService.likePost(communityId, likeCount);
-		System.out.println("communityId: " + communityId + ", likeCount: " + likeCount + ", isLiked: " + isLiked);
 		
 		Map<String, Object> response = new HashMap<>();
 		response.put("updatedLikeCount", likeCount);
@@ -47,7 +46,7 @@ public class LikePostRestController {
 
 	        return ResponseEntity.ok().body(Map.of("likeCount", updatedLikeCount));
 	    } catch (Exception e) {
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating like status");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 에러");
 	    }
 	}
 

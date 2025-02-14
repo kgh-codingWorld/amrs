@@ -34,7 +34,8 @@ public class CommentRestController {
     private ReplyCommentService replyCommentService;
     
     @PostMapping("/registerComment/{communityId}")
-    public ResponseEntity<CommentDTO> registerComment(@PathVariable("communityId") int communityId, @RequestBody CommentDTO commentDTO, HttpSession session) {
+    public ResponseEntity<CommentDTO> registerComment(@PathVariable("communityId") int communityId, 
+    												  @RequestBody CommentDTO commentDTO, HttpSession session) {
         try {
             // communityId를 CommentDTO에 설정 (필요한 경우)
             commentDTO.setCommunityId(communityId);

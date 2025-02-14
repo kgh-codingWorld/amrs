@@ -125,6 +125,8 @@ tbody tr:last-child td {
 </style>
 <script th:src="@{/jquery/jquery-3.7.1.min.js}"></script>
 <script th:src="@{http://dmaps.daum.net/map_js_init/postcode.v2.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 <script>
 	function execDaumPostcode() {
     	new daum.Postcode({
@@ -164,7 +166,7 @@ tbody tr:last-child td {
 }
 </script>
 <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
-	<script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.1.8.js"></script>
+<script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.1.8.js"></script>
 <script>
 	
 	$().ready(function(){
@@ -176,7 +178,7 @@ tbody tr:last-child td {
 			console.error('IMP 객체를 찾을 수 없습니다. 스크립트가 올바르게 로드되었는지 확인하세요.');
 		}
 		
-		$('#editNameBtn').click(function(e) {
+		$('#editHpBtn').click(function(e) {
 			e.preventDefault();
 			console.log("본인인증 시작");
 			
@@ -194,10 +196,16 @@ tbody tr:last-child td {
 				// 인증 성공 시 로직
 				console.log("rsp 표시");
 				if (rsp.success) {
-					axios.post("/certifications/confirm", { imp_uid: rsp.imp_uid })
+					console.log("imp_uid 값: ", rsp.imp_uid);
+					axios.post("/member/api/certifications/confirm", { imp_uid: rsp.imp_uid })
 					.then(function(response) {
 						alert("인증이 성공적으로 처리되었습니다.");
-						// 인증이 성공한 후 다른 동작 처리
+						if ($("#modifyPhone").length > 0) {
+						    $("#modifyPhone").show(); // 요소 표시
+						    $("#newMemberHp").attr("placeholder", $("#hpText").text()); // 기존 휴대폰 번호를 placeholder로 설정
+						} else {
+						    console.error("modifyPhone 요소를 찾을 수 없습니다.");
+						}
 					})
 					.catch(function(error) {
 						alert("서버 통신 중 오류가 발생했습니다.");
@@ -208,6 +216,27 @@ tbody tr:last-child td {
 				}
 			});
         });
+		
+		$("#modifyPhoneBtn").click(function(){
+			let newMemberHp = S("newMemberHp").val().trim();
+			
+			if(newMemberHp === "") {
+				alert("새로운 휴대폰 번호를 입력해주세요.");
+				return;
+			}
+			
+			axios.post("/member/api/modifyMemberHp", {newMemberHp: newMemberHp})
+			.then(function(response) {
+				alert("휴대폰 번호가 성공적으로 변경되었습니다.");
+				
+				$("#hpText").text(newMemberHp);
+				$("#modifyPhone").hide();
+			})
+			.catch(function(error){
+				alert("휴대폰 번호 변경 중 오류가 발생했습니다.");
+			})
+			
+		});
 		
         
         // 프로필 변경 버튼 클릭 시 file input 트리거
@@ -262,10 +291,10 @@ tbody tr:last-child td {
 	        // 현재 비밀번호를 검증하는 AJAX 요청
 	        $.ajax({
 	            type: "post",
-	            url: "/member/isValidPasswd",
+	            url: "/member/api/isValidPasswd",
 	            data: { "passwd": passwd, "memberId": memberId },  // memberId도 전송
-	            success: function(isValidPasswd) {
-	                if (isValidPasswd === "y") {
+	            success: function(isValid) {
+	                if (isValid) {
 	                	$("#isValidPasswdMsg").html("<span style='color:green;'>패스워드가 일치합니다.</span>");
 	                	
 	                    // 새로운 비밀번호와 확인 비밀번호가 일치하는지 검증
@@ -275,10 +304,14 @@ tbody tr:last-child td {
 	                        // 비밀번호 변경 요청
 	                        $.ajax({
 	                            type: "post",
-	                            url: "/member/modifyMyPasswd",
+	                            url: "/member/api/modifyMyPasswd",
 	                            data: { "newPasswd": newPasswd, "memberId": memberId },  // memberId도 함께 전송
 	                            success: function(response) {
-	                                alert("비밀번호가 성공적으로 변경되었습니다.");
+	                                alert("비밀번호가 성공적으로 변경되었습니다. 다시 로그인하세요.");
+	                                /* 쿠키의 만료 시간을 과거로 설정 */
+	                                document.cookie = "JSESSIONID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+	                                document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+	                                window.location.href = "/member/login";
 	                            },
 	                            error: function(xhr, status, error) {
 	                                console.log("Error: " + error);
@@ -336,7 +369,6 @@ tbody tr:last-child td {
 					            <td>이름</td>
 					            <td style="font-weight: bold;">
 					                <span id="nameText" th:text="${memberDTO.memberNm}"></span>
-					                <input type="button" id="editNameBtn" class="btn btn-primary btn-sm" style="margin-left: 10px;" value="변경(개명 시 사용)">
 					            </td>
 					        </tr>
 							<tr align="center">
@@ -359,9 +391,11 @@ tbody tr:last-child td {
 							        <span id="hpText" th:text="${memberDTO.memberHp}"></span>
 							        <input type="button" id="editHpBtn" class="btn btn-primary btn-sm" style="margin-left: 10px;" value="휴대폰 번호 변경">
 							        
-							        <!-- 휴대폰 번호 수정 입력 필드 (처음에는 숨김 처리) -->
-							        <input type="text" id="editHp" class="hidden form-control" style="width: 16rem; margin: 10px;" th:placeholder="${memberDTO.memberHp}" name="memberHp">
-							        
+							        <!-- 변경할 휴대폰 번호 입력 -->
+							        <div id="modifyPhone" style="display: none; margin-top: 10px;">
+								        <input type="text" id="newMemberHp" class="form-control" style="width: 16rem; margin: 10px;" th:placeholder="${memberDTO.memberHp}" name="memberHp">
+								        <button id="modifyPhoneBtn" class="btn btn-success btn-sm" style="margin-left: 10px;">변경</button>
+							        </div>
 							    </td>
 							</tr>
 							<tr align="center">

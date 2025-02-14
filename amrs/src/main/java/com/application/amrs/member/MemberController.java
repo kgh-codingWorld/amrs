@@ -29,28 +29,21 @@ public class MemberController {
 	@Value("${file.repo.path}")
 	private String fileRepositoryPath;
 
-	@Value("${admin.id}")
-	private String adminId;
-	
-	@Value("${admin.password}")
-	private String adminPwd;
+//	@Value("${admin.id}")
+//	private String adminId;
+//	
+//	@Value("${admin.password}")
+//	private String adminPwd;
 	
 	@Autowired
 	private MemberService memberService;
 	
 	// 회원가입
 	@PostMapping("/registerMember")
-	private String registerMember(@RequestParam("uploadProfile") MultipartFile uploadProfile, @ModelAttribute MemberDTO memberDTO) throws IllegalStateException, IOException {
+	private String registerMember(@RequestParam("uploadProfile") MultipartFile uploadProfile, 
+								  @ModelAttribute MemberDTO memberDTO) throws IllegalStateException, IOException {
 		memberService.registerMember(uploadProfile, memberDTO);
 		return "redirect:/member/login";
-	}
-	
-	// 아이디 중복체크
-	@PostMapping("/checkDuplicatedId")
-	@ResponseBody
-	public String checkDuplicatedId(@RequestParam("memberId") String memberId) {
-		System.out.println("controller의 memberId: " + memberId);
-		return memberService.checkDuplicatedId(memberId);
 	}
 	
 	// 로그인
@@ -58,14 +51,6 @@ public class MemberController {
     public String login(@ModelAttribute MemberDTO memberDTO, HttpServletRequest request, Model model) {
         HttpSession session = request.getSession();
 
-        if (isAdmin(memberDTO)) {
-            session.setAttribute("adminId", adminId);
-            session.setAttribute("adminNm", "관리자");
-            
-            System.out.println("adminId: " + adminId);
-            System.out.println("memberDTO.getMemberId(): " + memberDTO.getMemberId());
-            return "redirect:/admin/dashboard";
-        }
 
         if (memberService.login(memberDTO)) {
             session.setAttribute("memberId", memberDTO.getMemberId());
@@ -76,42 +61,19 @@ public class MemberController {
             return "member/login"; // 로그인 실패 시 로그인 페이지로 돌아감
         }
     }
-	
+//        if (isAdmin(memberDTO)) {
+//            session.setAttribute("adminId", adminId);
+//            session.setAttribute("adminNm", "관리자");
+//            
+//            return "redirect:/admin/dashboard";
+//        }
 	
 	/* 로그아웃 기능은 CommonController에 있음 */
 	
-	
-	// 비밀번호 일치 여부
-	@PostMapping("/isValidPasswd")
-	@ResponseBody
-	public String isValidPasswd(@RequestParam("passwd") String passwd, @RequestParam("memberId") String memberId) {
-		
-		String isValidPasswd = "n";
-		//MemberDTO memberDTO = new MemberDTO();
-		//memberDTO.setMemberId(memberId);
-		
-		if(memberService.isValidPasswd(passwd, memberId)) {
-			isValidPasswd = "y";
-		}
-		
-		System.out.println("#@@@@" + memberId);
-		System.out.println("#@@@@" + isValidPasswd);
-		return isValidPasswd;
-	}
-
-	// 비밀번호 수정
-	@PostMapping("/modifyMyPasswd")
-	public String modifyMyPasswd(@RequestParam("newPasswd") String newPasswd, @RequestParam("memberId") String memberId) {
-		
-		MemberDTO memberDTO = new MemberDTO();
-		memberDTO.setMemberId(memberId);
-		memberService.modifyMyPasswd(newPasswd, memberDTO);
-		return "redirect:/member/myInfo";
-	}
-	
 	// 개인정보 수정
 	@PostMapping("/modifyMyInfo")
-	public String modifyMyInfo(@RequestParam("uploadProfile") MultipartFile uploadProfile, @ModelAttribute MemberDTO memberDTO) throws IllegalStateException, IOException {
+	public String modifyMyInfo(@RequestParam("uploadProfile") MultipartFile uploadProfile, 
+							   @ModelAttribute MemberDTO memberDTO) throws IllegalStateException, IOException {
 		memberService.modifyMyInfo(uploadProfile, memberDTO);
 		return "redirect:/member/myInfo";
 	}
@@ -122,7 +84,6 @@ public class MemberController {
                                 @RequestParam("memberId") String memberId, 
                                 Model model, HttpServletRequest request) {
 		
-        // 비밀번호 검증 및 탈퇴 처리
         boolean isRemoved = memberService.removeAccount(passwd, memberId);
 
         if (isRemoved) {
@@ -138,7 +99,7 @@ public class MemberController {
     }
 	
 	// 관리자 여부 확인 메서드
-    private boolean isAdmin(MemberDTO memberDTO) {
-        return memberDTO.getMemberId().equals(adminId) && memberDTO.getPasswd().equals(adminPwd);
-    }
+//    private boolean isAdmin(MemberDTO memberDTO) {
+//        return memberDTO.getMemberId().equals(adminId) && memberDTO.getPasswd().equals(adminPwd);
+//    }
 }

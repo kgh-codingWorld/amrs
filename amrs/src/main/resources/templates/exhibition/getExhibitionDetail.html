@@ -273,8 +273,6 @@
     <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
     <!-- jQuery -->
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
-    <!-- iamport.payment.js -->
-    <script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
     
     <script src="/exhibitionCalendar.js"></script>
     <script>
@@ -289,7 +287,7 @@
     
     <script>
     
-    $().ready(function() {
+    $(document).ready(function() {
         
         const pricePerTicket = 10000;
         const modal = document.getElementById("paymentModal");
@@ -311,6 +309,11 @@
             const orderCnt = $("input[name='orderCnt']").val();
             const exhibitionTitle = $(".exhibition-title").text();
 
+            console.log(localId);
+            console.log(memberId);
+            console.log(reservDate);
+            console.log(orderCnt);
+            
             if (!localId || !memberId || !reservDate || !orderCnt) {
                 alert("모든 정보를 입력해 주세요.");
                 return;
@@ -336,18 +339,18 @@
 
         // 모달 닫기 버튼
         closeModal.onclick = function() {
-        	closeModalModal();
+            closeModalModal();
         };
 
         // 취소 버튼 클릭 시 모달 닫기
         cancelPaymentButton.onclick = function() {
-        	closeModalModal();
+            closeModalModal();
         };
 
         // 모달 외부를 클릭하면 모달 닫기
         window.onclick = function(event) {
             if (event.target == modal) {
-            	closeModalModal();
+                closeModalModal();
             }
         };
 
@@ -358,10 +361,10 @@
                 modal.style.display = "none";
             }, 300); // 애니메이션 시간 후 숨김
         }
-        
+
         // 결제 확인 버튼 클릭 시 결제 진행
         confirmPaymentButton.onclick = function() {
-        	closeModalModal();
+            closeModalModal();
             processPayment();
         };
 
@@ -374,18 +377,20 @@
             const totalPrice = orderCnt * pricePerTicket;
             const exhibitionTitle = $("input[name='exhibitionTitle']").val();
             const exhibitionImage = $("input[name='exhibitionImage']").val();
-            console.log("exhibitionTitle:::",exhibitionTitle);
-            console.log("exhibitionImage:::",exhibitionImage );
+            console.log("exhibitionTitle:::", exhibitionTitle);
+            console.log("exhibitionImage:::", exhibitionImage);
 
-            const user_email = 'test1@gmail.com'; // 실제 사용자 이메일로 대체
-            const username = '김길동'; // 실제 사용자 이름으로 대체
+            const user_email = $("input[name='memberId']").val(); // 실제 사용자 이메일로 대체
+            const username = $("input[name='memberNm']").val(); // 실제 사용자 이름으로 대체
             kakaoPay(user_email, username, reservDate, localId, memberId, totalCnt, totalPrice, orderCnt, exhibitionTitle, exhibitionImage);
         }
 
         function kakaoPay(useremail, username, reservDate, localId, memberId, totalCnt, totalPrice, orderCnt, exhibitionTitle, exhibitionImage) {
             IMP.init("imp20450427"); // 가맹점 식별코드
             const makeMerchantUid = `IMP_${new Date().getTime()}`; // 고유 결제 번호 생성
+            console.log("html: ", useremail);
 
+            // 결제 요청
             IMP.request_pay({
                 pg: 'kakaopay.TC0ONETIME', 
                 pay_method: 'card', 
@@ -393,47 +398,57 @@
                 name: '전시 티켓',
                 amount: totalPrice, 
                 buyer_email: useremail,
-                buyer_name: username,
+                buyer_name: username
             }, function(rsp) {
                 if (rsp.success) {
-                    alert('결제 완료!');
-                    // DB 저장 요청 및 페이지 새로고침
-                    $.ajax({
-                        url: '/payment/doPayment',
-                        method: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({
-                            merchant_uid: rsp.merchant_uid,
-                            amount: rsp.paid_amount,
-                            reservDate: reservDate,
-                            localId: localId,
-                            memberId: memberId,
-                            price: totalPrice,
-                            totalCnt: totalCnt,
-                            orderCnt: orderCnt,
-                            restCnt: totalCnt - orderCnt,
-                            exhibitionTitle: exhibitionTitle,
-                            exhibitionImage: exhibitionImage
-                        }),
-                        success: function(response) {
-                            if (response.includes("successfully")) {
-                                alert('결제 데이터가 성공적으로 저장되었습니다.');
-                                location.href="/member/mypageMain";
-                            } else {
-                                alert('결제 완료 후 데이터 저장에 실패하였습니다.');
-                            }
-                        }, error: function(xhr, status, error) {
-                            alert('결제 데이터 저장 중 오류가 발생하였습니다: ' + error);
+                    fetch("/payment/api/verifyPayment", {
+                        method: "post",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ imp_uid: rsp.imp_uid })
+                    })
+                    .then(response => response.text())
+                    .then(result => {
+                        console.log("result: ", result);
+                        alert("결제 검증 성공");
+
+                        // 검증 성공 후 결제 데이터 저장
+                        return $.ajax({
+                            url: '/payment/api/doPayment',
+                            method: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                merchant_uid: rsp.merchant_uid,
+                                amount: rsp.paid_amount,
+                                reservDate: reservDate,
+                                localId: localId,
+                                memberId: memberId,
+                                price: totalPrice,
+                                totalCnt: totalCnt,
+                                orderCnt: orderCnt,
+                                restCnt: totalCnt - orderCnt,
+                                exhibitionTitle: exhibitionTitle,
+                                exhibitionImage: exhibitionImage
+                            })
+                        });
+                    })
+                    .then(response => {
+                        if (response.includes("successfully")) {
+                            alert('결제 데이터가 성공적으로 저장되었습니다.');
+                            location.href = "/member/mypageMain";
+                        } else {
+                            alert('결제 완료 후 데이터 저장에 실패하였습니다.');
                         }
+                    })
+                    .catch(error => {
+                        alert('결제 데이터 저장 중 오류가 발생하였습니다: ' + error);
                     });
+
                 } else {
                     alert(`결제 실패: ${rsp.error_msg}`);
                 }
             });
         }
-    });
 
-    
         document.addEventListener("DOMContentLoaded", function() {
             const descriptionElement = document.querySelector(".exhibition-description");
             if (descriptionElement) {
@@ -446,7 +461,7 @@
                 descriptionElement.innerHTML = descriptionText;
             }
             
-         	// 매수 값 변경 시 총 가격 업데이트 함수
+            // 매수 값 변경 시 총 가격 업데이트 함수
             const orderCntInput = document.querySelector("input[name='orderCnt']");
             const priceDisplay = document.getElementById("priceDisplay");
             const hiddenPriceInput = document.querySelector("input[name='price']");
@@ -460,6 +475,9 @@
                 hiddenPriceInput.value = totalPrice;  // hidden price 필드에 총 가격 설정
             });
         });
+
+    });
+
     </script>
 </head>
 <body>
