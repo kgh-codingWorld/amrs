@@ -60,7 +60,7 @@ public class MemberServiceImpl implements MemberService {
 		if(memberDTO.getSmsstsYn() == null) memberDTO.setSmsstsYn("n");
 		if(memberDTO.getEmailstsYn() == null) memberDTO.setEmailstsYn("n");
 		
-		//memberDTO.setPasswd(passwordEncoder.encode(memberDTO.getPasswd()));
+		memberDTO.setPasswd(passwordEncoder.encode(memberDTO.getPasswd()));
 		
 		memberDAO.insertMember(memberDTO);
 	}
