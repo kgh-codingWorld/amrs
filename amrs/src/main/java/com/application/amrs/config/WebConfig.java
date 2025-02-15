@@ -23,7 +23,7 @@ public class WebConfig implements WebMvcConfigurer {
 //		registry.addResourceHandler("/uploads/**")
 //				.addResourceLocations("file:///c:/spring_member_profile/");
 		registry.addResourceHandler("/uploads/**")
-		.addResourceLocations("file:///home/ubuntu/file_repository");
+		.addResourceLocations("file:///home/ubuntu/file_repository/");
 	
 		registry.addResourceHandler("/favicon.ico")
         .addResourceLocations("classpath:/static/");
