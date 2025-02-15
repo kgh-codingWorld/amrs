@@ -20,8 +20,10 @@ public class WebConfig implements WebMvcConfigurer {
 	
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+//		registry.addResourceHandler("/uploads/**")
+//				.addResourceLocations("file:///c:/spring_member_profile/");
 		registry.addResourceHandler("/uploads/**")
-				.addResourceLocations("file:///c:/spring_member_profile/");
+		.addResourceLocations("file:///home/ubuntu/file_repository");
 	
 		registry.addResourceHandler("/favicon.ico")
         .addResourceLocations("classpath:/static/");
