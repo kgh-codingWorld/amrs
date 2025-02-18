@@ -55,6 +55,8 @@ public class MemberServiceImpl implements MemberService {
 			memberDTO.setMemberProfileUUID(uploadFile);
 			
 			uploadProfile.transferTo(new File(fileRepositoryPath + uploadFile));
+		} else {
+			
 		}
 		
 		if(memberDTO.getSmsstsYn() == null) memberDTO.setSmsstsYn("n");

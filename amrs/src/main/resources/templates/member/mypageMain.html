@@ -54,7 +54,7 @@ tbody tr:last-child td {
 	border-bottom: none;
 }
 
-.container {
+.container-box {
 	display: flex;
 	justify-content: space-between;
 	align-items: flex-start;
@@ -75,15 +75,15 @@ tbody tr:last-child td {
 	justify-content: space-around;
 	gap: 30px;
 	margin-top: 6rem;
+	margin-right: 10rem;
 }
 
 .feature {
 	flex: 1 1 45%;
 	display: inline-block;
 	background-color: #fff;
-	padding: 30px;
+	padding: 30px 10px;
 	padding-top: 10px;
-	border-radius: 12px;
 	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 	transition: transform 0.3s ease, box-shadow 0.3s ease;
 	border-radius: 12px;
@@ -141,6 +141,7 @@ tbody tr:last-child td {
 
 .feature-same-date-ordered {
 	display: flex;
+	justify-content: space-around;
 	background-color: #fff;
 	border-radius: 12px;
 	border-style: solid;
@@ -187,17 +188,46 @@ tbody tr:last-child td {
 	height: 24vh;
 	gap: 136px; /* 아이콘과 버튼 사이 간격 */
 }
+.payment-info-row{
+    width: 100%;
+    margin-bottom: 10px;
+}
 .payment-info {
     display: flex;
     align-items: center;
+    min-width: 120px;
     gap: 10px; /* 카테고리와 값 사이 간격 조정 */
-    margin-bottom: 5px;
 }
 
 .payment-info span {
     font-weight: bold;
-    min-width: 80px; /* 카테고리의 최소 너비 설정 */
+    flex-shrink: 0;
 }
+
+.payment-info p {
+	margin: 0;
+	text-align: right;
+	flex-grow: 1;
+}
+.payment-date {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.review-button {
+    background-color: #007bff;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.review-button:hover {
+    background-color: #0056b3;
+}
+
 </style>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
@@ -227,13 +257,8 @@ tbody tr:last-child td {
 <body>
 	<div layout:fragment="content">
 		<!-- Profile Section -->
-		<div th:if="${session.memberId == null}">
-			<script type="text/javascript">
-		        window.location.href = '/member/login'; // 로그인 페이지 URL로 변경
-		    </script>
-		</div>
 		<div class="login-background">
-			<div class="container">
+			<div class="container-box">
 				<!-- Account Settings -->
 				<div class="account-settings mt-5">
 					<table class="noto-serif-kr">
@@ -268,43 +293,40 @@ tbody tr:last-child td {
 					    <i class="fa-solid fa-magnifying-glass"></i>
 					</div>
 					<div class="feature" th:each="payment : ${paymentList}">
-						결제일자: <div class="payment-date" th:text="${#dates.format(payment.createDt, 'yyyy-MM-dd')}">
-							<p align="right">
-								<a href="" class="order-detail-link">주문 상세보기</a>
-							<p>
+						<div class="payment-date">
+							<span th:text="|${#dates.format(payment.createDt, 'yyyy-MM-dd')}에 결제함|"></span>
+							<input type="hidden" name="paymentId" th:value="${payment.paymentId}">
 						</div>
 						<div class="feature-same-date-ordered">
-							<img th:src="${payment.exhibitionImage}"
+						<a th:href="@{/exhibition/exhibitionDetail/{localId}(localId=${payment.localId})}">
+							<img th:src="${payment.exhibitionImage}" 
 								class="introduce-card" alt="전시 포스터"
 								style="width: 150px; height: 200px;">
+						</a>
 							<div class="same-date-ordered-info">
 								<h3 th:text="${payment.exhibitionTitle}"></h3>
 								<hr />
-								<div class="payment-info">
-								    <span>티켓수</span>
-								    <p th:text="${payment.orderCnt}"></p>
-								</div>
-								
-								<div class="payment-info">
-								    <span>결제</span>
-								    <p th:text="${payment.price}"></p>
-								</div>
-								
+								<div class="payment-info-row">
 								<div class="payment-info">
 								    <span>관람일</span>
 								    <p th:text="${payment.reservDate}"></p>
 								</div>
+								<div class="payment-info">
+								    <span>결제금액</span>
+								    <p th:text="|${payment.price}원|"></p>
+								</div>
+								
+								<div class="payment-info">
+								    <span>티켓수</span>
+								    <p th:text="|${payment.orderCnt}매|"></p>
+								</div>
+							</div>
 							</div>
 							<!-- <div class="delete-button-zone">
 								<i class="fa-solid fa-bars-staggered"></i>
 								<button class="btn btn-create-review">리뷰 작성</button>
 							</div> -->
 							<!-- 팝업 창 -->
-							<div class="modal-overlay" id="modalOverlay"></div>
-							<div class="modal" id="modal">
-								<span class="close-btn" id="closeBtn">&times;</span>
-								<p>팝업 창 내용입니다.</p>
-							</div>
 						</div>
 						</div>
 				</div>

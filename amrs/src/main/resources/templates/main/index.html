@@ -37,10 +37,8 @@
 						<h2 class="mb-4 section-title noto-serif-kr">다양한 전시를<br/>누려보세요!</h2>
 						<p class="mb-4">Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet velit. Aliquam vulputate velit imperdiet dolor tempor tristique. </p>
 					</div> 
-					<!-- End Column 1 -->
 
-					<!-- Start Column 2 -->
-					<div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0" th:each="exhibition : ${exhibitions}">
+					<div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0" th:each="exhibition : ${exhibitionList}">
 						<a class="product-item" th:href="@{/exhibition/exhibitionDetail/{localId}(localId=${exhibition['localId']})}">
 							<img th:src="${exhibition['imageUrl']}" class="img-fluid product-thumbnail" onerror="this.src='/bootstrap/images/img-grid-3.jpg'" alt="Exhibition Image">
 							<h3 class="product-title" th:text="${exhibition.title}">Exhibition Title</h3>
@@ -49,7 +47,7 @@
 								<img th:src="@{/bootstrap/images/cross.svg}" class="img-fluid">
 							</span>
 						</a>
-					</div> 
+					</div>
 					<!-- End Column 2 -->
 
 				</div>
@@ -65,7 +63,7 @@
 					<div class="col-md-6">
 						<h2 class="section-title noto-serif-kr">Community</h2>
 					</div>
-					<div class="col-md-6 text-start text-md-end" th:each="community: ${communityList}">
+					<div class="col-md-6 text-start text-md-end">
 						<a th:href="@{/community/communityMain}" class="more noto-serif-kr">게시물 모두 보기</a>
 					</div>
 				</div>

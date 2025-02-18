@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 public class PaymentDTO {
 	
+	private int paymentId;
 	private String localId;
 	private String memberId;
 	private int price;

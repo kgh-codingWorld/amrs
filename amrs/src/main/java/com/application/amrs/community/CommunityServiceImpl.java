@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,17 +23,7 @@ public class CommunityServiceImpl implements CommunityService {
 
 	@Override
 	public List<Map<String, Object>> getCommunityList() {
-		
-		List<Map<String, Object>> communityList = communityDAO.selectCommunityList();
-		
-		for(Map<String, Object> community : communityList) {
-			String memberId = (String) community.get("memberId");
-			String memberNm = memberService.getMemberNameById(memberId);
-			String maskedMemberNm = memberService.maskLastCharacter(memberNm);
-			community.put("memberNm", maskedMemberNm);
-		}
-		
-		return communityList; // 블로그 리스트 조회
+		return processCommunityList(communityDAO.selectCommunityList());
 	}
 	
 	@Override
@@ -51,16 +42,7 @@ public class CommunityServiceImpl implements CommunityService {
 
 	@Override
 	public void likePost(int communityId, int likeCount) {
-		
-		Map<String, Object> communityMap = communityDAO.selectCommunityById(communityId);
-		
-		CommunityDTO communityDTO = new CommunityDTO();
-		communityDTO.setCommunityId((Integer) communityMap.get("communityId"));
-		communityDTO.setLikeCount((Integer) communityMap.get("likeCount"));
-	    
-		communityDTO.setLikeCount(likeCount);
-		communityDAO.updateLikeCount(communityDTO);
-	    
+		communityDAO.updateLikeCount(new CommunityDTO(communityId, likeCount));
 	}
 
 	@Override
@@ -75,65 +57,71 @@ public class CommunityServiceImpl implements CommunityService {
 
 	@Override
 	public boolean hasMemberLikedPost(String memberId, int communityId) {
-	    Map<String, Object> params = new HashMap<>();
-	    params.put("memberId", memberId);
-	    params.put("communityId", communityId);
-	    return communityDAO.checkMemberLike(params);
+	    return communityDAO.checkMemberLike(createParams(memberId, communityId));
 	}
 	
 	@Override
 	@Transactional
     public int toggleLike(String memberId, int communityId, boolean liked) {
-		Map<String, Object> params = new HashMap<>();
-        params.put("memberId", memberId);
-        params.put("communityId", communityId);
-
+		Map<String, Object> params = createParams(memberId, communityId);
         boolean hasLiked = communityDAO.checkMemberLike(params); // 좋아요 여부 체크
 
-        if(liked) {
-        	if (!hasLiked) {
-                // 좋아요가 존재하지 않으면
-        		communityDAO.insertLike(params);
-                System.out.println("insertLike 실행 확인");
-            }
-        } else {
-        	if (hasLiked) {
-                // 좋아요가 존재하면
-        		communityDAO.deleteLike(params);
-                System.out.println("deleteLike 실행 확인");
-            }
+        if(liked && !hasLiked) { // 좋아요가 존재하지 않으면
+    		communityDAO.insertLike(params);
+        } else if (!liked && hasLiked){
+    		communityDAO.deleteLike(params);
         }
         
         communityDAO.updateLikeCount(new CommunityDTO(communityId, 0));
-        
         return communityDAO.countLikesForCommunity(communityId); // 최종 좋아요 개수 반환
     }
 
 	@Override
 	public List<Map<String, Object>> getMyCommunityList(String memberId) {
-		
-		List<Map<String, Object>> myCommunityList = communityDAO.selectMyCommunityList(memberId);
-		
-		for(Map<String, Object> myCommunity : myCommunityList) {
-			//String memberId = (String) myForum.get("memberId");
-			String memberNm = memberService.getMemberNameById(memberId);
-			String maskedMemberNm = memberService.maskLastCharacter(memberNm);
-			myCommunity.put("memberNm", maskedMemberNm);
-		}
-		
-		return myCommunityList;
+		return processCommunityList(communityDAO.selectMyCommunityList(memberId), memberId);
 	}
 
 	@Override
 	public List<Map<String, Object>> getRecentCommunityList(int count) {
 		List<Map<String, Object>> allCommunityList = getCommunityList();
 		if(allCommunityList.isEmpty()) {
-    		System.out.println("커뮤니티 데이터 없음");
     		return Collections.emptyList();
     	}
-    	
     	Collections.shuffle(allCommunityList);
-    	
     	return allCommunityList.subList(0, Math.min(count, allCommunityList.size()));
 	}
+	
+	private List<Map<String, Object>> processCommunityList(List<Map<String, Object>> communityList) {
+        communityList.forEach(this::maskMemberName);
+        return communityList;
+    }
+	
+	private List<Map<String, Object>> processCommunityList(List<Map<String, Object>> communityList, String memberId) {
+		communityList.forEach(community -> maskMemberName(community, memberId));
+        return communityList;
+    }
+	
+	private void maskMemberName(Map<String, Object> community) {
+        String memberId = (String) community.get("memberId");
+        if (memberId != null) {
+            String memberNm = memberService.getMemberNameById(memberId);
+            if (memberNm != null) {
+                community.put("memberNm", memberService.maskLastCharacter(memberNm));
+            }
+        }
+    }
+	
+    private void maskMemberName(Map<String, Object> community, String memberId) {
+    	String memberNm = memberService.getMemberNameById(memberId);
+        if (memberNm != null) {
+            community.put("memberNm", memberService.maskLastCharacter(memberNm));
+        }
+    }
+
+    private Map<String, Object> createParams(String memberId, int communityId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("memberId", memberId);
+        params.put("communityId", communityId);
+        return params;
+    }
 }

@@ -1,12 +1,12 @@
 package com.application.amrs.common;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -29,6 +29,9 @@ public class CommonController {
 	private MemberService memberService;
 	
 	@Autowired
+	private ExhibitionService exhibitionService;
+	
+	@Autowired
 	private CommunityService communityService;
 	
 	@Autowired
@@ -40,34 +43,38 @@ public class CommonController {
 	@Autowired
 	private PaymentService paymentService;
 	
-//	@Autowired
-//    private ExhibitionRestController exhibitionRestController;
-	
 	/* 페이지 이동용 컨트롤러 */
 	// .
 	// .
 	// .
 	
+	// 메인 화면으로 이동
 	@GetMapping("/")
 	public String main(Model model) {
-		// 메인 화면으로 이동
-		ExhibitionService exhibitionService = new ExhibitionService();
-		List<ExhibitionItem> randomExhibitions = exhibitionService.getRandomExhibitions(3);
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start("load main");
 		
-		List<Map<String, Object>> communityList = communityService.getRecentCommunityList(3);
-		System.out.println("!@@@@###" + communityList);
+		model.addAttribute("exhibitionList", exhibitionService.getRandomExhibitions(3));
+		model.addAttribute("communityList", communityService.getRecentCommunityList(3));
+		stopWatch.stop();
+		System.out.println("실행 시간: " + stopWatch.getTotalTimeMillis() + " ms");
 		
-		model.addAttribute("exhibitions", randomExhibitions);
-		model.addAttribute("communityList", communityList);
 		return "main/index";
 	}
 	
 	/*회원 관련 메서드*/
 	
+	// 로그인 페이지로 이동
 	@GetMapping("/member/login")
 	public String login() {
-		// 로그인 페이지로 이동
 		return "member/login";
+	}
+	
+	// 로그아웃된 상태로 메인 화면 이동
+	@GetMapping("/member/logout")
+	public String logout(HttpServletRequest request) {
+		request.getSession().invalidate();
+		return "redirect:/";
 	}
 	
 	@GetMapping("/member/findId")
@@ -80,115 +87,146 @@ public class CommonController {
 		return "member/resetPassword";
 	}
 	
-	@GetMapping("/member/logout")
-	public String logout(HttpServletRequest request) {
-		
-		HttpSession session = request.getSession();
-		session.invalidate();
-		
-		return "redirect:/";
-	}
 	
+	// 회원가입 페이지로 이동
 	@GetMapping("/member/registerMember")
 	public String registerMember() {
-		// 회원가입 페이지로 이동
 		return "member/registerMember";
 	}
 
+	// 마이페이지 메인으로 이동
 	@GetMapping("/member/mypageMain")
 	public String mypageMain(HttpServletRequest request, Model model) {
+		String memberId = getSessionMemberId(request);
+		if(memberId == null) return "redirect:/member/login";
 		
-		HttpSession session = request.getSession();
-		String memberId = (String)session.getAttribute("memberId");
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start("load mypageMain");
 		
-		if(memberId != null) {
-			// 현재 로그인된 아이디로 payment 정보 호출
-			List<Map<String, Object>> paymentList = paymentService.getPaymentList(memberId);
-			model.addAttribute("paymentList", paymentList);
-			
-			
-		} else {
-			model.addAttribute("paymentList", Collections.emptyList());
-		}
-		model.addAttribute("memberId", memberId);
+		// 현재 로그인된 아이디로 payment 정보 호출
+		model.addAttribute("paymentList", paymentService.getPaymentList(memberId));
 		
-		// 마이페이지 메인으로 이동
+		stopWatch.stop();
+		System.out.println("실행 시간: " + stopWatch.getTotalTimeMillis() + " ms");
+		
 		return "member/mypageMain";
 	}
 	
+	// 개인정보확인/수정 페이지 전 비밀번호 확인 페이지로 이동
 	@GetMapping("/member/checkPassword")
 	public String checkPassword() { 
-		// 개인정보확인/수정 페이지 전 비밀번호 확인 페이지로 이동
 		return "member/checkPassword";
 	}
 	
+	// 개인정보확인/수정 페이지로 이동
 	@GetMapping("/member/myInfo")
 	public String myInfo(HttpServletRequest request, Model model) {
-		// 개인정보확인/수정 페이지로 이동
-		HttpSession session = request.getSession();
-		model.addAttribute("memberDTO", memberService.getMemberDetail((String)session.getAttribute("memberId")));
+		String memberId = getSessionMemberId(request);
+		if(memberId == null) return "redirect:/member/login";
+		
+		model.addAttribute("memberDTO", memberService.getMemberDetail(memberId));
 		return "member/myInfo";
 	}
 	
+	// 회원탈퇴 페이지로 이동
 	@GetMapping("/member/removeAccount")
-	public String removeAccount(Model model, HttpSession session) {
-		
-		String memberId = (String) session.getAttribute("memberId");
+	public String removeAccount(HttpServletRequest request, Model model) {
+		String memberId = getSessionMemberId(request);
 		model.addAttribute("memberDTO", memberService.getMemberDetail(memberId));
-		//MemberDTO memberDTO = memberService.getMemberDetail(memberId);
-		//model.addAttribute("memberDTO", memberDTO);
-		
 		return "member/removeAccount";
 	}
 	
+	// 소개 페이지로 이동
 	@GetMapping("/main/about")
 	public String about() {
-		// 소개 페이지로 이동
 		return "main/about";
 	}
 	
 	/* 전시 관련 메서드 */
-	
+
+	// 모든 전시 페이지로 이동
 	@GetMapping("/exhibition/exhibitionList")
-    public String exhibitionList(Model model) {
-		ExhibitionService exhibitionService = new ExhibitionService();
-        List<ExhibitionItem> items = exhibitionService.getExhibitionItems();
-        model.addAttribute("exhibitionList", items);
-        return "exhibition/exhibitionList";
-    }
+	public String exhibitionList(Model model) {
+	    StopWatch stopWatch = new StopWatch();
+	    stopWatch.start("load exhibitionList");
+
+	    List<ExhibitionItem> exhibitionList = exhibitionService.getExhibitionItems();
+
+	    model.addAttribute("exhibitionList", exhibitionList);
+
+	    stopWatch.stop();
+	    System.out.println("실행 시간: " + stopWatch.getTotalTimeMillis() + " ms");
+
+	    return "exhibition/exhibitionList";
+	}
 	
+	// 현재 전시 페이지로 이동
+	@GetMapping("/exhibition/exhibitionNow")
+	public String exhibitionNow(Model model) {
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start("load exhibitionNow");
+		
+		List<ExhibitionItem> items = exhibitionService.getShowingExhibitionItems();
+		model.addAttribute("showingItems", items);
+    	stopWatch.stop();
+        System.out.println("실행 시간: " + stopWatch.getTotalTimeMillis() + " ms");
+        
+    	return "exhibition/exhibitionNow";
+	}
+	
+	// 과거 전시 페이지로 이동
+	@GetMapping("/exhibition/exhibitionArchive")
+	public String exhibitionArchive(Model model) {
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start("load exhibitionArchive");
+		
+		List<ExhibitionItem> items = exhibitionService.getShowedExhibitionItems();
+		
+		stopWatch.stop();
+        System.out.println("실행 시간: " + stopWatch.getTotalTimeMillis() + " ms");
+        
+		model.addAttribute("showedItems", items);
+		return "exhibition/exhibitionArchive";
+	}
+	
+	// 전시 상세보기 페이지로 이동
 	@GetMapping("/exhibition/exhibitionDetail/{localId}")
-	public String exhibitionDetail(Model model, @PathVariable("localId") String localId, HttpServletRequest request) {
+	public String exhibitionDetail(@PathVariable("localId") String localId, HttpServletRequest request, Model model) {
+		String memberId = getSessionMemberId(request);
+		if(memberId == null) return "redirect:/member/login";
 
-		System.out.println(" ~~~~ exhibitionDetail : 전 localId : " + localId);
-
-		HttpSession session = request.getSession();
-		ExhibitionService exhibitionService = new ExhibitionService();
-		ExhibitionItem items = exhibitionService.exhibitionDetail(localId);
-		System.out.println(" ~~~~ exhibitionDetail : items imageurl : " + items.getImageUrl());
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start("load exhibitionDetail");
 		
-		model.addAttribute("exhibitionDetail", items);
-		model.addAttribute("memberDTO", memberService.getMemberDetail((String)session.getAttribute("memberId")));
+		ExhibitionItem exhibitionItem = exhibitionService.exhibitionDetail(localId);
+			
+		stopWatch.stop();
+        System.out.println("실행 시간: " + stopWatch.getTotalTimeMillis() + " ms");
+        
+        	addExhibitionAttributes(model, memberId, localId, exhibitionItem);
 		
-		int totalCnt = paymentService.getTotalTicketCount(localId);
-		int restCnt = paymentService.getTicketRestCnt(localId);
-		model.addAttribute("totalCnt", totalCnt);
-		model.addAttribute("restCnt", restCnt);
-
-		System.out.println(" ~~~~ exhibitionDetail : 후 localId : " + localId);
-
 		return "exhibition/getExhibitionDetail";
 	}
-
-	/* 블로그 관련 메서드 */
 	
+	// 전시 속성 모델에 추가
+	private void addExhibitionAttributes(Model model, String memberId, String localId, ExhibitionItem exhibitionItem) {
+		model.addAttribute("exhibitionDetail", exhibitionItem);
+		model.addAttribute("isExpired", exhibitionItem.getIsExpired());
+		model.addAttribute("memberDTO", memberService.getMemberDetail(memberId));
+		model.addAttribute("totalCnt", paymentService.getTotalTicketCount(localId));
+		model.addAttribute("restCnt", paymentService.getTicketRestCnt(localId));
+	}
+
+	/* 커뮤니티 관련 메서드 */
+	
+	// 커뮤니티 메인 페이지로 이동
 	@GetMapping("/community/communityMain")
-    public String getCommunityList(HttpServletRequest request, Model model) {
-        List<Map<String, Object>> communityList = communityService.getCommunityList();
-        model.addAttribute("communityList", communityList);
+    public String getCommunityList(Model model) {
+        model.addAttribute("communityList", communityService.getCommunityList());
         return "community/communityMain"; 
     }
 
+	// 커뮤니티 작성 페이지로 이동
 	@GetMapping("/community/registerCommunity")
 	public String registerCommunity(HttpServletRequest request, Model model) {
 		HttpSession session = request.getSession();
@@ -198,60 +236,49 @@ public class CommonController {
 		return "community/registerCommunity";
 	}
 	
+	// 커뮤니티 상세보기 페이지로 이동
 	@GetMapping("/community/communityDetail/{communityId}")
 	public String communityDetail(@PathVariable("communityId") int communityId, HttpServletRequest request, Model model) {
-
-	    String sessionMemberId = (String) request.getSession().getAttribute("memberId");
-	    
-	    boolean isLiked = communityService.hasMemberLikedPost(sessionMemberId, communityId);
+	    String sessionMemberId = getSessionMemberId(request);
+	    if(sessionMemberId == null) return "redirect:/member/login";
 	    
 	    Map<String, Object> community = communityService.getCommunityById(communityId, true);
 	    
-	    String memberId = (String) community.get("memberId");
-	    String memberNm = memberService.getMemberNameById(memberId);
-	    
-	    String maskedMemberNm = memberService.maskLastCharacter(memberNm);
-
-	    List<Map<String, Object>> commentList = commentService.getCommentList(communityId);
-	    
-	    for (Map<String, Object> comment : commentList) {
-	        String commentMemberId = (String) comment.get("memberId");
-	        String commentMemberNm = memberService.getMemberNameById(commentMemberId);
-	        
-	        String commentMaskedMemberNm = memberService.maskLastCharacter(commentMemberNm);
-	        
-	        comment.put("memberNm", commentMaskedMemberNm);
-	        comment.put("memberId", commentMemberId);
-
-	        int commentId = (int) comment.get("commentId");
-
-	        List<Map<String, Object>> replyCommentList = replyCommentService.getReplyCommentList(commentId);
-
-	        for (Map<String, Object> replyComment : replyCommentList) {
-	            String replyMemberId = (String) replyComment.get("memberId");
-	            String replyMemberNm = memberService.getMemberNameById(replyMemberId);
-
-	            String replyMaskedMemberNm = memberService.maskLastCharacter(replyMemberNm);
-
-	            replyComment.put("memberNm", replyMaskedMemberNm);
-	            replyComment.put("memberId", replyMemberId);
-	        }
-
-	        comment.put("replyCommentList", replyCommentList);
-	    }
-
-	    int commentCnt = commentService.countCommentByCommunityId(communityId);
-	    
-	    model.addAttribute("commentCnt", commentCnt); 	// 댓글 수
-	    model.addAttribute("community", community);     // 게시글 정보
-	    model.addAttribute("memberNm", maskedMemberNm); // 게시글 작성자의 마스킹된 이름
-	    model.addAttribute("isLiked", isLiked);      	// 현재 사용자의 '좋아요' 여부
-	    model.addAttribute("commentList", commentList); // 댓글 목록 (대댓글 포함)
-
+	    addCommunityAttributes(model, sessionMemberId, communityId, community);
 	    return "community/communityDetail";
 	}
-
 	
+	// 커뮤니티 속성 모델에 추가
+	private void addCommunityAttributes(Model model, String sessionMemberId, int communityId, Map<String, Object> community) {
+        boolean isLiked = communityService.hasMemberLikedPost(sessionMemberId, communityId);
+        String memberId = (String) community.get("memberId");
+        String maskedMemberNm = memberService.maskLastCharacter(memberService.getMemberNameById(memberId));
+
+        List<Map<String, Object>> commentList = commentService.getCommentList(communityId);
+        commentList.forEach(comment -> maskCommentData(comment));
+
+        model.addAttribute("commentCnt", commentService.countCommentByCommunityId(communityId));
+        model.addAttribute("community", community);
+        model.addAttribute("memberNm", maskedMemberNm);
+        model.addAttribute("isLiked", isLiked);
+        model.addAttribute("commentList", commentList);
+    }
+
+	// 이름 아스트리크 처리
+	private void maskCommentData(Map<String, Object> comment) {
+        String commentMemberId = (String) comment.get("memberId");
+        comment.put("memberNm", memberService.maskLastCharacter(memberService.getMemberNameById(commentMemberId)));
+
+        List<Map<String, Object>> replyCommentList = replyCommentService.getReplyCommentList((int) comment.get("commentId"));
+        replyCommentList.forEach(replyComment -> {
+            String replyMemberId = (String) replyComment.get("memberId");
+            replyComment.put("memberNm", memberService.maskLastCharacter(memberService.getMemberNameById(replyMemberId)));
+        });
+
+        comment.put("replyCommentList", replyCommentList);
+    }
+	
+	// 커뮤니티 수정 페이지로 이동
 	@GetMapping("/community/modifyCommunity/{communityId}")
 	public String modifyCommunity(@PathVariable("communityId") int communityId, HttpServletRequest request, Model model) {
 		HttpSession session = request.getSession();
@@ -263,27 +290,24 @@ public class CommonController {
 		return "community/modifyCommunity";
 	}
 	
+	// 커뮤니티 삭제 페이지로 이동
 	@GetMapping("/community/removeCommunity/{communityId}")
 	public String removeCommunity(@PathVariable("communityId") int communityId, HttpServletRequest request, Model model) {
-		HttpSession session = request.getSession();
-		model.addAttribute("memberDTO", memberService.getMemberDetail((String)session.getAttribute("memberId")));
+		if(getSessionMemberId(request) == null) return "redirect:/member/login";
+		model.addAttribute("memberDTO", memberService.getMemberDetail(getSessionMemberId(request)));
 		model.addAttribute("community", communityService.getCommunityById(communityId, true));
 		return "community/removeCommunity";
 	}
 	
+	// 내가 쓴 글 페이지로 이동
 	@GetMapping("/community/myCommunityPostList")
 	public String myCommunityPostList(HttpServletRequest request, Model model) {
-		// 내 게시글로 이동
-		HttpSession session = request.getSession();
-		MemberDTO memberDTO = memberService.getMemberDetail((String)session.getAttribute("memberId"));
+		String memberId = getSessionMemberId(request);
+		if(memberId == null) return "redirect:/member/login";
 		
-		List<Map<String, Object>> myCommunityList = communityService.getMyCommunityList((String)session.getAttribute("memberId"));
-        model.addAttribute("myCommunityList", myCommunityList);
-		
+		MemberDTO memberDTO = memberService.getMemberDetail(memberId);
+        model.addAttribute("myCommunityList", communityService.getMyCommunityList(memberId));
 		model.addAttribute("memberDTO", memberDTO);
-		if(session.getAttribute("memberId") == null) {
-			return "redirect:/member/login";
-		}
 		return "community/myCommunityPostList";
 	}
 	
@@ -291,5 +315,11 @@ public class CommonController {
 	public String cartMain() {
 		return "member/cartMain";
 	}
+	
+	/* 공통 메서드 */
+    private String getSessionMemberId(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        return (String) session.getAttribute("memberId");
+    }
 	
 }

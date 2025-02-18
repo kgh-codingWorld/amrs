@@ -3,6 +3,8 @@ package com.application.amrs.comment;
 import java.util.Date;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +23,11 @@ import com.application.amrs.replyComment.ReplyCommentService;
 import jakarta.servlet.http.HttpSession;
 
 @RestController
-@RequestMapping("/comment")
+@RequestMapping("/comment/api")
 public class CommentRestController {
 
+	private static final Logger logger = LoggerFactory.getLogger(CommentRestController.class);
+	
     @Autowired
     private CommentService commentService;
     
@@ -34,84 +38,94 @@ public class CommentRestController {
     private ReplyCommentService replyCommentService;
     
     @PostMapping("/registerComment/{communityId}")
-    public ResponseEntity<CommentDTO> registerComment(@PathVariable("communityId") int communityId, 
-    												  @RequestBody CommentDTO commentDTO, HttpSession session) {
-        try {
-            // communityId를 CommentDTO에 설정 (필요한 경우)
-            commentDTO.setCommunityId(communityId);
-
-            String loggedInMemberId = (String) session.getAttribute("memberId");
-            if (loggedInMemberId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-            }
-
-            String memberNm = memberService.getMemberNameById(loggedInMemberId);
-            if(memberNm != null) {
-            	commentDTO.setMemberNm(memberNm);
-            }
-            commentDTO.setCreateDt(new Date());
-            
-            // 댓글을 등록하고, 등록된 댓글 정보를 반환
-            CommentDTO savedComment = commentService.registerComment(commentDTO);
-            CommentDTO returnComment = commentService.getOneComment(savedComment.getCommentId());
-            
-            return ResponseEntity.status(HttpStatus.CREATED).body(returnComment);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+    public ResponseEntity<?> registerComment(@PathVariable("communityId") int communityId, @RequestBody CommentDTO commentDTO, HttpSession session) {
+    	return processCommentRegistration(communityId, commentDTO, session);
     }
     
     @PostMapping("/modifyComment/{commentId}")
-    public ResponseEntity<?> modifyComment(@PathVariable("commentId") int commentId, @RequestBody CommentDTO commentDTO) {
-    	commentDTO.setCommentId(commentId);
+    public ResponseEntity<?> modifyComment(@PathVariable int commentId, @RequestBody CommentDTO commentDTO) {
+        commentDTO.setCommentId(commentId);
         commentService.modifyComment(commentDTO);
-        
-        return ResponseEntity.ok().body("댓글이 성공적으로 수정되었습니다.");
+        return ResponseEntity.ok("댓글이 성공적으로 수정되었습니다.");
     }
-    
+
     @PostMapping("/removeComment/{commentId}")
-    @ResponseBody
-    public ResponseEntity<?> removeComment(@PathVariable("commentId") int commentId) {
-    	commentService.removeComment(commentId);
-    	return ResponseEntity.ok().body("댓글이 성공적으로 삭제되었습니다.");
+    public ResponseEntity<?> removeComment(@PathVariable int commentId) {
+        commentService.removeComment(commentId);
+        return ResponseEntity.ok("댓글이 성공적으로 삭제되었습니다.");
     }
-    
+
     @PostMapping("/registerReply/{commentId}")
-    public ResponseEntity<ReplyCommentDTO> registerReply(@PathVariable("commentId") int commentId, @RequestBody ReplyCommentDTO replyCommentDTO, HttpSession session) {
-		try {
-			replyCommentDTO.setCommentId(commentId);
-			
-			String loggedInMemberId = (String) session.getAttribute("memberId");
-			if(loggedInMemberId == null) {
-				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-			}
-			
-			String memberNm = memberService.getMemberNameById(loggedInMemberId);
-			if(memberNm != null) {
-				replyCommentDTO.setMemberNm(memberNm);
-			}
-			replyCommentDTO.setCreateDt(new Date());
-			
-			ReplyCommentDTO savedReply = replyCommentService.registerReply(replyCommentDTO);
-			ReplyCommentDTO returnReply = replyCommentService.getOneReply(savedReply.getReplyId());
-			
-			return ResponseEntity.status(HttpStatus.CREATED).body(returnReply);
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-		}
+    public ResponseEntity<?> registerReply(@PathVariable int commentId, @RequestBody ReplyCommentDTO replyCommentDTO, HttpSession session) {
+        return processReplyRegistration(commentId, replyCommentDTO, session);
     }
-    
+
     @PostMapping("/modifyReply/{replyId}")
-    public ResponseEntity<?> modifyReply(@PathVariable("replyId") int replyId, @RequestBody ReplyCommentDTO replyCommentDTO){
-    	replyCommentDTO.setReplyId(replyId);
-    	replyCommentService.modifyReply(replyCommentDTO);
-    	return ResponseEntity.ok().body("대댓글이 성공적으로 수정되었습니다.");
+    public ResponseEntity<?> modifyReply(@PathVariable int replyId, @RequestBody ReplyCommentDTO replyCommentDTO) {
+        replyCommentDTO.setReplyId(replyId);
+        replyCommentService.modifyReply(replyCommentDTO);
+        return ResponseEntity.ok("대댓글이 성공적으로 수정되었습니다.");
     }
-    
+
     @PostMapping("/removeReply/{replyId}")
-    public ResponseEntity<?> removeReply(@PathVariable("replyId") int replyId) {
-    	System.out.println("^^" + replyId);
-    	replyCommentService.removeReply(replyId);
-    	return ResponseEntity.ok().body("대댓글이 성공적으로 삭제되었습니다.");
+    public ResponseEntity<?> removeReply(@PathVariable int replyId) {
+        replyCommentService.removeReply(replyId);
+        return ResponseEntity.ok("대댓글이 성공적으로 삭제되었습니다.");
+    }
+
+    // 댓글 등록 처리
+    private ResponseEntity<?> processCommentRegistration(int communityId, CommentDTO commentDTO, HttpSession session) {
+        try {
+            String memberId = getSessionMemberId(session);
+            if (memberId == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+
+            commentDTO.setCommunityId(communityId);
+            commentDTO.setMemberNm(getMemberNameById(memberId));
+            commentDTO.setCreateDt(new Date());
+
+            CommentDTO savedComment = commentService.registerComment(commentDTO);
+            CommentDTO returnComment = commentService.getOneComment(savedComment.getCommentId());
+            returnComment.setMemberNm(memberService.maskLastCharacter(returnComment.getMemberNm()));
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(returnComment);
+        } catch (Exception e) {
+            return handleException(e, "댓글 등록 중 오류 발생");
+        }
+    }
+
+    // 대댓글 등록 처리
+    private ResponseEntity<?> processReplyRegistration(int commentId, ReplyCommentDTO replyCommentDTO, HttpSession session) {
+        try {
+            String memberId = getSessionMemberId(session);
+            if (memberId == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+
+            replyCommentDTO.setCommentId(commentId);
+            replyCommentDTO.setMemberNm(getMemberNameById(memberId));
+            replyCommentDTO.setCreateDt(new Date());
+
+            ReplyCommentDTO savedReply = replyCommentService.registerReply(replyCommentDTO);
+            ReplyCommentDTO returnReply = replyCommentService.getOneReply(savedReply.getReplyId());
+            returnReply.setMemberNm(memberService.maskLastCharacter(returnReply.getMemberNm()));
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(returnReply);
+        } catch (Exception e) {
+            return handleException(e, "대댓글 등록 중 오류 발생");
+        }
+    }
+
+    // 세션에서 memberId 가져오기
+    private String getSessionMemberId(HttpSession session) {
+        return (String) session.getAttribute("memberId");
+    }
+
+    // memberId로 회원 이름 가져오기
+    private String getMemberNameById(String memberId) {
+        return memberService.getMemberNameById(memberId);
+    }
+
+    // 예외 처리 메서드
+    private ResponseEntity<?> handleException(Exception e, String errorMessage) {
+        logger.error(errorMessage, e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
     }
 }

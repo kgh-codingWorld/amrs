@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>전체전시</title>
+    <title>현재전시</title>
     <style>
         .all-list {
             display: grid;
@@ -87,7 +87,6 @@
 		    background: #ccc;
 		    cursor: not-allowed;
 		}
-        
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
@@ -95,7 +94,7 @@
 
 <div layout:fragment="content">
 	<div style="text-align: center; margin-top: 50px;">
-	    <h2 class="noto-serif-kr" style="color:black;">모든전시</h2>
+	    <h2 class="noto-serif-kr" style="color:black;">현재전시</h2>
 	    <div class="pagination">
             <button id="prevPage"><i class="fa-solid fa-arrow-left"></i></button>
             <button id="nextPage"><i class="fa-solid fa-arrow-right"></i></button>
@@ -103,22 +102,20 @@
 	    <hr/>
 	    
 	    <div class="all-list">
-			    <div th:each="exhibition : ${exhibitionList}" class="exhibition-item">
-			        <!-- 진행 중인 전시 (클릭 가능) -->
-			        <span th:if="${!exhibition.isExpired}">
-			            <a th:href="@{/exhibition/exhibitionDetail/{localId}(localId=${exhibition.localId})}">
-			                <img th:src="${exhibition.imageUrl}" onerror="this.src='/bootstrap/images/img-grid-3.jpg'" alt="Exhibition Image">
-			                <h3 th:text="${exhibition.title}">Exhibition Title</h3>
-			            </a>
-			        </span>
-			        
-			        <!-- 종료된 전시 (클릭 불가) -->
-			        <span th:if="${exhibition.isExpired}" class="expired">
-			            <img th:src="${exhibition.imageUrl}" onerror="this.src='/bootstrap/images/img-grid-3.jpg'" alt="Exhibition Image">
-			            <h3 th:text="'[종료됨] ' + ${exhibition.title}">Exhibition Title</h3>
-			        </span>
-			    </div>
+	    <th:block th:if="${showingItems != null}"> 
+		    <div th:each="item : ${showingItems}" class="exhibition-item">
+		        <!-- 전시 제목 리스트 렌더링 -->
+		        <span th:if="${!item.isExpired}">
+			        <a th:href="@{/exhibition/exhibitionDetail/{localId}(localId=${item.localId})}">
+				        <img th:src="${item.imageUrl}" onerror="this.src='/bootstrap/images/img-grid-3.jpg'" alt="Exhibition Image">
+			        	<h3 th:text="${item.title}">Exhibition Title</h3>
+					</a>	    
+				</span>
+		    </div>
+		    </th:block>
 		</div>
+	
+	
 	    <!-- JavaScript로 제목 리스트 출력 (확인용) -->
 	    <div id="exhibitionData" th:attr="data-exhibitionList=${exhibitionList}"></div>
 	    <script th:src="@{/exhibition.js}"></script>

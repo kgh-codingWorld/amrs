@@ -3,6 +3,7 @@
 <mapper namespace="com.application.amrs.payment.PaymentDAO">
 
 <resultMap id="paymentMap" type="hashmap">
+	<result column="PAYMENT_ID"		property="paymentId"/>
 	<result column="LOCAL_ID" 		property="localId"/>
 	<result column="MEMBER_ID" 		property="memberId"/>
 	<result column="PRICE"			property="price"/>
@@ -62,10 +63,10 @@
 	ORDER	BY CREATE_DT DESC
 </select>
 
-<select id="selectPaymentInfo" resultType="PaymentDTO" parameterType="String">
+<select id="selectPaymentDetail" resultType="PaymentDTO" parameterType="int">
 	SELECT *
 	FROM PAYMENT
-	WHERE MEMBER_ID = #{memberId}
+	WHERE PAYMENT_ID = #{paymentId}
 	LIMIT 1
 </select>
 </mapper>

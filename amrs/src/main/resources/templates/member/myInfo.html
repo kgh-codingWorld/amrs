@@ -335,14 +335,13 @@ tbody tr:last-child td {
 </head>
 <body>
 	<div layout:fragment="content">
-
 		<!-- Profile Section -->
 		<div class="login-background">
 			<div class="container">
 			<form th:action="@{/member/modifyMyInfo}" method="post" enctype="multipart/form-data">
 					<div class="profile-header">
 					<!-- 프로필 이미지 미리보기 -->
-			        <img id="profileImage" th:src="${memberDTO.memberProfileUUID != null ? '/uploads/' + memberDTO.memberProfileUUID : '/bootstrap/images/profile_basic2.webp'}"
+			        <img id="profileImage" th:src="${memberDTO.memberProfileUUID != null ? '/uploads/' + memberDTO.memberProfileUUID : @{/bootstrap/images/profile_basic2.webp}}"
 			            alt="User Profile Picture" class="img-thumbnail" width="150" height="150">
 			
 			        <!-- 프로필 이미지 업로드 -->

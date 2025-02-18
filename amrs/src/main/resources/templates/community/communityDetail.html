@@ -333,7 +333,7 @@
 			}
 			
 			$.ajax({
-				url : '/comment/registerComment/' + communityId,
+				url : '/comment/api/registerComment/' + communityId,
 				type : 'post',
 				contentType: 'application/json',
 				data : JSON.stringify({
@@ -394,7 +394,7 @@
 		    
 		
 		        $.ajax({
-		        	url: '/comment/modifyComment/' + commentId,
+		        	url: '/comment/api/modifyComment/' + commentId,
 		        	type: 'post',
 		        	contentType: 'application/json',
 		        	data: JSON.stringify({
@@ -427,7 +427,7 @@
 		    if (confirm("댓글을 삭제하시겠습니까?")) {
 		        
 		        $.ajax({
-		        	url: '/comment/removeComment/' + commentId,
+		        	url: '/comment/api/removeComment/' + commentId,
 		        	type: 'POST',
 		        	success: function(response){
 		        		alert('댓글이 삭제되었습니다.');
@@ -456,7 +456,7 @@
 		    }
 
 		    $.ajax({
-		        url: '/comment/registerReply/' + commentId,
+		        url: '/comment/api/registerReply/' + commentId,
 		        type: 'post',
 		        contentType: 'application/json',
 		        data: JSON.stringify({
@@ -509,7 +509,7 @@
 		        }
 		
 		        $.ajax({
-		        	url: '/comment/modifyReply/' + replyId,
+		        	url: '/comment/api/modifyReply/' + replyId,
 		        	type: 'post',
 		        	contentType: 'application/json',
 		        	data: JSON.stringify({
@@ -538,7 +538,7 @@
 		    
 		    if (confirm("대댓글을 삭제하시겠습니까?")) {
 		        $.ajax({
-		        	url: '/comment/removeReply/' + replyId,
+		        	url: '/comment/api/removeReply/' + replyId,
 		        	type: 'post',
 		        	success: function(response){
 		        		alert('댓글이 삭제되었습니다.');
@@ -557,6 +557,13 @@
 <body>
 
 	<div layout:fragment="content">
+		<div th:if="${session.memberId == null}">
+			<script type="text/javascript">
+				alert('로그인 후 이용 가능합니다.');
+		        window.location.href = '/member/login'; // 로그인 페이지 URL로 변경
+		    </script>
+		</div>
+		<div th:unless="${session.memberId == null}">
 		<div class="community-background">
 			<div class="section">
 				<div class="container">
@@ -588,6 +595,10 @@
 								작성자: <span th:text="${memberNm}"></span>&nbsp; | &nbsp;작성일: <span
 									th:text="${#dates.format(community.createDt, 'yyyy-MM-dd')}"></span>
 							</p>
+						</div>
+						<div class="thumbnail">
+							<img th:src="${community['communityThumbnailUUID'] != null ? '/uploads/' + community['communityThumbnailUUID'] : '/bootstrap/images/community_basic.jpg'}"
+	                                 style="width: 100%; height:300px; object-fit: cover;" alt="Thumbnail" class="img-fluid">
 						</div>
 
 						<div class="community-content noto-serif-kr">
@@ -665,6 +676,7 @@
 					</div>
 				</div>
 			</div>
+		</div>
 		</div>
 	</div>
 

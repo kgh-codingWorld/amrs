@@ -12,5 +12,6 @@ public interface PaymentDAO {
 	public Integer selectTotalTicketCnt(String localId);
 	public Integer selectRestTicketCnt(String localId);
 	public List<Map<String, Object>> selectPaymentList(String memberId);
-	public PaymentDTO selectPaymentInfo(String memberId);
+	public PaymentDTO selectPaymentDetail(int paymentId);
+	
 }

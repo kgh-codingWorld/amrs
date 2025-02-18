@@ -309,15 +309,19 @@
             const orderCnt = $("input[name='orderCnt']").val();
             const exhibitionTitle = $(".exhibition-title").text();
 
-            console.log(localId);
-            console.log(memberId);
-            console.log(reservDate);
-            console.log(orderCnt);
-            
             if (!localId || !memberId || !reservDate || !orderCnt) {
                 alert("모든 정보를 입력해 주세요.");
                 return;
             }
+            
+            var restCnt = parseInt(document.getElementById("ticketCount").textContent.trim(), 10);
+            console.log('orderCnt', orderCnt);
+            console.log('restCnt', restCnt);
+            
+            if(orderCnt > restCnt) {
+            	alert("해당 매수로 예매가 불가능합니다(잔여티켓 수 확인).");
+            	return;
+            } 
 
             const totalPrice = orderCnt * pricePerTicket;
             $("input[name='price']").val(totalPrice);
@@ -340,17 +344,20 @@
         // 모달 닫기 버튼
         closeModal.onclick = function() {
             closeModalModal();
+            return;
         };
 
         // 취소 버튼 클릭 시 모달 닫기
         cancelPaymentButton.onclick = function() {
             closeModalModal();
+            return;
         };
 
         // 모달 외부를 클릭하면 모달 닫기
         window.onclick = function(event) {
             if (event.target == modal) {
                 closeModalModal();
+                return;
             }
         };
 
@@ -475,6 +482,18 @@
                 hiddenPriceInput.value = totalPrice;  // hidden price 필드에 총 가격 설정
             });
         });
+        
+                document.addEventListener("DOMContentLoaded", function () {
+                    const paymentButton = document.querySelector("#payment");
+                    const restTicketCount = parseInt(document.querySelector("#ticketCount").textContent.trim(), 10);
+
+                    if (restTicketCount <= 0) {
+                        paymentButton.style.backgroundColor = "#ccc";
+                        paymentButton.style.cursor = "not-allowed";
+                        paymentButton.disabled = true;
+                    }
+                });
+
 
     });
 
@@ -519,32 +538,49 @@
             <div class="date-selection noto-serif-kr">
             </div>
             
-            <label for="ticketCount">잔여티켓</label>
-            <span id="ticketCount" th:text="${restCnt}"></span>
+            <p th:if="${restCnt == null or restCnt == 0}" style="color: red; font-weight: bold;">
+				해당 전시는 매진되었습니다.            
+            </p>
+            <p th:if="${isExpired}" style="color: red; font-weight: bold;">
+				전시 기간이 마감되었습니다.            
+            </p>
             
-            <label for="orderCnt">매수</label>
-            <input type="number" name="orderCnt" min="1">
-            
-            <span id="priceDisplay" style="color: red; font: bold">10,000원</span>
-	            <input type="date" name="reservDate" style="display:none;"/>
-	            <input type="hidden" name="localId" th:value="${exhibitionDetail != null ? exhibitionDetail.localId : ''}" />
-	            <input type="hidden" name="memberId" th:value="${memberDTO.memberId}"/>
-	            <input type="hidden" name="memberNm" th:value="${memberDTO.memberNm}"/>
-	            <input type="hidden" name="totalCnt" th:value="${totalCnt}">
-	            <input type="hidden" name="price" value="10000">
-	       		<button type="submit" class="btn me-2 noto-serif-kr" style="height: 3rem; width: 23rem; margin-top: 25px" id="payment">결제하기</button>
+            <div th:if="${not (isExpired or (restCnt == null or restCnt == 0))}">
+	            <p style="display: ruby;">
+		            <label for="ticketCount">잔여티켓</label>
+		            <span id="ticketCount" th:text="${restCnt}">매</span>
+	            </p>
+	            
+	            <label for="orderCnt">매수</label>
+	            <input type="number" name="orderCnt" min="1" max="20"
+	            	   class="input-box"
+	            	   style="width: 100%; padding: 10px; font-size: 1rem; margin-bottom: 10px;">
+	            
+	            <span id="priceDisplay" style="color: red; font: bold">10,000원</span>
+	            
+		            <input type="date" name="reservDate" style="display:none;"/>
+		            <input type="hidden" name="localId" th:value="${exhibitionDetail != null ? exhibitionDetail.localId : ''}" />
+		            <input type="hidden" name="memberId" th:value="${memberDTO.memberId}"/>
+		            <input type="hidden" name="memberNm" th:value="${memberDTO.memberNm}"/>
+		            <input type="hidden" name="totalCnt" th:value="${totalCnt}">
+		            <input type="hidden" name="price" value="10000">
+		            
+		       		<button type="submit" class="btn me-2 noto-serif-kr"
+		       		 		style="height: 3rem; width: 23rem; margin-top: 25px" 
+		       		 		id="payment">결제하기</button>
+        	</div>
         </div>
     </div>
     <!-- 결제 확인 모달 -->
 	<div id="paymentModal" class="modal">
-	    <div class="modal-content">
+	    <div class="modal-content noto-serif-kr">
 	        <span class="close" style="text-align:right; margin-right: 15px; color: #fff;">&times;</span>
-	        <h2 class="noto-serif-kr" style="text-align: center; color: #fff;">결제 정보</h2>
-	        <p><strong>결제자 이름:</strong> <span id="modalUserName"></span></p>
-	        <p><strong>전시 제목:</strong> <span id="modalExhibitionTitle"></span></p>
-	        <p><strong>예매 날짜:</strong> <span id="modalReservDate"></span></p>
-	        <p><strong>티켓 수:</strong> <span id="modalTicketCount"></span></p>
-	        <p><strong>총 가격:</strong> <span id="modalTotalPrice"></span>원</p>
+	        <h2 style="text-align: center; color: black;">결제 정보</h2>
+	        <p><strong>결제자 이름</strong> <span id="modalUserName"></span></p>
+	        <p><strong>전시 제목</strong> <span id="modalExhibitionTitle"></span></p>
+	        <p><strong>예매 날짜</strong> <span id="modalReservDate"></span></p>
+	        <p><strong>티켓 수</strong> <span id="modalTicketCount"></span></p>
+	        <p><strong>총 가격</strong> <span id="modalTotalPrice"></span>원</p>
 	        <div class="button-container">
 		        <button id="confirmPayment">예매하기</button>
 		        <button id="cancelPayment">취소</button>

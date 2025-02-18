@@ -30,7 +30,4 @@ public class MemberDTO {
 	private Date createDt;
 	private Date updateDt;
 	
-	private String followings;
-	private String followers;
-	
 }

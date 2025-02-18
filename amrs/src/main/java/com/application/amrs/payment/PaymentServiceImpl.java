@@ -13,8 +13,9 @@ public class PaymentServiceImpl implements PaymentService{
 	private PaymentDAO paymentDAO;
 
 	@Override
-	public void registerPayment(PaymentDTO paymentDTO) {
+	public int registerPayment(PaymentDTO paymentDTO) {
 		paymentDAO.insertPayment(paymentDTO);
+		return paymentDTO.getPaymentId();
 	}
 
 
@@ -45,10 +46,11 @@ public class PaymentServiceImpl implements PaymentService{
 		return paymentDAO.selectPaymentList(memberId);
 	}
 
-//	@Override
-//	public PaymentDTO getPaymentInfo(String memberId) {
-//		return paymentDAO.selectPaymentInfo(memberId);
-//	}
+
+	@Override
+	public PaymentDTO getPaymentDetail(int paymentId) {
+		return paymentDAO.selectPaymentDetail(paymentId);
+	}
 
 
 

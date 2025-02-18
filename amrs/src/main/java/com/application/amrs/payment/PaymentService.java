@@ -5,9 +5,9 @@ import java.util.Map;
 
 public interface PaymentService {
 
-	public void registerPayment(PaymentDTO paymentDTO);
-	public int getTotalTicketCount(String localId);
-	public int getTicketRestCnt(String localId);
+	public int registerPayment(PaymentDTO paymentDTO);
+	public int getTotalTicketCount(String paymentId);
+	public int getTicketRestCnt(String paymentId);
 	public List<Map<String, Object>> getPaymentList(String memberId);
-	//public PaymentDTO getPaymentInfo(String memberId);
+	public PaymentDTO getPaymentDetail(int paymentId);
 }
