@@ -20,10 +20,16 @@
             C.COMMUNITY_THUMBNAIL_UUID 	AS COMMUNITY_THUMBNAIL_UUID,
             C.READ_CNT 					AS READ_CNT, 
             C.CREATE_DT 				AS CREATE_DT,
-            M.MEMBER_ID 				AS MEMBER_ID
+            M.MEMBER_ID 				AS MEMBER_ID,
+            M.MEMBER_NM					AS MEMBER_NM
     FROM    COMMUNITY C
     JOIN    MEMBER M ON C.MEMBER_ID = M.MEMBER_ID
     ORDER   BY C.CREATE_DT DESC
+    <choose>
+    	<when test="limit != null and limit > 0">
+	    	LIMIT #{limit}
+    	</when>
+    </choose>
 </select>
 
 <select id="selectCommunityById" resultMap="communityMap" parameterType="int">
@@ -61,17 +67,24 @@
 </insert>
 
 <update id="updateCommunity" parameterType="CommunityDTO">
-	UPDATE COMMUNITY
-	<set>
-		<if test="communityTitle != null and communityTitle != ''">
-			COMMUNITY_TITLE = #{communityTitle},
-		</if>
-		<if test="communityContent != null and communityContent != ''">
-			COMMUNITY_CONTENT = #{communityContent}
-		</if> 
-	</set>
-	WHERE COMMUNITY_ID = #{communityId}
+    UPDATE COMMUNITY
+    <set>
+        <if test="communityTitle != null and communityTitle != ''">
+            COMMUNITY_TITLE = #{communityTitle},
+        </if>
+        <if test="communityContent != null and communityContent != ''">
+            COMMUNITY_CONTENT = #{communityContent},
+        </if>
+        <if test="communityOriginalThumbnailName != null and communityOriginalThumbnailName != ''">
+            COMMUNITY_ORIGINAL_THUMBNAIL_NAME = #{communityOriginalThumbnailName},
+        </if>
+        <if test="communityThumbnailUUID != null and communityThumbnailUUID != ''">
+            COMMUNITY_THUMBNAIL_UUID = #{communityThumbnailUUID},
+        </if>
+    </set>
+    WHERE COMMUNITY_ID = #{communityId}
 </update>
+
 
 <delete id="deleteCommunity" parameterType="int">
 	DELETE 	FROM COMMUNITY
@@ -151,4 +164,5 @@
     WHERE COMMUNITY_ID = #{communityId}
     AND LIKED = TRUE
 </select>
+
 </mapper>

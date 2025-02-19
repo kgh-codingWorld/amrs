@@ -55,7 +55,7 @@ public class CommonController {
 		stopWatch.start("load main");
 		
 		model.addAttribute("exhibitionList", exhibitionService.getRandomExhibitions(3));
-		model.addAttribute("communityList", communityService.getRecentCommunityList(3));
+		model.addAttribute("communityList", communityService.getCommunityList(3));
 		stopWatch.stop();
 		System.out.println("실행 시간: " + stopWatch.getTotalTimeMillis() + " ms");
 		
@@ -222,7 +222,7 @@ public class CommonController {
 	// 커뮤니티 메인 페이지로 이동
 	@GetMapping("/community/communityMain")
     public String getCommunityList(Model model) {
-        model.addAttribute("communityList", communityService.getCommunityList());
+        model.addAttribute("communityList", communityService.getCommunityList(null));
         return "community/communityMain"; 
     }
 

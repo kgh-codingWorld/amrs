@@ -173,12 +173,17 @@ public class ExhibitionService {
 
             String title = item.optString("TITLE", "제목 없음");
             String imageUrl = item.optString("IMAGE_OBJECT", "/bootstrap/images/img-grid-3.jpg");
+            String description = item.optString("DESCRIPTION", "");
             String period = item.optString("PERIOD", " ");
-
+            String eventPeriod = item.optString("EVENT_PERIOD", "");
+            String cntcInsttNm = item.optString("CNTCINSTTNM", "");
+            String charge = item.optString("CHARGE", "");
+            String spatialCoverage = item.optString("SPATIAL_COVERAGE", "");
+            String contactPoint= item.optString("CONTACT_POINT", "");
             ExhibitionStatus status = determineExhibitionStatus(period);
             boolean isExpired = (status == ExhibitionStatus.EXPIRED);
 
-            exhibitionList.add(new ExhibitionItem(localId, title, imageUrl, isExpired));
+            exhibitionList.add(new ExhibitionItem(localId, title, imageUrl, description, period, eventPeriod, cntcInsttNm, charge, spatialCoverage, contactPoint, isExpired));
         }
         return exhibitionList;
     }

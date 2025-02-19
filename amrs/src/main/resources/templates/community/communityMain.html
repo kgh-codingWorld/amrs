@@ -39,7 +39,9 @@
                     <!-- 왼쪽 정렬된 글쓰기 및 설정 버튼 -->
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
+                        <th:block th:if="${session.memberId != null}">
                             <a th:href="@{/community/registerCommunity}" class="btn btn-secondary me-2 noto-serif-kr">→ 글쓰기</a>
+                        </th:block>
                             <a th:href="@{/community/myCommunityPostList}" class="btn btn-white-outline noto-serif-kr me-2">My Talk</a>
                         </div>
 

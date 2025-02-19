@@ -6,8 +6,8 @@ import java.util.Map;
 public interface CommunityService {
 
 	public void registerCommunity(CommunityDTO communityDTO);
-	public List<Map<String, Object>> getCommunityList();
-	public List<Map<String, Object>> getRecentCommunityList(int count);
+	public List<Map<String, Object>> getCommunityList(Integer limit);
+//	public List<Map<String, Object>> getRecentCommunityList(int count);
 	public Map<String, Object> getCommunityById(int communityId, boolean isIncreaseReadCnt);
 	public void likePost(int communityId, int likeCount);
 	public boolean hasMemberLikedPost(String memberId, int communityId);

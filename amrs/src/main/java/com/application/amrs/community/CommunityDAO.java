@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 @Mapper
 public interface CommunityDAO {
 
-	public List<Map<String, Object>> selectCommunityList();						// 게시글 전체조회
+	public List<Map<String, Object>> selectCommunityList(Integer limit);						// 게시글 전체조회
 	public Map<String, Object> selectCommunityById(int communityId);				// 게시글 상세조회
 	public void insertCommunity(CommunityDTO communityDTO);								// 게시글 등록
 	public void updateCommunity(CommunityDTO communityDTO);								// 게시글 수정

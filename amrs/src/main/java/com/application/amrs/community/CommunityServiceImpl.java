@@ -22,8 +22,8 @@ public class CommunityServiceImpl implements CommunityService {
 	private MemberService memberService;
 
 	@Override
-	public List<Map<String, Object>> getCommunityList() {
-		return processCommunityList(communityDAO.selectCommunityList());
+	public List<Map<String, Object>> getCommunityList(Integer limit) {
+		return processCommunityList(communityDAO.selectCommunityList(limit));
 	}
 	
 	@Override
@@ -81,15 +81,15 @@ public class CommunityServiceImpl implements CommunityService {
 		return processCommunityList(communityDAO.selectMyCommunityList(memberId), memberId);
 	}
 
-	@Override
-	public List<Map<String, Object>> getRecentCommunityList(int count) {
-		List<Map<String, Object>> allCommunityList = getCommunityList();
-		if(allCommunityList.isEmpty()) {
-    		return Collections.emptyList();
-    	}
-    	Collections.shuffle(allCommunityList);
-    	return allCommunityList.subList(0, Math.min(count, allCommunityList.size()));
-	}
+//	@Override
+//	public List<Map<String, Object>> getRecentCommunityList(int count) {
+//		List<Map<String, Object>> allCommunityList = getCommunityList();
+//		if(allCommunityList.isEmpty()) {
+//    		return Collections.emptyList();
+//    	}
+//    	Collections.shuffle(allCommunityList);
+//    	return allCommunityList.subList(0, Math.min(count, allCommunityList.size()));
+//	}
 	
 	private List<Map<String, Object>> processCommunityList(List<Map<String, Object>> communityList) {
         communityList.forEach(this::maskMemberName);
@@ -124,4 +124,5 @@ public class CommunityServiceImpl implements CommunityService {
         params.put("communityId", communityId);
         return params;
     }
+
 }
