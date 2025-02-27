@@ -4,9 +4,12 @@ import java.util.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.Data;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PaymentDTO {
 	
 	private int paymentId;
@@ -21,4 +24,6 @@ public class PaymentDTO {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date reservDate;
 	private Date createDt;
+	
+	private boolean hasReview;
 }

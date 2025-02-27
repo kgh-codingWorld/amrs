@@ -10,6 +10,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>전시상세</title>
     <style>
+    	.noto-serif-kr{
+    		font-family: "Noto Serif KR", serif;
+	  	font-optical-sizing: auto;
+		font-weight: weight;
+		font-style: normal;
+    	}
         .exhibition-container {
 		    display: flex;
 		    max-width: 1000px;
@@ -483,19 +489,55 @@
             });
         });
         
-                document.addEventListener("DOMContentLoaded", function () {
-                    const paymentButton = document.querySelector("#payment");
-                    const restTicketCount = parseInt(document.querySelector("#ticketCount").textContent.trim(), 10);
+        document.addEventListener("DOMContentLoaded", function () {
+            const paymentButton = document.querySelector("#payment");
+            const restTicketCount = parseInt(document.querySelector("#ticketCount").textContent.trim(), 10);
 
-                    if (restTicketCount <= 0) {
-                        paymentButton.style.backgroundColor = "#ccc";
-                        paymentButton.style.cursor = "not-allowed";
-                        paymentButton.disabled = true;
-                    }
-                });
+            if (restTicketCount <= 0) {
+                paymentButton.style.backgroundColor = "#ccc";
+                paymentButton.style.cursor = "not-allowed";
+                paymentButton.disabled = true;
+            }
+        });
 
-
+        $("#cart").off("click").on("click", function(e) {
+        	e.preventDefault();
+        	registerCart();
+        });
+        
+	    function registerCart() {
+	    	const reservDate = $("input[name='reservDate']").val();
+	        const localId = $("input[name='localId']").val();
+	        const memberId = $("input[name='memberId']").val();
+	        const totalCnt = $("input[name='totalCnt']").val();
+	        const orderCnt = $("input[name='orderCnt']").val();
+	        const totalPrice = orderCnt * pricePerTicket;
+	        const exhibitionTitle = $("input[name='exhibitionTitle']").val();
+	        const exhibitionImage = $("input[name='exhibitionImage']").val();
+	        
+	        $.ajax({
+	        	url: "/cart/api/registerCart",
+	        	type: "post",
+	        	contentType: 'application/json',
+	        	data: JSON.stringify({
+	        		"memberId" : memberId, 
+	        		"localId" : localId, 
+	        		"reservDate" : reservDate, 
+	        		"orderCnt" : orderCnt, 
+	        		"totalPrice" : totalPrice, 
+	        		"exhibitionTitle" : exhibitionTitle, 
+	        		"exhibitionImage" : exhibitionImage}),
+        		success : function(response){
+        			alert("장바구니에 추가되었습니다. 장바구니로 이동하시겠습니까?");
+        			location.href="/member/cartMain";
+        		}, error(xhr, status, error){
+        			console.error(error);
+        		}
+	        	
+	        })
+	    }
     });
+    
 
     </script>
 </head>
@@ -523,8 +565,8 @@
 			<hr/>
             <!-- Description -->
             <div class="exhibition-description noto-serif-kr" th:utext="${item.description}"></div>
-			<input type="text" name="exhibitionTitle" th:value="${item.title}">        
-			<input type="text" name="exhibitionImage" th:value="${item.imageUrl}">        
+			<input type="hidden" name="exhibitionTitle" th:value="${item.title}">        
+			<input type="hidden" name="exhibitionImage" th:value="${item.imageUrl}">        
         </div>
 
         <!-- Right Column: Calendar and Booking Information -->
@@ -554,7 +596,7 @@
 	            <label for="orderCnt">매수</label>
 	            <input type="number" name="orderCnt" min="1" max="20"
 	            	   class="input-box"
-	            	   style="width: 100%; padding: 10px; font-size: 1rem; margin-bottom: 10px;">
+	            	   style="width: 95%; padding: 10px; font-size: 1rem; margin-bottom: 10px;">
 	            
 	            <span id="priceDisplay" style="color: red; font: bold">10,000원</span>
 	            
@@ -565,9 +607,15 @@
 		            <input type="hidden" name="totalCnt" th:value="${totalCnt}">
 		            <input type="hidden" name="price" value="10000">
 		            
-		       		<button type="submit" class="btn me-2 noto-serif-kr"
-		       		 		style="height: 3rem; width: 23rem; margin-top: 25px" 
-		       		 		id="payment">결제하기</button>
+		            <div class="button-group" style="display: flex; justify-content: space-between;">
+			       		<button type="submit" class="btn me-2 noto-serif-kr"
+			       		 		style="height: 3rem; width: 11rem; margin-top: 25px" 
+			       		 		id="payment">결제하기</button>
+	       		 		<button type="button" class="btn me-2 noto-serif-kr"
+	       		 				style="background-color: mediumpurple; width: 11rem; height: 3rem; margin-top: 25px;"
+	       		 				onclick="registerCart()"
+	       		 				id="cart">장바구니 추가</button>
+       		 		</div>
         	</div>
         </div>
     </div>

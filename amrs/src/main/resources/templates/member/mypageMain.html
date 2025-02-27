@@ -296,6 +296,12 @@ tbody tr:last-child td {
 						<div class="payment-date">
 							<span th:text="|${#dates.format(payment.createDt, 'yyyy-MM-dd')}에 결제함|"></span>
 							<input type="hidden" name="paymentId" th:value="${payment.paymentId}">
+							<a th:if="${payment.hasReview}" 
+						   th:href="@{/review/reviewDetail/{paymentId}/{reviewId}(paymentId=${payment.paymentId}, reviewId=${payment.reviewId})}"
+						   class="btn btn-primary">리뷰조회</a>
+							<a th:unless="${payment.hasReview}" 
+                   			th:href="@{/review/registerReview/{paymentId}(paymentId=${payment.paymentId})}"
+                   			class="btn btn-success">리뷰작성</a>	
 						</div>
 						<div class="feature-same-date-ordered">
 						<a th:href="@{/exhibition/exhibitionDetail/{localId}(localId=${payment.localId})}">
@@ -328,7 +334,7 @@ tbody tr:last-child td {
 							</div> -->
 							<!-- 팝업 창 -->
 						</div>
-						</div>
+					</div>
 				</div>
 			</div>
 		</div>

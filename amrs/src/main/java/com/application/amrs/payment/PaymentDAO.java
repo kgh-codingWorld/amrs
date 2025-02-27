@@ -10,7 +10,7 @@ public interface PaymentDAO {
 
 	public void insertPayment(PaymentDTO paymentDTO);
 	public Integer selectTotalTicketCnt(String localId);
-	public Integer selectRestTicketCnt(String localId);
+	public Integer selectRestTicketCnt(String paymentId);
 	public List<Map<String, Object>> selectPaymentList(String memberId);
 	public PaymentDTO selectPaymentDetail(int paymentId);
 	

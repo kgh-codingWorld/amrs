@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.application.amrs.review.ReviewDAO">
+	
+	<resultMap id="reviewMap" type="map">
+		<result column="REVIEW_ID" 			property="reviewId"/>
+		<result column="REVIEW_CONTENT" 		property="reviewContent"/>
+		<result column="PAYMENT_ID" 		property="paymentId"/>
+		<result column="MEMBER_ID" 			property="memberId"/>
+		<result column="CREATE_DT" 			property="createDt"/>
+		<result column="UPDATE_DT" 			property="updateDt"/>
+	</resultMap>
+
+	<select id="findReviewIdByPaymentId" resultType="java.lang.Integer">
+		SELECT 	REVIEW_ID
+		FROM	REVIEW
+		WHERE	PAYMENT_ID = #{paymentId} LIMIT 1
+	</select>
+
+	<insert id="insertReview" parameterType="map">
+		INSERT INTO REVIEW (
+			REVIEW_CONTENT,
+			PAYMENT_ID,
+			MEMBER_ID,
+			CREATE_DT
+		) VALUES (
+			#{reviewContent},
+			#{paymentId},
+			#{memberId},
+			NOW()
+		)
+	</insert>
+	
+	<select id="selectReviewDetail" resultType="ReviewDTO" parameterType="map">
+		SELECT REVIEW_ID, REVIEW_CONTENT
+		FROM REVIEW
+		WHERE PAYMENT_ID = #{paymentId}
+		AND REVIEW_ID = #{reviewId}
+	</select>
+	
+	<update id="updateReview" parameterType="ReviewDTO">
+		UPDATE 	REVIEW
+		SET		REVIEW_CONTENT = #{reviewContent},
+				UPDATE_DT = CURRENT_TIMESTAMP
+		WHERE	REVIEW_ID = #{reviewId}
+	</update>
+	<delete id="deleteReview" parameterType="int">
+		DELETE FROM REVIEW
+		WHERE REVIEW_ID = #{reviewId}
+	</delete>
+</mapper>

@@ -728,6 +728,13 @@ textarea {
 	font-style: normal;
 }
 
+.review-background{
+	background: url("/bootstrap/images/main7.jpg") no-repeat fixed center center;
+	background-size: cover;
+	background-color: rgba(0, 0, 0, 1.0);
+	position: relative;
+}
+
 .hero {
 	background: url("/bootstrap/images/main4.jpg") no-repeat fixed center center;
 	background-size: cover;

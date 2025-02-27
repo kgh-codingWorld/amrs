@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.application.amrs.cart.CartDAO">
+
+<resultMap id="cartMap" type="hashmap" >
+	<result column="CART_ID"  	   			property="cartId"/>
+	<result column="LOCAL_ID"  	   			property="localId"/>
+	<result column="MEMBER_ID" 	   			property="memberId"/>
+	<result column="EXHIBITION_TITLE" 	   	property="exhibitionTitle"/>
+	<result column="EXHIBITION_IMAGE" 	   	property="exhibitionImage"/>
+	<result column="ORDER_CNT" 	   			property="orderCnt"/>
+	<result column="RESERV_DATE" 	   		property="reservDate"/>
+	<result column="CREATE_DT" 	   			property="createDt"/>
+	<result column="UPDATE_DT"       		property="updateDt"/>
+</resultMap>
+
+<select id="selectCartList" resultMap="cartMap">
+    SELECT  C.CART_ID 				AS CART_ID,
+    		C.LOCAL_ID				AS LOCAL_ID,
+            C.EXHIBITION_TITLE 		AS EXHIBITION_TITLE,
+            C.EXHIBITION_IMAGE 		AS EXHIBITION_IMAGE,
+            C.ORDER_CNT 			AS ORDER_CNT,
+            C.RESERV_DATE 			AS RESERV_DATE,
+            C.CREATE_DT 			AS CREATE_DT,
+            M.MEMBER_ID 			AS MEMBER_ID
+    FROM    CART C
+    JOIN    MEMBER M ON C.MEMBER_ID = M.MEMBER_ID
+    ORDER   BY C.CREATE_DT DESC
+</select>
+
+<insert id="insertCart" parameterType="CartDTO">
+	INSERT INTO CART (
+		LOCAL_ID,
+		EXHIBITION_TITLE,
+		EXHIBITION_IMAGE,
+		ORDER_CNT,
+		RESERV_DATE,
+		MEMBER_ID
+	)
+	VALUES (
+		#{localId},
+		#{exhibitionTitle},
+		#{exhibitionImage},
+		#{orderCnt},
+		#{reservDate},
+		#{memberId}
+	)
+</insert>
+
+</mapper>

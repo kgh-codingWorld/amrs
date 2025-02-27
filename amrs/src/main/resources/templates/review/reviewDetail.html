@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>리뷰 상세 및 수정</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .review-container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .review-left {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .review-left img {
+            width: 100%;
+            max-width: 200px;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .review-right {
+            flex: 2;
+            min-width: 300px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        textarea {
+            height: 120px;
+            resize: none;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            width: 48%;
+        }
+
+        .btn-edit {
+            background-color: #007bff;
+        }
+        .btn-edit:hover {
+            background-color: #0056b3;
+        }
+        .btn-save {
+            background-color: #28a745;
+        }
+        .btn-save:hover {
+            background-color: #218838;
+        }
+        .btn-cancel {
+            background-color: #dc3545;
+        }
+        .btn-cancel:hover {
+            background-color: #c82333;
+        }
+        .btn-remove {
+            background-color: #ff6347;
+        }
+        .btn-remove:hover {
+            background-color: #d32f2f;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function enableEditing() {
+            document.getElementById("reviewContent").removeAttribute("readonly");
+            document.getElementById("saveBtn").style.display = "inline-block";
+            document.getElementById("cancelBtn").style.display = "inline-block";
+            document.getElementById("editBtn").style.display = "none";
+        }
+
+        function cancelEditing() {
+            document.getElementById("reviewContent").setAttribute("readonly", "true");
+            document.getElementById("saveBtn").style.display = "none";
+            document.getElementById("cancelBtn").style.display = "none";
+            document.getElementById("editBtn").style.display = "inline-block";
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("passwordModal").style.display = "none";
+        });
+        
+        function showPasswordModal() {
+            document.getElementById("passwordModal").style.display = "flex";
+        }
+
+        function closePasswordModal() {
+            document.getElementById("passwordModal").style.display = "none";
+        }
+
+        function verifyPasswordAndDelete() {
+            const passwd = document.getElementById("passwd").value;
+            const reviewId = document.querySelector("input[name='reviewId']").value;
+            const memberId = document.querySelector("input[name='memberId']").value;
+            
+            console.log("PASSWD: " + passwd);
+            
+            $.ajax({
+            	url: "/member/api/isValidPasswd",
+            	type: "post",
+            	data: {"passwd": passwd, "memberId": memberId},
+            	contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+            	success: function(isValid) {
+            		if(isValid) {
+            			$.ajax({
+            				url: "/review/api/removeReview",
+            				type: "post",
+            				data: {"reviewId": reviewId},
+            				success: function(response){
+            					console.log(response);
+            					alert("리뷰가 삭제되었습니다.");
+            					location.href = "/member/mypageMain";
+            				}
+            			})
+            		} else {
+            			alert("비밀번호가 틀렸습니다.");
+            		}
+            	}, error: function(xhr, status, error) {
+            		console.error(error);
+            	}
+            	
+            });
+        }
+    </script>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="wrapper review-background">
+        <div class="review-container">
+            <div class="review-left">
+                <img th:src="${payment.exhibitionImage}" alt="전시 포스터">
+                <h3 class="noto-serif-kr" th:text="${payment.exhibitionTitle}"></h3>
+            </div>
+
+            <div class="review-right">
+                <h2 class="noto-serif-kr">리뷰 상세</h2>
+                <form th:action="@{/review/modifyReview}" method="post">
+                    <input type="hidden" name="reviewId" th:value="${review.reviewId}" />
+                    <input type="hidden" name="memberId" th:value="${session.memberId}" />
+                    <input type="hidden" name="paymentId" th:value="${payment.paymentId}" />
+
+                    <label for="reviewContent">리뷰 내용</label>
+                    <textarea id="reviewContent" name="reviewContent" readonly th:text="${review.reviewContent}"></textarea>
+
+                    <div class="button-group">
+                        <button type="button" id="editBtn" class="btn btn-edit noto-serif-kr" onclick="enableEditing()">수정</button>
+                        <button type="submit" id="saveBtn" class="btn btn-save noto-serif-kr" style="display:none; width:7rem;">저장</button>
+                        <button type="button" id="cancelBtn" class="btn btn-cancel noto-serif-kr" style="display:none; width:7rem;" onclick="cancelEditing()">취소</button>
+                        <button type="button" id="removeBtn" class="btn btn-remove noto-serif-kr" onclick="showPasswordModal()">삭제</button>
+                        <button type="button" class="btn btn-cancel noto-serif-kr" th:onclick="|location.href='@{/member/mypageMain}'|">뒤로 가기</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+	<div id="passwordModal" class="modal">
+    <div class="modal-content" style="width: 22rem; height: 15rem;">
+        <h3 class="noto-serif-kr" style="margin-top: 1rem;">비밀번호 입력</h3>
+        <input type="password" name="passwd" id="passwd" style="margin-top: 2rem; border-radius: 5px; border-color: lightgray; border-style: dashed;">
+        <div class="button-group" style="margin-top: 2rem;">
+            <button type="button" class="btn btn-remove noto-serif-kr" onclick="verifyPasswordAndDelete()">확인</button>
+            <button type="button" class="btn btn-cancel noto-serif-kr" onclick="closePasswordModal()">취소</button>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+</html>

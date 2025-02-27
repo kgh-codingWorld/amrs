@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>리뷰 작성</title>
+    <style>
+        body {
+		    font-family: 'Arial', sans-serif;
+		    background-color: #f8f9fa;
+		    margin: 0;
+		    padding: 0;
+		    align-items: center; /* 세로 중앙 정렬 */
+		    min-height: 100vh; /* 화면 전체 높이 기준 정렬 */
+		}
+		
+		.wrapper {
+		    display: flex;
+		    justify-content: center; /* 내부 요소 가로 정렬 */
+		    align-items: center; /* 내부 요소 세로 정렬 */
+		    width: 100%;
+		    min-height: 100vh;
+		}
+		
+		.review-container {
+		    background: #ffffff;
+		    padding: 30px;
+		    border-radius: 10px;
+		    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+		    width: 90%;
+		    max-width: 800px;
+		    display: flex;
+		    flex-wrap: wrap;
+		    gap: 20px;
+		    justify-content: center; /* 내부 요소 중앙 정렬 */
+		    align-items: center;
+		}
+		
+		/* 왼쪽 (전시 포스터 + 제목) */
+		.review-left {
+		    flex: 1;
+		    min-width: 200px;
+		    text-align: center;
+		}
+		
+		.review-left img {
+		    width: 100%;
+		    max-width: 200px;
+		    height: auto;
+		    border-radius: 10px;
+		}
+		
+		.review-left h3 {
+		    margin-top: 15px;
+		    font-size: 20px;
+		    color: #333;
+		}
+		
+		/* 오른쪽 (리뷰 입력 폼) */
+		.review-right {
+		    flex: 2;
+		    min-width: 300px;
+		}
+		
+		label {
+		    font-weight: bold;
+		    margin-bottom: 5px;
+		    display: block;
+		}
+		
+		input[type="text"], textarea, select, input[type="file"] {
+		    width: 100%;
+		    padding: 10px;
+		    font-size: 16px;
+		    border: 1px solid #ddd;
+		    border-radius: 5px;
+		    margin-bottom: 15px;
+		}
+		
+		textarea {
+		    height: 120px;
+		    resize: none;
+		}
+		
+		.button-group {
+		    display: flex;
+		    justify-content: space-between;
+		}
+		
+		.btn {
+		    padding: 10px 20px;
+		    font-size: 16px;
+		    color: white;
+		    border: none;
+		    border-radius: 5px;
+		    cursor: pointer;
+		    text-align: center;
+		    width: 48%;
+		}
+		
+		.btn-submit {
+		    background-color: #28a745;
+		}
+		
+		.btn-submit:hover {
+		    background-color: #218838;
+		}
+		
+		.btn-cancel {
+		    background-color: #dc3545;
+		}
+		
+		.btn-cancel:hover {
+		    background-color: #c82333;
+		}
+		
+		/* 모바일 반응형 */
+		@media (max-width: 600px) {
+		    .review-container {
+		        flex-direction: column;
+		        text-align: center;
+		    }
+		}
+
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="wrapper review-background">
+        <div class="review-container">
+            <!-- 왼쪽: 전시 포스터 + 전시 제목 -->
+            <div class="review-left">
+                <img th:src="${payment.exhibitionImage}" alt="전시 포스터">
+                <h3 class="noto-serif-kr" th:text="${payment.exhibitionTitle}"></h3>
+            </div>
+
+            <!-- 오른쪽: 리뷰 작성 폼 -->
+            <div class="review-right">
+                <h2 class="noto-serif-kr">리뷰 작성</h2>
+                <form th:action="@{/review/registerReview}" method="post">
+                    <input type="hidden" name="memberId" th:value="${session.memberId}" />
+                    <input type="hidden" name="paymentId" th:value="${payment.paymentId}" />
+
+                    <textarea id="reviewContent" name="reviewContent" required></textarea>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-submit noto-serif-kr">리뷰 작성</button>
+                        <button type="button" class="btn btn-cancel noto-serif-kr" th:onclick="|location.href='@{/member/mypageMain}'|">취소</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

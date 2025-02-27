@@ -1,5 +1,6 @@
 package com.application.amrs.common;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,14 +11,18 @@ import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import com.application.amrs.cart.CartService;
 import com.application.amrs.comment.CommentService;
 import com.application.amrs.community.CommunityService;
 import com.application.amrs.exhibition.ExhibitionService;
 import com.application.amrs.exhibition.ExhibitionService.ExhibitionItem;
 import com.application.amrs.member.MemberDTO;
 import com.application.amrs.member.MemberService;
+import com.application.amrs.payment.PaymentDTO;
 import com.application.amrs.payment.PaymentService;
 import com.application.amrs.replyComment.ReplyCommentService;
+import com.application.amrs.review.ReviewDTO;
+import com.application.amrs.review.ReviewService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -43,6 +48,11 @@ public class CommonController {
 	@Autowired
 	private PaymentService paymentService;
 	
+	@Autowired
+	private ReviewService reviewService;
+	
+	@Autowired
+	private CartService cartService;
 	/* 페이지 이동용 컨트롤러 */
 	// .
 	// .
@@ -104,7 +114,15 @@ public class CommonController {
 		stopWatch.start("load mypageMain");
 		
 		// 현재 로그인된 아이디로 payment 정보 호출
-		model.addAttribute("paymentList", paymentService.getPaymentList(memberId));
+		List<Map<String, Object>> paymentList = paymentService.getPaymentList(memberId);
+		for(Map<String, Object> payment : paymentList) {
+			int paymentId = (int) payment.get("paymentId");
+			Integer reviewId = reviewService.getReviewIdByPaymentId(paymentId);
+			payment.put("reviewId", reviewId);
+			payment.put("hasReview", reviewId != null);
+		}
+		
+		model.addAttribute("paymentList", paymentList);
 		
 		stopWatch.stop();
 		System.out.println("실행 시간: " + stopWatch.getTotalTimeMillis() + " ms");
@@ -203,7 +221,7 @@ public class CommonController {
 		stopWatch.stop();
         System.out.println("실행 시간: " + stopWatch.getTotalTimeMillis() + " ms");
         
-        	addExhibitionAttributes(model, memberId, localId, exhibitionItem);
+        addExhibitionAttributes(model, memberId, localId, exhibitionItem);
 		
 		return "exhibition/getExhibitionDetail";
 	}
@@ -215,6 +233,31 @@ public class CommonController {
 		model.addAttribute("memberDTO", memberService.getMemberDetail(memberId));
 		model.addAttribute("totalCnt", paymentService.getTotalTicketCount(localId));
 		model.addAttribute("restCnt", paymentService.getTicketRestCnt(localId));
+	}
+	
+	
+	/* 리뷰 관련 메서드 */
+	
+	@GetMapping("/review/registerReview/{paymentId}")
+	public String registerReview(@PathVariable("paymentId") int paymentId, HttpServletRequest request, Model model) {
+		String memberId = getSessionMemberId(request);
+		if(memberId == null) return "redirect:/member/login";
+		PaymentDTO payment = paymentService.getPaymentDetail(paymentId);
+		model.addAttribute("payment", payment);
+		return "review/registerReview";
+	}
+	
+	@GetMapping("/review/reviewDetail/{paymentId}/{reviewId}")
+	public String reviewDetail(@PathVariable("paymentId") int paymentId, @PathVariable("reviewId") int reviewId, HttpServletRequest request, Model model) {
+		String memberId = getSessionMemberId(request);
+		if(memberId == null) return "redirect:/member/login";
+		System.out.println("reviewIdData before getReviewDetail: " + reviewId);
+		ReviewDTO review = reviewService.getReviewDetail(paymentId, reviewId);
+		System.out.println("reviewData after getReviewDetail: " + review);
+		PaymentDTO payment = paymentService.getPaymentDetail(paymentId);
+		model.addAttribute("payment", payment);
+		model.addAttribute("review", review);
+		return "review/reviewDetail";
 	}
 
 	/* 커뮤니티 관련 메서드 */
@@ -311,8 +354,30 @@ public class CommonController {
 		return "community/myCommunityPostList";
 	}
 	
+	/* 장바구니 관련 메서드 */
 	@GetMapping("/member/cartMain")
-	public String cartMain() {
+	public String cartMain(HttpServletRequest request, Model model) {
+		String memberId = getSessionMemberId(request);
+		if(memberId == null) return "redirect:/member/login";
+		
+		List<Map<String, Object>> carts = cartService.getCartList();
+		
+		Map<String, Integer> restCntMap = new HashMap<>();
+	    Map<String, Integer> totalCntMap = new HashMap<>();
+		
+		for(Map<String, Object> cart : carts) {
+			String localId = cart.get("localId").toString();
+			// 중복 조회 방지
+	        if (!restCntMap.containsKey(localId)) {
+	            restCntMap.put(localId, paymentService.getTicketRestCnt(localId));
+	            totalCntMap.put(localId, paymentService.getTotalTicketCount(localId));
+	        }
+		}
+		
+		model.addAttribute("cartList", carts);
+	    model.addAttribute("restCntMap", restCntMap);  // localId별 잔여 티켓 수
+	    model.addAttribute("totalCntMap", totalCntMap); // localId별 전체 티켓 수
+	    model.addAttribute("memberNm", memberService.getMemberNameById(memberId));
 		return "member/cartMain";
 	}
 	

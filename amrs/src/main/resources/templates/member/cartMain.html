@@ -19,7 +19,315 @@
 		font-weight: weight;
 		font-style: normal;
 	}
+	.modal {
+	    display: none;
+	    position: fixed;
+	    top: 0;
+	    left: 0;
+	    width: 100%;
+	    height: 100%;
+	    background-color: rgba(0, 0, 0, 0.5);
+	    z-index: 1000;
+	    visibility: hidden;
+	    opacity: 0;
+	    transition: opacity 0.3s ease, bisibility 0.3s ease;
+	}
+
+	.modal-content {
+	    position: absolute;
+	    top: 50%;
+	    left: 50%;
+	    transform: translate(-50%, -50%);
+	    width: 90%;
+	    max-width: 600px;
+	    background-color: #e0e0e0;
+	    color: #1e1e1e;
+	    padding: 20px;
+	    border-radius: 15px;
+	    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+	}
+	
+	.modal-content h2 {
+	    text-align: center;
+	    color: #e0e0e0;
+	    font-size: 24px;
+	    margin-bottom: 15px;
+	}
+	
+	.modal-content p {
+	    margin: 15px 0;
+	    font-size: 16px;
+	    line-height: 1.6;
+	}
+	
+	.modal-content p strong {
+	    color: #3b5d50;
+	}
+	
+	.modal-content button {
+	    width: calc(50% - 10px);
+	    padding: 12px;
+	    background-color: #2f2f2f;
+	    color: #fff;
+	    border: none;
+	    border-radius: 8px;
+	    margin: 10px 5px 0;
+	    font-size: 16px;
+	    cursor: pointer;
+	    transition: background-color 0.3s;
+	}
+	
+	.modal-content button:hover {
+	    background-color: #005f8d;
+	}
+	
+	.modal-content .close {
+	    position: absolute;
+	    top: 15px;
+	    right: 20px;
+	    color: #e0e0e0;
+	    font-size: 20px;
+	    cursor: pointer;
+	    transition: color 0.3s;
+	}
+	
+	.modal-content .close:hover {
+	    color: #ff6b6b;
+	}
+	.modal-content .button-container {
+	    display: flex;
+	    justify-content: space-between;
+	    margin-top: 20px;
+	}
+	
+	.modal-content .button-container button {
+	    width: 48%; /* 버튼이 나란히 놓일 수 있도록 너비 조정 */
+	    padding: 12px;
+	    background-color: #2f2f2f;
+	    color: #fff;
+	    border: none;
+	    border-radius: 8px;
+	    font-size: 16px;
+	    cursor: pointer;
+	    transition: background-color 0.3s;
+	}
+	
+	.modal-content .button-container button:hover {
+	    background-color: #3b5d50;
+	}
 </style>
+<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+	$(document).ready(function(){
+		$(".increase").on("click", function() {
+			updateOrderCnt($(this));
+		});
+		$(".decrease").on("click", function () {
+			updateOrderCnt($(this), -1);
+		});
+		updateTotal();
+		updateTotalCnt();
+		
+		const pricePerTicket = 10000;
+        const modal = document.getElementById("paymentModal");
+        const closeModal = document.getElementsByClassName("close")[0];
+        const confirmPaymentButton = document.getElementById("confirmPayment");
+        const cancelPaymentButton = document.getElementById("cancelPayment");
+
+        modal.style.display = "none";
+        modal.style.visibility = "hidden";
+        modal.style.opacity = "0";
+        
+        // 결제 버튼 클릭 -> 모달 띄우기
+        $("#payment").on("click", function(e) {
+            e.preventDefault();
+            const exhibitions = updateModalInfo();
+            if (!exhibitions) return;
+
+            $("#paymentModal").css({ display: "block", visibility: "visible", opacity: "1" });
+        });
+
+        // 모달 닫기
+        $(".close, #cancelPayment").on("click", function() {
+            $("#paymentModal").css({ opacity: "0", visibility: "hidden" });
+            setTimeout(() => $("#paymentModal").css("display", "none"), 300);
+        });
+
+        // 결제 진행
+        $("#confirmPayment").on("click", function() {
+            const exhibitions = updateModalInfo();
+            if (!exhibitions) return;
+
+            const userEmail = $("input[name='memberId']").val();
+            const userName = $("input[name='memberNm']").val();
+            const totalPrice = parseInt($("#modalAllTotalPrice").text().replace(/,/g, "").replace("원", ""));
+            const totalCnt = parseInt($("#modalAllTotalCnt").text().replace(/,/g, "").replace("매", ""));
+            
+            kakaoPay(userEmail, userName, exhibitions, totalPrice, totalCnt);
+        });
+    });
+
+    function updateModalInfo() {
+        let exhibitions = [];
+        let totalOrderCnt = 0;
+        let totalPrice = 0;
+        const pricePerTicket = 10000;
+
+        $(".site-blocks-table").each(function () {
+            let exhibitionTitle = $(this).find(".product-name h2").text().trim();
+            let exhibitionImage = $(this).find(".product-thumbnail img").attr("src");
+            let reservDate = $(this).find("input[name='reservDate']").val();
+            let orderCnt = parseInt($(this).find("input[name='orderCnt']").val()) || 0;
+            let eachTotalPrice = orderCnt * pricePerTicket;
+			let localId = $("input[name='localId']").val();
+			let totalCnt = $("input[name='totalCnt']").val();
+			let restCnt = $("input[name='restCnt']").val();
+			
+			if(orderCnt > restCnt) {
+            	alert("해당 매수로 예매가 불가능합니다(잔여티켓 수 확인).");
+            	return;
+            }
+            
+            if (orderCnt > 0) {
+                exhibitions.push({
+                	exhibitionTitle: exhibitionTitle,
+                	exhibitionImage: exhibitionImage,
+                	reservDate: reservDate,
+                	orderCnt: orderCnt,
+                	eachTotalPrice: eachTotalPrice,
+                	localId: localId,
+                	totalCnt: totalCnt,
+                	restCnt: restCnt
+                });
+
+                totalOrderCnt += orderCnt;
+                totalPrice += eachTotalPrice;
+            }
+        });
+
+        if (exhibitions.length === 0) {
+            alert("장바구니가 비어 있습니다.");
+            return false;
+        }
+
+        let modalBody = $("#modalExhibitions");
+        modalBody.empty();
+
+        exhibitions.forEach(item => {
+            modalBody.append(`
+                <div>
+                    <img src="${item.exhibitionImage}" style="width: 100px;">
+                    <p><strong>전시:</strong> ${item.exhibitionTitle}</p>
+                    <p><strong>날짜:</strong> ${item.reservDate}</p>
+                    <p><strong>수량:</strong> ${item.orderCnt}매</p>
+                    <p><strong>가격:</strong> ${item.eachTotalPrice.toLocaleString()}원</p>
+                    <hr>
+                </div>
+            `);
+        });
+
+        $("#modalAllTotalCnt").text(totalOrderCnt.toLocaleString() + "매");
+        $("#modalAllTotalPrice").text(totalPrice.toLocaleString() + "원");
+        return exhibitions;
+    }
+
+    function kakaoPay(userEmail, userName, exhibitions, totalPrice, totalOrderCnt) {
+        IMP.init("imp20450427");
+        const merchantUid = `IMP_${new Date().getTime()}`;
+
+        IMP.request_pay({
+            pg: 'kakaopay.TC0ONETIME',
+            pay_method: 'card',
+            merchant_uid: merchantUid,
+            name: '전시 티켓 결제',
+            amount: totalPrice,
+            buyer_email: userEmail,
+            buyer_name: userName
+        }, function(rsp) {
+            if (rsp.success) {
+                fetch("/payment/api/verifyPayment", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ imp_uid: rsp.imp_uid })
+                })
+                .then(response => response.text())
+                .then(result => {
+                        exhibitions.forEach(item => {
+                            $.ajax({
+                                url: '/payment/api/doPayment',
+                                method: 'POST',
+                                contentType: 'application/json',
+                                data: JSON.stringify({
+                                    merchant_uid: rsp.merchant_uid,
+                                    amount: rsp.paid_amount,
+                                    reservDate: item.reservDate,
+                                    memberId: userEmail,
+                                    orderCnt: item.orderCnt,
+                                    price: item.eachTotalPrice,
+                                    exhibitionTitle: item.exhibitionTitle,
+                                    exhibitionImage: item.exhibitionImage,
+                                    localId: item.localId,
+                                    totalCnt: item.totalCnt,
+                                    restCnt: item.restCnt
+                                }),
+                                success: function(response) {
+                                    console.log("결제 저장 성공:", response);
+                                },
+                                error: function(err) {
+                                    console.error("결제 저장 실패:", err);
+                                }
+                            });
+                        });
+
+                        alert("결제가 완료되었습니다!");
+                        location.href = "/member/mypageMain";
+                })
+                .catch(error => {
+                    alert("결제 검증 중 오류 발생: " + error);
+                });
+            } else {
+                alert(`결제 실패: ${rsp.error_msg}`);
+            }
+        });
+    }
+
+	function updateOrderCnt(button) {
+		let row = button.closest("tr");
+		let orderCntInput = row.find(".quantity-amount");
+		let totalCell = row.find(".product-total");
+		let unitPrice = 10000; // 기본 단가
+
+		let orderCnt = parseInt(orderCntInput.val());
+		if (orderCnt < 1) orderCnt = 1;
+		orderCntInput.val(orderCnt);
+
+		totalCell.text((unitPrice * orderCnt).toLocaleString() + "원");
+		updateTotal();
+		updateTotalCnt();
+	}
+
+	function updateTotal() {
+		let total = 0;
+		$(".product-total").each(function () {
+			let priceText = $(this).text().replace("원", "").replace(/,/g, "").trim();
+			let price = parseInt(priceText) || 0;
+			
+			total += price;
+		});
+		$("#totalPrice").text(total.toLocaleString() + "원");
+	}
+	
+	function updateTotalCnt() {
+		let totalCnt = 0;
+		$(".quantity-amount").each(function () {
+			let cntText = $(this).val();
+			let cnt = parseInt(cntText) || 0;
+			totalCnt += cnt;
+		});
+		$("#totalCnt").text(totalCnt.toLocaleString() + "매");
+	}
+</script>
 </head>
 
 <body>
@@ -44,104 +352,77 @@
 		<div class="untree_co-section before-footer-section noto-serif-kr">
 			<div class="container">
 				<div class="row mb-5">
-					<form class="col-md-12" method="post">
-						<div class="site-blocks-table">
-							<table class="table">
-								<thead>
-									<tr>
-										<th class="product-thumbnail">Image</th>
-										<th class="product-name">Product</th>
-										<th class="product-price">Price</th>
-										<th class="product-quantity">Quantity</th>
-										<th class="product-total">Total</th>
-										<th class="product-remove">Remove</th>
-									</tr>
-								</thead>
-								<tbody th:each="item : ${exhibitionDetail}">
-									<tr>
-										<td class="product-thumbnail">
-											<img th:src="@{item.imageUrl}" alt="Exhibition Image" class="exhibition-image">
-										</td>
-										<td class="product-name">
-											<h2 class="h5 text-black" th:text="${item.title}"></h2>
-										</td>
-										<td>10,000원</td>
-										<td>
-											<div
-												class="input-group mb-3 d-flex align-items-center quantity-container"
-												style="max-width: 120px;">
-												<div class="input-group-prepend">
-													<button class="btn btn-outline-black decrease"
-														type="button">&minus;</button>
-												</div>
-												<input type="text"
-													class="form-control text-center quantity-amount" value="1"
-													placeholder="" aria-label="Example text with button addon"
-													aria-describedby="button-addon1">
-												<div class="input-group-append">
-													<button class="btn btn-outline-black increase"
-														type="button">&plus;</button>
-												</div>
+					<div class="site-blocks-table" th:each="item : ${cartList}">
+						<table class="table">
+							<thead>
+								<tr>
+									<th class="product-thumbnail">Image</th>
+									<th class="product-name">Product</th>
+									<th class="product-name">Reservation Date</th>
+									<th class="product-price">Price</th>
+									<th class="product-quantity">Quantity</th>
+									<th class="product-total">Total</th>
+									<th class="product-remove">Remove</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td class="product-thumbnail">
+										<img th:src="${item.exhibitionImage}" alt="Exhibition Image" class="exhibition-image" style="width: inherit;">
+									</td>
+									<td class="product-name">
+										<h2 class="h5 text-black" th:text="${item.exhibitionTitle}"></h2>
+									</td>
+									<td th:text="${item.reservDate}"></td>
+									<td>10,000원</td>
+									<td>
+										<div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px;">
+											<div class="input-group-prepend">
+												<button class="btn btn-outline-black decrease" type="button">&minus;</button>
 											</div>
-
-										</td>
-										<td>$49.00</td>
-										<td><a href="#" class="btn btn-black btn-sm">X</a></td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</form>
-				</div>
-
-				<div class="row">
-					<div class="col-md-6">
-						<div class="row mb-5">
-							<div class="col-md-6 mb-3 mb-md-0">
-								<button class="btn btn-black btn-sm btn-block">새로고침</button>
-							</div>
-							<div class="col-md-6">
-								<button class="btn btn-outline-black btn-sm btn-block">쇼핑 계속하기</button>
-							</div>
-						</div>
+											<input type="text" class="form-control text-center quantity-amount" name="orderCnt" th:value="${item.orderCnt}" readonly>
+											<div class="input-group-append">
+												<button class="btn btn-outline-black increase" type="button">&plus;</button>
+											</div>
+										</div>
+									</td>
+									<td class="product-total" th:text="${#numbers.formatInteger(10000 * item.orderCnt, 0, 'COMMA')} + '원'"></td>
+									<td><button class="btn btn-black btn-sm remove-item" onclick="removeCart()">X</button></td>
+								</tr>
+							</tbody>
+						</table>
+						<input type="date" name="reservDate" th:value="${item.reservDate}" style="display:none;"/>
+						<input type="hidden" name="localId" th:value="${item.localId}">
+						<input type="hidden" name="memberId" th:value="${item.memberId}">
+						<input type="hidden" name="memberNm" th:value="${memberNm}"/>
+						<input type="hidden" name="restCnt" th:value="${restCntMap[item.localId]}"/>
+						<input type="hidden" name="totalCnt" th:value="${totalCntMap[item.localId]}"/>
 					</div>
-					<div class="col-md-6 pl-5">
-						<div class="row justify-content-end">
-							<div class="col-md-7">
-								<div class="row">
-									<div class="col-md-12 text-right border-bottom mb-5">
-										<h3 class="text-black h4 text-uppercase">Cart Totals</h3>
-									</div>
-								</div>
-								<div class="row mb-3">
-									<div class="col-md-6">
-										<span class="text-black">Subtotal</span>
-									</div>
-									<div class="col-md-6 text-right">
-										<strong class="text-black">$230.00</strong>
-									</div>
-								</div>
-								<div class="row mb-5">
-									<div class="col-md-6">
-										<span class="text-black">Total</span>
-									</div>
-									<div class="col-md-6 text-right">
-										<strong class="text-black">$230.00</strong>
-									</div>
-								</div>
-
-								<div class="row">
-									<div class="col-md-12">
-										<button class="btn btn-black btn-lg py-3 btn-block"
-											onclick="window.location='checkout.html'">결제하기</button>
-									</div>
-								</div>
-							</div>
-						</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12 text-right" style="display: flex; justify-content: space-between;">
+					<h3 class="text-black h4 text-uppercase">Total Quantity: <span id="totalCnt">0매</span></h3>
+						<h3 class="text-black h4 text-uppercase">Total: <span id="totalPrice">0원</span></h3>
+						<button type="submit" class="btn btn-black btn-lg py-3 btn-block" id="payment">결제하기</button>
 					</div>
 				</div>
 			</div>
 		</div>
+		<!-- 결제 확인 모달 -->
+	<div id="paymentModal" class="modal">
+	    <div class="modal-content noto-serif-kr">
+	        <span class="close" style="text-align:right; margin-right: 15px; color: #fff;">&times;</span>
+	        <h2 style="text-align: center; color: black;">결제 정보</h2>
+	        <div id="modalExhibitions"></div>
+	        <br/>
+	        <p><strong>총 가격</strong> <span id="modalAllTotalPrice"></span></p>
+	        <p><strong>총 개수</strong> <span id="modalAllTotalCnt"></span></p>
+	        <div class="button-container">
+		        <button id="confirmPayment">예매하기</button>
+		        <button id="cancelPayment">취소</button>
+	        </div>
+	    </div>
+	</div>
 	</div>
 
 </body>

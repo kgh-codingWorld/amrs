@@ -37,6 +37,7 @@ public class PortOneAuthService {
         if (accessToken == null || isTokenExpired()) {
             fetchNewAccessToken();
         }
+        System.out.println("getValidAccessToken@@@#####");
         return accessToken;
     }
 
