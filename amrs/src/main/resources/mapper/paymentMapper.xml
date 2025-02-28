@@ -17,30 +17,31 @@
 </resultMap>
 
 <!-- insertPayment: 새 결제 정보 삽입, TOTAL_CNT는 처음 설정된 값으로 유지 -->
-<insert id="insertPayment" parameterType="PaymentDTO">
-	INSERT INTO PAYMENT (
-		LOCAL_ID,
-		MEMBER_ID,
-		PRICE,
-		TOTAL_CNT,
-		ORDER_CNT,
-		REST_CNT,
-		EXHIBITION_TITLE,
-		EXHIBITION_IMAGE,
-		RESERV_DATE
-	)
-	VALUES (
-		#{localId},
-		#{memberId},
-		#{price},
-		#{totalCnt},
-		#{orderCnt},
-		#{totalCnt} - #{orderCnt},
-		#{exhibitionTitle},
-		#{exhibitionImage},
-		#{reservDate}
-	);
+<insert id="insertPayment" parameterType="PaymentDTO" useGeneratedKeys="true" keyProperty="paymentId">
+    INSERT INTO PAYMENT (
+        LOCAL_ID,
+        MEMBER_ID,
+        PRICE,
+        TOTAL_CNT,
+        ORDER_CNT,
+        REST_CNT,
+        EXHIBITION_TITLE,
+        EXHIBITION_IMAGE,
+        RESERV_DATE
+    ) 
+    VALUES (
+        #{localId},
+        #{memberId},
+        #{price},
+        #{totalCnt},
+        #{orderCnt},
+        #{totalCnt} - #{orderCnt},
+        #{exhibitionTitle},
+        #{exhibitionImage},
+        #{reservDate}
+    );
 </insert>
+
 
 <select id="selectTotalTicketCnt" resultType="int" parameterType="String">
 	SELECT TOTAL_CNT
@@ -69,4 +70,5 @@
 	WHERE PAYMENT_ID = #{paymentId}
 	LIMIT 1
 </select>
+
 </mapper>

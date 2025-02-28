@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
+		const today = new Date();
 
 		// 초기 달력 생성
         function renderCalendar() {
@@ -31,7 +32,16 @@ document.addEventListener("DOMContentLoaded", function() {
                 const dayCell = document.createElement("div");
                 dayCell.className = "day";
                 dayCell.innerText = day;
-                dayCell.onclick = () => selectDate(day); // 날짜 클릭 이벤트 추가
+                
+                const dateObj = new Date(currentYear, currentMonth, day);
+                
+                // 오늘보다 과거 날짜인 경우 클릭 비활성화
+	            if (dateObj < today.setHours(0, 0, 0, 0)) {
+	                dayCell.classList.add("disabled"); // 비활성화 스타일 적용
+	            } else {
+	                dayCell.onclick = () => selectDate(day); // 날짜 클릭 이벤트 추가
+	            }
+                
                 calendar.appendChild(dayCell);
             }
         }

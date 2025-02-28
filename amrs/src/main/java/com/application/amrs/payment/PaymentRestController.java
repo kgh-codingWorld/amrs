@@ -2,6 +2,7 @@ package com.application.amrs.payment;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,70 +57,51 @@ public class PaymentRestController {
         return processPaymentVerificationResponse(response);
     }
 	
+	@Transactional
 	@PostMapping("/doPayment")
-	public ResponseEntity<?> doPayment(@RequestBody Object request) {
-		try {
-			List<PaymentDTO> payments = new ArrayList<>();
-			
-			if (request instanceof List) {
-	            // JSON 배열인 경우
-	            payments = (List<PaymentDTO>) request;
-	        } else if (request instanceof Map) {
-	            // JSON 객체(단일 결제)인 경우
-	            PaymentDTO singlePayment = new ObjectMapper().convertValue(request, PaymentDTO.class);
-	            payments.add(singlePayment);
-	        } else {
-	            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-	                .body(Collections.singletonMap("message", "잘못된 요청 형식입니다."));
-	        }
-			
-			 List<Map<String, Object>> responses = new ArrayList<>();
-			 
-			 StopWatch stopWatch = new StopWatch();
+	public ResponseEntity<?> doPayment(@RequestBody List<PaymentDTO> payments) {
+		Map<String, Object> response = new HashMap<>();
+		
+	    try {
+	        List<Map<String, Object>> responses = new ArrayList<>();
+	        StopWatch stopWatch = new StopWatch();
 	        stopWatch.start("doPayment");
 
 	        for (PaymentDTO paymentDTO : payments) {
+	            // 남은 티켓 확인
 	            int restCnt = paymentService.getTicketRestCnt(paymentDTO.getLocalId());
 
-	            if (restCnt <= 0) {
-	                responses.add(Map.of(
-	                    "message", "잔여 티켓이 없습니다.",
-	                    "localId", paymentDTO.getLocalId(),
-	                    "status", "failed"
-	                ));
-	                continue; // 다음 결제 요청 처리
+	            if (restCnt < paymentDTO.getOrderCnt()) {
+	                throw new RuntimeException("잔여 티켓이 부족하여 결제를 진행할 수 없습니다.");
 	            }
+	        }
 
-	            if (paymentDTO.getOrderCnt() > restCnt) {
-	                responses.add(Map.of(
-	                    "message", "잔여 티켓보다 많은 수량을 예매할 수 없습니다.",
-	                    "localId", paymentDTO.getLocalId(),
-	                    "status", "failed"
-	                ));
-	                continue;
-	            }
-
+	        for (PaymentDTO paymentDTO : payments) {
+	            // 결제 정보 저장
 	            int paymentId = paymentService.registerPayment(paymentDTO);
-	            System.out.println(paymentId);
-
 	            responses.add(Map.of(
-	                "message", "결제 성공",
-	                "paymentId", paymentId,
-	                "localId", paymentDTO.getLocalId(),
-	                "status", "success"
+	                "message", "결제 완료",
+	                "status", "success",
+	                "paymentId", paymentId
 	            ));
 	        }
 
 	        stopWatch.stop();
 	        System.out.println("실행 시간: " + stopWatch.getTotalTimeMillis() + " ms");
+	        
+	        response.put("status", "success");
+	        response.put("message", "결제 완료");
+	        response.put("data", responses);
 
 	        return ResponseEntity.ok(responses);
-			
-		} catch(Exception e) {
-			e.printStackTrace();
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "결제 처리 중 오류 발생"));
-		}
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	            .body(Collections.singletonMap("message", "결제 처리 중 오류 발생"));
+	    }
 	}
+
+
 	
 	private HttpHeaders createAuthHeaders(String accessToken) {
         HttpHeaders headers = new HttpHeaders();

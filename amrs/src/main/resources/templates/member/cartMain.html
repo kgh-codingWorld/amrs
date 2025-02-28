@@ -246,51 +246,59 @@
             buyer_name: userName
         }, function(rsp) {
             if (rsp.success) {
-                fetch("/payment/api/verifyPayment", {
+                $.ajax({
+                    url: "/payment/api/verifyPayment",
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ imp_uid: rsp.imp_uid })
-                })
-                .then(response => response.text())
-                .then(result => {
-                        exhibitions.forEach(item => {
-                            $.ajax({
-                                url: '/payment/api/doPayment',
-                                method: 'POST',
-                                contentType: 'application/json',
-                                data: JSON.stringify({
-                                    merchant_uid: rsp.merchant_uid,
-                                    amount: rsp.paid_amount,
-                                    reservDate: item.reservDate,
-                                    memberId: userEmail,
-                                    orderCnt: item.orderCnt,
-                                    price: item.eachTotalPrice,
-                                    exhibitionTitle: item.exhibitionTitle,
-                                    exhibitionImage: item.exhibitionImage,
-                                    localId: item.localId,
-                                    totalCnt: item.totalCnt,
-                                    restCnt: item.restCnt
-                                }),
-                                success: function(response) {
-                                    console.log("결제 저장 성공:", response);
-                                },
-                                error: function(err) {
-                                    console.error("결제 저장 실패:", err);
-                                }
-                            });
-                        });
+                    contentType: "application/json",
+                    data: JSON.stringify({ imp_uid: rsp.imp_uid }),
+                    success: function(result) {
+                        console.log("결제 검증 성공:", result);
+                        alert("결제 검증 성공");
 
-                        alert("결제가 완료되었습니다!");
-                        location.href = "/member/mypageMain";
-                })
-                .catch(error => {
-                    alert("결제 검증 중 오류 발생: " + error);
+                        // 검증 성공 후 결제 데이터 저장
+                        $.ajax({
+                            url: "/payment/api/doPayment",
+                            method: "POST",
+                            contentType: "application/json",
+                            data: JSON.stringify(exhibitions.map(item => ({
+                                merchant_uid: rsp.merchant_uid,
+                                amount: rsp.paid_amount,
+                                reservDate: item.reservDate,
+                                memberId: userEmail,
+                                orderCnt: item.orderCnt,
+                                price: item.eachTotalPrice,
+                                exhibitionTitle: item.exhibitionTitle,
+                                exhibitionImage: item.exhibitionImage,
+                                localId: item.localId,
+                                totalCnt: item.totalCnt,
+                                restCnt: item.restCnt
+                            }))),
+                            success: function(response) {
+                                console.log("결제 저장 성공:", response);
+                                if (response.status === "success") {
+                                    alert("결제가 완료되었습니다!");
+                                    location.href = "/member/mypageMain";
+                                } else {
+                                    alert("결제 완료 후 데이터 저장에 실패하였습니다: " + response.message);
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error("결제 저장 실패:", error);
+                                alert("결제 저장 중 오류 발생: " + (xhr.responseJSON ? xhr.responseJSON.message : '서버 오류 발생'));
+                            }
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("결제 검증 실패:", error);
+                        alert("결제 검증 중 오류 발생: " + (xhr.responseJSON ? xhr.responseJSON.message : '서버 오류 발생'));
+                    }
                 });
             } else {
                 alert(`결제 실패: ${rsp.error_msg}`);
             }
         });
     }
+
 
 	function updateOrderCnt(button) {
 		let row = button.closest("tr");
