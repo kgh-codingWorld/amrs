@@ -10,4 +10,5 @@ public interface CartDAO {
 
 	public List<Map<String, Object>> selectCartList();
 	public void insertCart(CartDTO cartDTO);
+	public int deleteCart(int cartId);
 }

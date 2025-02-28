@@ -47,4 +47,9 @@
 	)
 </insert>
 
+<delete id="deleteCart" parameterType="int">
+    DELETE FROM CART 
+    WHERE CART_ID = #{cartId}
+</delete>
+
 </mapper>

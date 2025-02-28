@@ -22,4 +22,10 @@ public class CartServiceImpl implements CartService{
 		cartDAO.insertCart(cartDTO);
 	}
 
+	@Override
+	public boolean removeCart(int cartId) {
+		int deletedRows = cartDAO.deleteCart(cartId);
+	    return deletedRows > 0;
+	}
+
 }

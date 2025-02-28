@@ -166,6 +166,35 @@
             
             kakaoPay(userEmail, userName, exhibitions, totalPrice, totalCnt);
         });
+        
+        
+        $("#removeBtn").on("click", function() {
+        	let row = $(this).closest("tr");
+        	let cartId = $("input[name='cartId']").val();
+        	
+        	if (!cartId) {
+                alert("장바구니 항목을 찾을 수 없습니다.");
+                return;
+            }
+        	
+        	$.ajax({
+        		url: "/cart/api/removeCart/" + cartId,
+        		type: "post",
+        		success : function(response) {
+        			console.log("장바구니 삭제", response);
+        			
+        			row.fadeOut(300, function() {
+                        $(this).remove();
+                        updateTotal(); // ✅ 합계 업데이트
+                        updateTotalCnt();
+                    });
+        		},
+        		error: function(xhr, status, error) {
+                    console.error("장바구니 삭제 실패:", error);
+                    alert("장바구니 삭제에 실패했습니다. 다시 시도해주세요.");
+                }
+        	});
+        });
     });
 
     function updateModalInfo() {
@@ -275,11 +304,11 @@
                             }))),
                             success: function(response) {
                                 console.log("결제 저장 성공:", response);
-                                if (response.status === "success") {
+                                if (Array.isArray(response) && response.length > 0 && response[0].status === "success") {
                                     alert("결제가 완료되었습니다!");
                                     location.href = "/member/mypageMain";
                                 } else {
-                                    alert("결제 완료 후 데이터 저장에 실패하였습니다: " + response.message);
+                                    alert("결제 완료 후 데이터 저장에 실패하였습니다: " + (xhr.responseJSON ? xhr.responseJSON.message : '서버 오류 발생'));
                                 }
                             },
                             error: function(xhr, status, error) {
@@ -335,6 +364,7 @@
 		});
 		$("#totalCnt").text(totalCnt.toLocaleString() + "매");
 	}
+	
 </script>
 </head>
 
@@ -395,10 +425,11 @@
 										</div>
 									</td>
 									<td class="product-total" th:text="${#numbers.formatInteger(10000 * item.orderCnt, 0, 'COMMA')} + '원'"></td>
-									<td><button class="btn btn-black btn-sm remove-item" onclick="removeCart()">X</button></td>
+									<td><button class="btn btn-black btn-sm remove-item" id="removeBtn">X</button></td>
 								</tr>
 							</tbody>
 						</table>
+						<input type="hidden" name="cartId" th:value="${item.cartId}"/>
 						<input type="date" name="reservDate" th:value="${item.reservDate}" style="display:none;"/>
 						<input type="hidden" name="localId" th:value="${item.localId}">
 						<input type="hidden" name="memberId" th:value="${item.memberId}">
