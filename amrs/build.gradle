@@ -35,6 +35,8 @@ dependencies {
     implementation 'org.json:json:20210307'												// REST API access token용
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.0'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.0'
     implementation group: 'org.springframework.boot', 									// 이메일 인증용
     name: 'spring-boot-starter-mail', 
     version: '3.0.5'

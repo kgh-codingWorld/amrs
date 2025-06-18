@@ -15,6 +15,8 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Configuration
 @EnableCaching // 캐싱 적용 위해 추가
 public class CacheConfig {
@@ -32,14 +34,22 @@ public class CacheConfig {
 		return new LettuceConnectionFactory(host, port); // 기본 포트
 	}
 	
+	@Bean
+	public ObjectMapper redisObjectMapper() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		return objectMapper;
+	}
+	
 	// Redis 캐시 설정
     @Bean
-    public RedisCacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
-        RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
+    public RedisCacheManager cacheManager(RedisConnectionFactory redisConnectionFactory, ObjectMapper redisObjectMapper) {
+    	GenericJackson2JsonRedisSerializer seralizer = new GenericJackson2JsonRedisSerializer(redisObjectMapper);
+        
+    	RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
         		.entryTtl(Duration.ofMinutes(10)) // 캐시 만료 시간: 10분
                 .disableCachingNullValues()
                 .serializeValuesWith(org.springframework.data.redis.serializer.RedisSerializationContext
-                        .SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+                        .SerializationPair.fromSerializer(seralizer));
 
         return RedisCacheManager.builder(redisConnectionFactory)
                 .cacheDefaults(cacheConfig)
@@ -47,13 +57,15 @@ public class CacheConfig {
     }
     
     @Bean
-    public RedisTemplate<String,Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+    public RedisTemplate<String,Object> redisTemplate(RedisConnectionFactory redisConnectionFactory, ObjectMapper redisObjectMapper) {
+    	GenericJackson2JsonRedisSerializer seralizer = new GenericJackson2JsonRedisSerializer(redisObjectMapper);
+    	
     	RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         
         // 키와 값을 직렬화 (JSON 방식)
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        redisTemplate.setValueSerializer(seralizer);
 
         return redisTemplate;
     }
