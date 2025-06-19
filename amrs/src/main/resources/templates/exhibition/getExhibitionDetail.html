@@ -517,11 +517,6 @@
         });
         
 	    function registerCart() {
-	    	if (!memberId){
-	    		alert("로그인이 필요한 기능입니다.");
-	    		window.location.href = 'member/login';
-	    	}
-	    	
 	    	const reservDate = $("input[name='reservDate']").val();
 	        const localId = $("input[name='localId']").val();
 	        const memberId = $("input[name='memberId']").val();
@@ -531,6 +526,10 @@
 	        const exhibitionTitle = $("input[name='exhibitionTitle']").val();
 	        const exhibitionImage = $("input[name='exhibitionImage']").val();
 	        
+	    	if (!memberId){
+	    		alert("로그인이 필요한 기능입니다.");
+	    		window.location.href = '/member/login';
+	    	}
 	        $.ajax({
 	        	url: "/cart/api/registerCart",
 	        	type: "post",
