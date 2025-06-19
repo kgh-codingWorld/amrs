@@ -517,6 +517,11 @@
         });
         
 	    function registerCart() {
+	    	if (!memberId){
+	    		alert("로그인이 필요한 기능입니다.");
+	    		window.location.href = 'member/login';
+	    	}
+	    	
 	    	const reservDate = $("input[name='reservDate']").val();
 	        const localId = $("input[name='localId']").val();
 	        const memberId = $("input[name='memberId']").val();
