@@ -612,8 +612,8 @@
 	            
 		            <input type="date" name="reservDate" style="display:none;"/>
 		            <input type="hidden" name="localId" th:value="${exhibitionDetail != null ? exhibitionDetail.localId : ''}" />
-		            <input type="hidden" name="memberId" th:value="${memberDTO.memberId}"/>
-		            <input type="hidden" name="memberNm" th:value="${memberDTO.memberNm}"/>
+		            <input type="hidden" name="memberId" th:value="${memberDTO != null ? memberDTO.memberId : ''}"/>
+		            <input type="hidden" name="memberNm" th:value="${memberDTO != null ? memberDTO.memberNm : ''}"/>
 		            <input type="hidden" name="totalCnt" th:value="${totalCnt}">
 		            <input type="hidden" name="price" value="10000">
 		            
