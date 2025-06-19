@@ -134,27 +134,31 @@ public class ExhibitionService {
     @Cacheable(value = "exhibitionCache", key = "'exhibitions'", unless = "#result.isEmpty()")
     public List<ExhibitionItem> fetchExhibitionData() {
     	
-    	String cachedData = (String) redisTemplate.opsForValue().get("exhibitionCache");
-    	
-    	if(cachedData != null) {
-    		System.out.println("redis에서 데이터 로드");
-    		JSONArray jsonItems = new JSONArray(cachedData);
-            return parseJsonToExhibitions(jsonItems);
-    	}
+//    	String cachedData = (String) redisTemplate.opsForValue().get("exhibitionCache");
+//    	
+//    	if(cachedData != null) {
+//    		System.out.println("redis에서 데이터 로드");
+//    		JSONArray jsonItems = new JSONArray(cachedData);
+//            return parseJsonToExhibitions(jsonItems);
+//    	}
     	System.out.println("Redis 캐시 없음 → API 호출 진행");
     	
         try {
             ResponseEntity<String> response = restTemplate.getForEntity(apiUrl, String.class);
             JSONObject jsonObject = new JSONObject(response.getBody());
-            JSONArray jsonItems = jsonObject.getJSONObject("response").getJSONObject("body").getJSONObject("items").getJSONArray("item");
+            JSONArray jsonItems = jsonObject.getJSONObject("response")
+            								.getJSONObject("body")
+            								.getJSONObject("items")
+            								.getJSONArray("item");
 
-            List<ExhibitionItem> exhibitionList = parseJsonToExhibitions(jsonItems);
+            //List<ExhibitionItem> exhibitionList = parseJsonToExhibitions(jsonItems);
             
-            String jsonString = jsonItems.toString();
-            redisTemplate.opsForValue().set("exhibitionCache", jsonString, Duration.ofMinutes(10));
-            System.out.println("redis 캐시 저장 완료");
-
-            return exhibitionList;
+//            String jsonString = jsonItems.toString();
+//            redisTemplate.opsForValue().set("exhibitionCache", jsonString, Duration.ofMinutes(10));
+//            System.out.println("redis 캐시 저장 완료");
+//
+//            return exhibitionList;
+            return parseJsonToExhibitions(jsonItems);
             
         } catch (HttpStatusCodeException e) {
         	 System.err.println("🚨 API 호출 중 오류 발생: " + e.getMessage());
