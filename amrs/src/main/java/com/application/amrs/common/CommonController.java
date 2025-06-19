@@ -210,6 +210,7 @@ public class CommonController {
 	// 전시 상세보기 페이지로 이동
 	@GetMapping("/exhibition/exhibitionDetail/{localId}")
 	public String exhibitionDetail(@PathVariable("localId") String localId, HttpServletRequest request, Model model) {
+		String memberId = getSessionMemberId(request);
 
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start("load exhibitionDetail");
