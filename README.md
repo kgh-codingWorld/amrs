@@ -1,8 +1,7 @@
 
 # AMRS — Art Museum Reservation System (Spring Boot)
 
-> Spring Boot 3.3 + Java 17 + MyBatis + Thymeleaf 기반 전시/예약 웹 애플리케이션.  
-> **목표**: 신입 백엔드 포트폴리오에서 요구되는 설계·구현·배포 역량을 한 번에 보여주는 완성형 예제.
+> Spring Boot 3.3 + Java 17 + MyBatis + Thymeleaf 기반 전시/예약 웹 애플리케이션
 
 ---
 
