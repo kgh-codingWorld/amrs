@@ -1,11 +1,20 @@
 
-# AMRS — Art Museum Reservation System (Spring Boot)
+# AMRS(Art Museum Reservation System)
+Spring Boot 3.3 + Java 17 + MyBatis + Thymeleaf 기반 전시 예매 및 결제 웹 애플리케이션
 
-> Spring Boot 3.3 + Java 17 + MyBatis + Thymeleaf 기반 전시/예약 웹 애플리케이션
+## 프로젝트 목표
+기존의 미술 전시 예매 시장은 각 미술관 및 플랫폼별로 파편화되어 있어, 사용자가 전시 정보를 통합하여 조회하고 예매하는 데 피로도가 높았다.
+본 프로젝트는 전국의 미술 전시 정보를 한곳에 모아 신속하게 조회하고, 안전한 단일 결제 파이프라인을 통해 예매할 수 있는 통합 예약 시스템 구축을 목표로 한다.
+- 파편화된 전시 정보 통합: 여러 플랫폼에 흩어진 전시 데이터를 통합하고 캐싱 메커니즘을 적용하여 안정적인 조회 환경 제공
+- 안전하고 검증된 결제 환경 구축: 외부 PG API 연동 시 백엔드 단의 더블 체크 검증 로직을 도입하여 결제 데이터의 신뢰성 확보
+- 사용자 참여형 커뮤니티 활성화: 전시 예매에 그치지 않고 댓글/대댓글, 리뷰, 좋아요 등 인터랙티브한 소통 기능을 유기적으로 연결
+### 기대효과
+> 결제 데이터 무결성 100% 달성: 클라이언트 변조 요청을 차단하는 백엔드 결제 검증 API 구현으로 부정 결제 및 오결제 원천 차단
+> 사용자 편의성 향상: 회원가입부터 장바구니, 결제, 리뷰 작성까지 이어지는 단일 엔드투엔드 서비스 경험 제공
+> 시스템 안정성 확보: 전역 예외처리 및 SQL 로깅 인프라(Log4JDBC) 구축으로 운영 중 발생하는 에러 추적 리소스 최소
 
----
 
-## 0) TL;DR
+## TL;DR
 - **Stack**: Spring Boot 3.3, Java 17, Gradle, MyBatis, Thymeleaf, Lombok, Validation, Log4JDBC, JUnit5
 - **DB**: MySQL 8.x (DDL 제공: `src/main/resources/mapper/amrs_ddl.sql`)
 - **문서/화면**: `/` 메인, Thymeleaf 템플릿 제공(`src/main/resources/templates/*`)
@@ -19,9 +28,8 @@
   - 리뷰: `/review`(MVC), `/review/api`(REST)  
   - 결제: `/payment/api`
 
----
 
-## 1) 폴더 구조
+## 폴더 구조
 ```
 amrs/
  ├─ build.gradle
@@ -48,9 +56,8 @@ amrs/
     └─ test/java/com/application/amrs/AmrsApplicationTests.java
 ```
 
----
 
-## 2) 의존성(요지)
+## 의존성
 - Spring Boot 3.3 (starter-web, validation, thymeleaf 등)
 - **MyBatis** (`org.mybatis.spring.boot`)
 - **Lombok** (compileOnly/annotationProcessor)
@@ -60,9 +67,8 @@ amrs/
 
 > `build.gradle`가 일부 주석/요약으로 정리되어 있으니 의존성 추가가 필요하면 `starter-web`, `thymeleaf`, `mybatis-spring-boot-starter` 확인.
 
----
 
-## 3) 데이터베이스
+## 데이터베이스
 - MySQL 8.x 사용. 초기 스키마는 `src/main/resources/mapper/amrs_ddl.sql` 참고.
 - 로컬 예시(DB·계정은 임의):
   ```properties
@@ -79,9 +85,8 @@ amrs/
 > 실제 저장소의 `application.properties`에는 실서버 RDS URL/계정, Gmail SMTP 비밀번호가 포함되어 있었음.  
 > **즉시 삭제하고** 아래 보안 가이드를 따라 환경변수로 분리하세요.
 
----
 
-## 4) 메일 인증(설정 예시)
+## 메일 인증(설정 예시)
 ```properties
 # application-mail.properties (예시)
 spring.mail.host=smtp.gmail.com
@@ -95,9 +100,8 @@ auth-code-expiration-millis=1800000
 ```
 - 실행 시: `MAIL_USER`, `MAIL_PASS`는 OS 환경변수로 주입.
 
----
 
-## 5) 빌드 & 실행
+## 빌드 & 실행
 ### A. Gradle (로컬)
 ```bash
 # 0) JDK 17 설치 필수
@@ -130,9 +134,8 @@ ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar app.jar"]
 ```
 - Compose 사용 시 MySQL을 함께 기동하는 서비스를 추가하세요.
 
----
 
-## 6) 주요 기능 & 엔드포인트(코드 기반 요약)
+## 주요 기능 & 엔드포인트(코드 기반 요약)
 
 ### 전시 (Exhibition)
 - 클래스: `ExhibitionRestController` (`/api/exhibitions`)
@@ -185,24 +188,21 @@ ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar app.jar"]
 
 > *주의*: 실제 파라미터/응답 모델은 MyBatis 매퍼와 DTO를 참고해 문서화하세요.
 
----
 
-## 7) 템플릿/정적 리소스
+## 템플릿/정적 리소스
 - `src/main/resources/templates/**` — Thymeleaf 페이지 (main, member, community, exhibition, review 등)
 - `src/main/resources/static/**` — CSS(bootstrap), JS(jquery), 이미지
 
----
 
-## 8) 테스트
+## 테스트
 ```bash
 ./gradlew test
 ```
 - `AmrsApplicationTests` 기본 포함.  
 - 통합 테스트 시 Testcontainers(MySQL) 도입을 권장.
 
----
 
-## 9) 운영/로깅
+## 운영/로깅
 - Logback 설정: `src/main/resources/logback.xml`  
 - Log4JDBC 사용으로 SQL 로깅 가능
 - 전역 예외 처리: `GlobalControllerAdvice`
